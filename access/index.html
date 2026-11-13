@@ -5,25 +5,28 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Hybrid lab access · Windows Server Labs</title>
 <meta name="description" content="Hands-on Windows Server 2025 labs: hybrid management with Azure Arc, and Windows Server security.">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css">
 <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="../assets/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
 <meta name="robots" content="noindex, nofollow">
 </head>
-<body class="track-access">
-<a class="skip" href="#content">Skip to content</a>
-<header class="top">
-  <a class="brand" href="../index.html"><img class="brand-mark" src="../assets/favicon.svg" alt="" width="22" height="22">Windows Server Labs</a>
-  <nav class="tracks" aria-label="Tracks"><a href="../hybrid/index.html">Hybrid</a><a href="../security/index.html">Security</a><a href="index.html" aria-current="true">Lab access</a></nav>
+<body class="t-access">
+<a class="skip" href="#content">Skip to main content</a>
+<header class="masthead">
+  <a class="brand" href="../index.html"><img src="../assets/favicon.svg" alt="" width="24" height="24"><span>Windows Server Labs</span></a>
+  <span class="divider" aria-hidden="true"></span>
+  <nav class="mainnav" aria-label="Main"><a href="../hybrid/index.html">Hybrid</a><a href="../security/index.html">Security</a><a href="index.html" aria-current="true">Lab access</a></nav>
+  <a class="gh" href="https://github.com/medyabi" rel="noopener">GitHub</a>
 </header>
-<div class="layout plain">
+<div class="doc no-toc">
 
-<main id="content" class="prose">
+<main id="content" class="article">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../index.html">Labs</a></li></ol></nav>
+<article class="prose">
 
 <p class="eyebrow">MTS team · Windows Server 2025 · Azure Arc</p>
-<h1>Hybrid lab access</h1>
+<h1>Hybrid lab access</h1><p class="meta"><span>Team guide</span><span>2 min read</span></p>
 <p class="lede">Each engineer has a personal Windows Server 2025 VM for the hybrid labs. You reach it from anywhere over HTTPS, through our Remote Desktop Gateway at <code>labs.ebigpictures.com</code>. Your password arrives privately from Mohamed, never on this page.</p>
 
 <h2>Connect in four steps</h2>
@@ -38,11 +41,11 @@
 <p>Each user name reaches one VM only. Download only your own file.</p>
 <div class="table-wrap"><table class="access-table">
 <thead><tr><th>User</th><th>Lab VM</th><th>Address</th><th>Connection file</th></tr></thead>
-<tbody><tr><td><code>mts01</code></td><td>WS25-VM01</td><td><code>192.168.100.90</code></td><td><a class="button small" href="rdp/mts01-WS25-VM01.rdp" download>Download mts01.rdp</a></td></tr><tr><td><code>mts02</code></td><td>WS25-VM02</td><td><code>192.168.100.91</code></td><td><a class="button small" href="rdp/mts02-WS25-VM02.rdp" download>Download mts02.rdp</a></td></tr><tr><td><code>mts03</code></td><td>WS25-VM03</td><td><code>192.168.100.92</code></td><td><a class="button small" href="rdp/mts03-WS25-VM03.rdp" download>Download mts03.rdp</a></td></tr><tr><td><code>mts04</code></td><td>WS25-VM04</td><td><code>192.168.100.93</code></td><td><a class="button small" href="rdp/mts04-WS25-VM04.rdp" download>Download mts04.rdp</a></td></tr><tr><td><code>mts05</code></td><td>WS25-VM05</td><td><code>192.168.100.94</code></td><td><a class="button small" href="rdp/mts05-WS25-VM05.rdp" download>Download mts05.rdp</a></td></tr><tr><td><code>mts06</code></td><td>WS25-VM06</td><td><code>192.168.100.95</code></td><td><a class="button small" href="rdp/mts06-WS25-VM06.rdp" download>Download mts06.rdp</a></td></tr><tr><td><code>mts07</code></td><td>WS25-VM07</td><td><code>192.168.100.96</code></td><td><a class="button small" href="rdp/mts07-WS25-VM07.rdp" download>Download mts07.rdp</a></td></tr><tr><td><code>mts08</code></td><td>WS25-VM08</td><td><code>192.168.100.97</code></td><td><a class="button small" href="rdp/mts08-WS25-VM08.rdp" download>Download mts08.rdp</a></td></tr></tbody>
+<tbody><tr><td><code>mts01</code></td><td>WS25-VM01</td><td><code>192.168.100.90</code></td><td><a class="btn primary small" href="rdp/mts01-WS25-VM01.rdp" download>Download mts01.rdp</a></td></tr><tr><td><code>mts02</code></td><td>WS25-VM02</td><td><code>192.168.100.91</code></td><td><a class="btn primary small" href="rdp/mts02-WS25-VM02.rdp" download>Download mts02.rdp</a></td></tr><tr><td><code>mts03</code></td><td>WS25-VM03</td><td><code>192.168.100.92</code></td><td><a class="btn primary small" href="rdp/mts03-WS25-VM03.rdp" download>Download mts03.rdp</a></td></tr><tr><td><code>mts04</code></td><td>WS25-VM04</td><td><code>192.168.100.93</code></td><td><a class="btn primary small" href="rdp/mts04-WS25-VM04.rdp" download>Download mts04.rdp</a></td></tr><tr><td><code>mts05</code></td><td>WS25-VM05</td><td><code>192.168.100.94</code></td><td><a class="btn primary small" href="rdp/mts05-WS25-VM05.rdp" download>Download mts05.rdp</a></td></tr><tr><td><code>mts06</code></td><td>WS25-VM06</td><td><code>192.168.100.95</code></td><td><a class="btn primary small" href="rdp/mts06-WS25-VM06.rdp" download>Download mts06.rdp</a></td></tr><tr><td><code>mts07</code></td><td>WS25-VM07</td><td><code>192.168.100.96</code></td><td><a class="btn primary small" href="rdp/mts07-WS25-VM07.rdp" download>Download mts07.rdp</a></td></tr><tr><td><code>mts08</code></td><td>WS25-VM08</td><td><code>192.168.100.97</code></td><td><a class="btn primary small" href="rdp/mts08-WS25-VM08.rdp" download>Download mts08.rdp</a></td></tr></tbody>
 </table></div>
 
 <h2>About the security warning</h2>
-<blockquote><p><strong>"Unknown publisher" is expected.</strong> It appears because the connection file isn't digitally signed. The connection itself is encrypted over HTTPS to <code>labs.ebigpictures.com</code> with a trusted certificate. Check that the gateway server shown is <code>labs.ebigpictures.com</code>, then click Connect.</p></blockquote>
+<div class="alert note"><p class="alert-title">Note</p><p><strong>"Unknown publisher" is expected.</strong> It appears because the connection file isn't digitally signed. The connection itself is encrypted over HTTPS to <code>labs.ebigpictures.com</code> with a trusted certificate. Check that the gateway server shown is <code>labs.ebigpictures.com</code>, then click Connect.</p></div>
 
 <h2>The labs</h2>
 <p>Nine labs, about 8 hours in total. Do them in order. Each ends with customer talking points.</p>
@@ -57,10 +60,67 @@
 </dl>
 <p><em>Don't forward your password outside the team.</em></p>
 
-</main>
-</div>
-<footer class="foot"><p>By Mohamed Dyabi, Microsoft Certified Trainer · learn.ebigpictures.com</p>
-<p class="small">Lab environments only. Several labs change security settings, lock accounts or force recovery. Never run them on production systems.</p></footer>
+</article>
 
+</main>
+
+</div>
+<footer class="sitefoot">
+  <div class="foot-in">
+    <div><strong>Windows Server Labs</strong><p>Hands-on labs by Mohamed Dyabi, Microsoft Certified Trainer.</p></div>
+    <ul>
+      <li><a href="../hybrid/index.html">Hybrid track</a></li>
+      <li><a href="../security/index.html">Security track</a></li>
+      <li><a href="index.html">Lab access</a></li>
+      <li><a href="https://github.com/medyabi/windows-server2025-Hybrid-lab" rel="noopener">Hybrid labs on GitHub</a></li>
+      <li><a href="https://github.com/medyabi/windows-server-security-lab" rel="noopener">Security labs on GitHub</a></li>
+    </ul>
+  </div>
+  <p class="fine">Lab environments only: several labs change security settings, lock accounts or force recovery. Never run them on production systems. An independent site, not affiliated with Microsoft. © 2026 Mohamed Dyabi</p>
+</footer>
+<script>
+(function(){
+  // Table of contents: open on wide screens, collapsible on small ones
+  var toc = document.querySelector('details.toc');
+  if (toc) {
+    var mq = window.matchMedia('(min-width: 1024px)');
+    var sync = function(){ if (mq.matches) toc.open = true; };
+    sync(); if (mq.addEventListener) mq.addEventListener('change', sync);
+    var cur = toc.querySelector('[aria-current="page"]');
+    if (cur && cur.scrollIntoView && mq.matches) cur.scrollIntoView({block: 'center'});
+  }
+  // Filter by title
+  var f = document.getElementById('toc-filter');
+  if (f) f.addEventListener('input', function(){
+    var q = f.value.trim().toLowerCase();
+    document.querySelectorAll('.toc-list li').forEach(function(li){
+      var hit = !q || li.textContent.toLowerCase().indexOf(q) !== -1;
+      li.hidden = !hit;
+    });
+  });
+  // Copy buttons on code blocks
+  document.querySelectorAll('.codeblock').forEach(function(cb){
+    var btn = cb.querySelector('.copy'), code = cb.querySelector('code');
+    if (!btn || !code) return;
+    btn.addEventListener('click', function(){
+      navigator.clipboard.writeText(code.innerText).then(function(){
+        btn.textContent = 'Copied'; setTimeout(function(){ btn.textContent = 'Copy'; }, 1500);
+      }, function(){ btn.textContent = 'Select and copy'; });
+    });
+  });
+  // Highlight the current section in "In this article"
+  var links = document.querySelectorAll('.aside-toc a');
+  if (links.length && 'IntersectionObserver' in window) {
+    var map = {}; links.forEach(function(a){ map[a.getAttribute('href').slice(1)] = a; });
+    var obs = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if (e.isIntersecting) {
+        links.forEach(function(a){ a.classList.remove('on'); });
+        var a = map[e.target.id]; if (a) a.classList.add('on');
+      }});
+    }, {rootMargin: '0px 0px -75% 0px'});
+    Object.keys(map).forEach(function(id){ var h = document.getElementById(id); if (h) obs.observe(h); });
+  }
+})();
+</script>
 </body>
 </html>

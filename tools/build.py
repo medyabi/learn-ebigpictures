@@ -125,15 +125,27 @@ def rewrite_url(url, repo, src_rel, out_rel, is_img=False):
     return new + ("#" + frag if frag else "")
 
 
-md = markdown.Markdown(extensions=["tables", "fenced_code", "sane_lists", "toc"],
-                       extension_configs={"toc": {"permalink": False}})
+md = markdown.Markdown(extensions=["tables", "pymdownx.superfences", "pymdownx.highlight", "sane_lists", "toc"],
+                       extension_configs={"toc": {"permalink": False},
+                                          "pymdownx.highlight": {"use_pygments": False}})
 
 
 def render_md(repo, src_rel, out_rel):
     with open(os.path.join(ROOTS[repo], src_rel), encoding="utf-8") as fh:
         text = fh.read()
+    # a closing code fence directly followed by text breaks lists: add a blank line
+    out_lines, in_fence = [], False
+    lines = text.split("\n")
+    for i, line in enumerate(lines):
+        out_lines.append(line)
+        if re.match(r"^\s*```", line):
+            in_fence = not in_fence
+            if not in_fence and i + 1 < len(lines) and lines[i + 1].strip():
+                out_lines.append("")
+    text = "\n".join(out_lines)
     md.reset()
     body = md.convert(text)
+    body = re.sub(r'<pre class="highlight">', '<pre>', body)
     # links and images
     body = re.sub(r'href="([^"]+)"', lambda m: 'href="%s"' % rewrite_url(m.group(1), repo, src_rel, out_rel), body)
     body = re.sub(r'src="([^"]+)"', lambda m: 'src="%s"' % rewrite_url(m.group(1), repo, src_rel, out_rel, True), body)
@@ -142,6 +154,18 @@ def render_md(repo, src_rel, out_rel):
     # mermaid
     body = re.sub(r'<pre><code class="language-mermaid">(.*?)</code></pre>',
                   r'<pre class="mermaid">\1</pre>', body, flags=re.S)
+    # blockquotes -> callouts
+    def callout(m):
+        inner = m.group(1)
+        lead = re.sub(r"<[^>]+>", "", inner[:200]).lower()
+        kind = "note"
+        if re.search(r"legal|before you start|first|warning|never|do not", lead):
+            kind = "important"
+        if re.search(r"cost", lead):
+            kind = "warning"
+        label = {"note": "Note", "important": "Important", "warning": "Warning"}[kind]
+        return f'<div class="alert {kind}"><p class="alert-title">{label}</p>{inner}</div>'
+    body = re.sub(r"<blockquote>\s*(.*?)\s*</blockquote>", callout, body, flags=re.S)
     # task lists
     body = re.sub(r"<li>\[ \]\s*", '<li class="task"><input type="checkbox"> ', body)
     body = re.sub(r"<li>\[[xX]\]\s*", '<li class="task"><input type="checkbox" checked> ', body)
@@ -156,13 +180,9 @@ def render_md(repo, src_rel, out_rel):
 
 
 # --------------------------------------------------------------------------
-# 4. Page shell
+# 4. Page shell (layout inspired by documentation sites: header, breadcrumb,
+#    left table of contents, article, right "In this article")
 # --------------------------------------------------------------------------
-FONTS = ('<link rel="preconnect" href="https://fonts.googleapis.com">'
-         '<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>'
-         '<link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600'
-         '&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">')
-
 MERMAID = ('<script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";'
            'const dark = document.documentElement.matches("[data-theme=dark]") || (window.matchMedia("(prefers-color-scheme: dark)").matches && !document.documentElement.matches("[data-theme=light]"));'
            'mermaid.initialize({startOnLoad:true, theme: dark ? "dark" : "neutral", securityLevel:"strict"});</script>')
@@ -184,6 +204,59 @@ CHECKLIST_JS = """<script>
 })();
 </script>"""
 
+SITE_JS = """<script>
+(function(){
+  // Table of contents: open on wide screens, collapsible on small ones
+  var toc = document.querySelector('details.toc');
+  if (toc) {
+    var mq = window.matchMedia('(min-width: 1024px)');
+    var sync = function(){ if (mq.matches) toc.open = true; };
+    sync(); if (mq.addEventListener) mq.addEventListener('change', sync);
+    var cur = toc.querySelector('[aria-current="page"]');
+    if (cur && cur.scrollIntoView && mq.matches) cur.scrollIntoView({block: 'center'});
+  }
+  // Filter by title
+  var f = document.getElementById('toc-filter');
+  if (f) f.addEventListener('input', function(){
+    var q = f.value.trim().toLowerCase();
+    document.querySelectorAll('.toc-list li').forEach(function(li){
+      var hit = !q || li.textContent.toLowerCase().indexOf(q) !== -1;
+      li.hidden = !hit;
+    });
+  });
+  // Copy buttons on code blocks
+  document.querySelectorAll('.codeblock').forEach(function(cb){
+    var btn = cb.querySelector('.copy'), code = cb.querySelector('code');
+    if (!btn || !code) return;
+    btn.addEventListener('click', function(){
+      navigator.clipboard.writeText(code.innerText).then(function(){
+        btn.textContent = 'Copied'; setTimeout(function(){ btn.textContent = 'Copy'; }, 1500);
+      }, function(){ btn.textContent = 'Select and copy'; });
+    });
+  });
+  // Highlight the current section in "In this article"
+  var links = document.querySelectorAll('.aside-toc a');
+  if (links.length && 'IntersectionObserver' in window) {
+    var map = {}; links.forEach(function(a){ map[a.getAttribute('href').slice(1)] = a; });
+    var obs = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if (e.isIntersecting) {
+        links.forEach(function(a){ a.classList.remove('on'); });
+        var a = map[e.target.id]; if (a) a.classList.add('on');
+      }});
+    }, {rootMargin: '0px 0px -75% 0px'});
+    Object.keys(map).forEach(function(id){ var h = document.getElementById(id); if (h) obs.observe(h); });
+  }
+})();
+</script>"""
+
+LANG_LABEL = {"powershell": "PowerShell", "kusto": "Kusto", "bash": "Bash", "json": "JSON", "xml": "XML"}
+
+ICONS = {
+    "hybrid": '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18a5 5 0 0 1-.6-9.96A6.5 6.5 0 0 1 18.8 9.1 4.5 4.5 0 0 1 18 18Z" fill="currentColor"/></svg>',
+    "security": '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5Z" fill="currentColor"/></svg>',
+    "access": '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2" fill="currentColor"/><rect x="8" y="18" width="8" height="2" rx="1" fill="currentColor"/></svg>',
+}
+
 
 def sidebar(track, out_rel):
     def link(label, target):
@@ -191,32 +264,106 @@ def sidebar(track, out_rel):
         return f'<a href="{rel(out_rel, target)}"{cur}>{html.escape(label)}</a>'
 
     if track == "hybrid":
+        name = "Hybrid management with Azure Arc"
         items = "".join(f"<li>{link(l, t)}</li>" for l, t in hyb_nav)
-        return (f'<nav class="side" aria-label="Hybrid labs"><p class="side-title">Hybrid track</p>'
-                f'<ol class="side-list">{items}</ol></nav>')
-    parts = [f"<li>{link(l, t)}</li>" for l, t in sec_nav]
-    for title, chap_out, items in sec_groups:
-        sub = "".join(f"<li>{link(l, t)}</li>" for l, t in items)
-        parts.append(f'<li class="group">{link(title, chap_out)}<ol>{sub}</ol></li>')
-    parts += [f"<li>{link(l, t)}</li>" for l, t in sec_tail]
-    return (f'<nav class="side" aria-label="Security labs"><p class="side-title">Security track</p>'
-            f'<ol class="side-list">{"".join(parts)}</ol></nav>')
+    else:
+        name = "Securing Windows Server"
+        parts = [f"<li>{link(l, t)}</li>" for l, t in sec_nav]
+        for title, chap_out, its in sec_groups:
+            sub = "".join(f"<li>{link(l, t)}</li>" for l, t in its)
+            open_ = " open" if out_rel == chap_out or any(t == out_rel for _, t in its) else ""
+            parts.append(f'<li class="group"><details{open_}><summary>{html.escape(title)}</summary>'
+                         f'<ol><li>{link("Chapter overview", chap_out)}</li>{sub}</ol></details></li>')
+        parts += [f"<li>{link(l, t)}</li>" for l, t in sec_tail]
+        items = "".join(parts)
+    return (f'<details class="toc"><summary>Table of contents</summary>'
+            f'<nav aria-label="{name}"><p class="toc-title">{name}</p>'
+            f'<input id="toc-filter" class="toc-filter" type="search" placeholder="Filter by title" aria-label="Filter by title">'
+            f'<ol class="toc-list">{items}</ol></nav></details>')
 
 
-def shell(out_rel, title, body, track=None, extra="", head=""):
+def crumbs(out_rel, title, track):
+    trail = [("Labs", "index.html")]
+    if track == "hybrid":
+        trail.append(("Hybrid track", "hybrid/index.html"))
+    elif track == "security":
+        trail.append(("Security track", "security/index.html"))
+        for t, chap_out, its in sec_groups:
+            if any(o == out_rel for _, o in its):
+                trail.append((re.sub(r"^Chapter (\d+):.*", r"Chapter \1", t), chap_out))
+    elif track == "access":
+        trail.append(("Lab access", "access/index.html"))
+    trail = [(l, t) for l, t in trail if t != out_rel]
+    items = "".join(f'<li><a href="{rel(out_rel, t)}">{html.escape(l)}</a></li>' for l, t in trail)
+    return f'<nav class="crumbs" aria-label="Breadcrumb"><ol>{items}</ol></nav>'
+
+
+def enhance(body):
+    """Code-block headers with Copy, and the 'In this article' list."""
+    def code(m):
+        lang = m.group(1) or ""
+        label = LANG_LABEL.get(lang, lang.capitalize() if lang else "")
+        if not lang:
+            nxt = body_ref[0][m.end():m.end() + 400]
+            if re.search(r"\b(Get|Set|New|Remove|Add|Install|Invoke|Enable|Disable|Start|Stop|Restart|Test|Import|Export|Update|Register|Grant|Copy)-[A-Z]", nxt):
+                label = "PowerShell"
+        return (f'<div class="codeblock"><div class="code-head"><span>{label}</span>'
+                f'<button type="button" class="copy">Copy</button></div><pre><code{m.group(2)}>')
+    body_ref = [body]
+    body = re.sub(r'<pre><code(?: class="language-([a-z0-9]+)")?()>', code, body)
+    body = re.sub(r'(<div class="codeblock">.*?</code></pre>)', r'\1</div>', body, flags=re.S)
+    heads = re.findall(r'<h2 id="([^"]+)">(.*?)</h2>', body)
+    if len(heads) < 2:
+        heads = re.findall(r'<h3 id="([^"]+)">(.*?)</h3>', body)
+    aside = ""
+    if len(heads) >= 2:
+        lis = "".join(f'<li><a href="#{i}">{re.sub(r"<[^>]+>", "", t)}</a></li>' for i, t in heads)
+        aside = f'<aside class="aside-toc" aria-label="In this article"><p>In this article</p><ol>{lis}</ol></aside>'
+    return body, aside
+
+
+def meta_line(body, kind):
+    words = len(re.sub(r"<[^>]+>", " ", body).split())
+    mins = max(1, round(words / 200))
+    return f'<p class="meta"><span>{kind}</span><span>{mins} min read</span></p>'
+
+
+def shell(out_rel, title, body, track=None, extra="", head="", kind="Article"):
     css = rel(out_rel, "assets/site.css")
     home = rel(out_rel, "index.html")
-    hyb = rel(out_rel, "hybrid/index.html")
-    sec = rel(out_rel, "security/index.html")
-    acc = rel(out_rel, "access/index.html")
-    cur_a = ' aria-current="true"' if track == "access" else ""
-    cur_h = ' aria-current="true"' if track == "hybrid" else ""
-    cur_s = ' aria-current="true"' if track == "security" else ""
-    side = sidebar(track, out_rel) if track in ("hybrid", "security") else ""
-    layout = "with-side" if side else "plain"
-    repo = REPO_URL["hyb" if track == "hybrid" else "sec"] if track in ("hybrid", "security") else None
-    src_link = f'<a href="{repo}" rel="noopener">Source on GitHub</a> · ' if repo else ""
+    nav = [("Hybrid", "hybrid/index.html", "hybrid"), ("Security", "security/index.html", "security"),
+           ("Lab access", "access/index.html", "access")]
+    cur = ' aria-current="true"'
+    nav_html = "".join(f'<a href="{rel(out_rel, t)}"{cur if track == k else ""}>{l}</a>' for l, t, k in nav)
     full_title = f"{title} · Windows Server Labs" if title != "Windows Server Labs" else title
+    is_doc = track in ("hybrid", "security", "access")
+    if is_doc:
+        body, aside = enhance(body)
+        side = sidebar(track, out_rel) if track in ("hybrid", "security") else ""
+        # metadata line right after the first h1
+        dur = re.search(r"<h1[^>]*>.*?\s*\((\d+[^)]*min[^)]*)\)\s*</h1>", body)
+        if dur:
+            body = body.replace(" (" + dur.group(1) + ")</h1>", "</h1>", 1)
+        meta = meta_line(body, kind)
+        if dur:
+            meta = meta.replace("</p>", f"<span>Lab time: {dur.group(1)}</span></p>")
+        body = re.sub(r"(</h1>)", lambda m: m.group(1) + meta, body, count=1)
+        repo = REPO_URL["hyb" if track == "hybrid" else "sec"] if track in ("hybrid", "security") else None
+        edit = f'<p class="source"><a href="{repo}" rel="noopener">View the source on GitHub</a></p>' if repo else ""
+        layout = f"""<div class="doc {'has-toc' if side else 'no-toc'}">
+{side}
+<main id="content" class="article">
+{crumbs(out_rel, title, track)}
+<article class="prose">
+{body}
+</article>
+{edit}
+</main>
+{aside}
+</div>"""
+        extra = SITE_JS + extra
+    else:
+        layout = f'<main id="content" class="home">\n{body}\n</main>'
     return f"""<!DOCTYPE html>
 <html lang="en">
 <head>
@@ -224,26 +371,33 @@ def shell(out_rel, title, body, track=None, extra="", head=""):
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>{html.escape(full_title)}</title>
 <meta name="description" content="Hands-on Windows Server 2025 labs: hybrid management with Azure Arc, and Windows Server security.">
-{FONTS}
 <link rel="stylesheet" href="{css}">
 <link rel="icon" href="{rel(out_rel, 'assets/favicon.svg')}" type="image/svg+xml">
 <link rel="icon" href="{rel(out_rel, 'assets/favicon-32.png')}" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="{rel(out_rel, 'assets/apple-touch-icon.png')}">
 {head}</head>
-<body class="track-{track or 'home'}">
-<a class="skip" href="#content">Skip to content</a>
-<header class="top">
-  <a class="brand" href="{home}"><img class="brand-mark" src="{rel(out_rel, 'assets/favicon.svg')}" alt="" width="22" height="22">Windows Server Labs</a>
-  <nav class="tracks" aria-label="Tracks"><a href="{hyb}"{cur_h}>Hybrid</a><a href="{sec}"{cur_s}>Security</a><a href="{acc}"{cur_a}>Lab access</a></nav>
+<body class="t-{track or 'home'}">
+<a class="skip" href="#content">Skip to main content</a>
+<header class="masthead">
+  <a class="brand" href="{home}"><img src="{rel(out_rel, 'assets/favicon.svg')}" alt="" width="24" height="24"><span>Windows Server Labs</span></a>
+  <span class="divider" aria-hidden="true"></span>
+  <nav class="mainnav" aria-label="Main">{nav_html}</nav>
+  <a class="gh" href="https://github.com/medyabi" rel="noopener">GitHub</a>
 </header>
-<div class="layout {layout}">
-{side}
-<main id="content" class="prose">
-{body}
-</main>
-</div>
-<footer class="foot"><p>{src_link}By Mohamed Dyabi, Microsoft Certified Trainer · learn.ebigpictures.com</p>
-<p class="small">Lab environments only. Several labs change security settings, lock accounts or force recovery. Never run them on production systems.</p></footer>
+{layout}
+<footer class="sitefoot">
+  <div class="foot-in">
+    <div><strong>Windows Server Labs</strong><p>Hands-on labs by Mohamed Dyabi, Microsoft Certified Trainer.</p></div>
+    <ul>
+      <li><a href="{rel(out_rel, 'hybrid/index.html')}">Hybrid track</a></li>
+      <li><a href="{rel(out_rel, 'security/index.html')}">Security track</a></li>
+      <li><a href="{rel(out_rel, 'access/index.html')}">Lab access</a></li>
+      <li><a href="{REPO_URL['hyb']}" rel="noopener">Hybrid labs on GitHub</a></li>
+      <li><a href="{REPO_URL['sec']}" rel="noopener">Security labs on GitHub</a></li>
+    </ul>
+  </div>
+  <p class="fine">Lab environments only: several labs change security settings, lock accounts or force recovery. Never run them on production systems. An independent site, not affiliated with Microsoft. © 2026 Mohamed Dyabi</p>
+</footer>
 {extra}
 </body>
 </html>
@@ -258,7 +412,6 @@ n_sec = sum(1 for (r, s) in pages if r == "sec" and "/lab-" in s)
 
 
 def home_page():
-    out = "index.html"
     hyb_items = [(re.sub(r"^Lab \d+:\s*", "", l), t) for l, t in hyb_nav[1:-1]]
     hyb_list = "".join(f'<li><a href="{t}">{html.escape(l)}</a></li>' for l, t in hyb_items)
     sec_items = [(re.sub(r"^Chapter \d+:\s*", "", ti), c, len(it)) for ti, c, it in sec_groups]
@@ -266,59 +419,60 @@ def home_page():
                        for ti, c, n in sec_items)
     body = f"""
 <section class="hero">
-  <p class="eyebrow">Windows Server 2025 · Azure Arc · AZ-801</p>
-  <h1>Learn Windows Server by doing it, one lab at a time</h1>
-  <p class="lede">Two hands-on tracks. In the first, you take an on-premises server and manage it from Azure. In the second, you watch an attack, build the control that stops it, and prove that it works.</p>
+  <div class="wrap">
+    <p class="kicker">Windows Server 2025 · Azure Arc · AZ-801</p>
+    <h1>Learn Windows Server by doing it, one lab at a time</h1>
+    <p class="lede">Two hands-on tracks. In the first, you take an on-premises server and manage it from Azure. In the second, you watch an attack, build the control that stops it, and prove that it works.</p>
+    <p class="cta"><a class="btn primary" href="hybrid/index.html">Start the hybrid track</a><a class="btn" href="security/setup.html">Build the security lab</a></p>
+  </div>
 </section>
 
-<div class="tracks-grid">
-  <article class="track-card hybrid">
-    <p class="eyebrow">Track 1 · {n_hyb} labs · about 8 hours</p>
-    <h2><a href="hybrid/index.html">Hybrid management with Azure Arc</a></h2>
+<div class="wrap">
+<h2 class="section-title">Browse the tracks</h2>
+<div class="cards">
+  <article class="card">
+    <div class="card-head"><span class="ico c-blue">{ICONS['hybrid']}</span><div><p class="card-kicker">Learning path · {n_hyb} labs · about 8 hours</p>
+    <h3><a href="hybrid/index.html">Hybrid management with Azure Arc</a></h3></div></div>
     <p>One Windows Server 2025 VM per person. Connect it to Azure Arc, unlock the Software Assurance benefits, and use Hotpatch, Azure Policy, Azure Monitor, Change Tracking, Defender for Cloud and Windows Admin Center in Azure. Every lab ends with customer talking points.</p>
     <ol class="mini">{hyb_list}</ol>
-    <p class="card-note">MTS engineer? <a href="access/index.html">Get your VM connection file</a>.</p>
-    <p><a class="button" href="hybrid/index.html">Start the hybrid track</a></p>
+    <p class="card-foot"><a href="hybrid/index.html">Start the hybrid track ›</a></p>
   </article>
-  <article class="track-card security">
-    <p class="eyebrow">Track 2 · {n_sec} labs · AZ-801</p>
-    <h2><a href="security/index.html">Securing Windows Server</a></h2>
+  <article class="card">
+    <div class="card-head"><span class="ico c-red">{ICONS['security']}</span><div><p class="card-kicker">Learning path · {n_sec} labs · AZ-801</p>
+    <h3><a href="security/index.html">Securing Windows Server</a></h3></div></div>
     <p>Four VMs, one domain, and an attacker. Each lab shows the attack first, then builds the control that stops it: passwords and lockout, Credential Guard, App Control, Protected Users, RODC, delegation, Sentinel, IPsec and BitLocker.</p>
     <ol class="mini">{sec_list}</ol>
-    <p><a class="button" href="security/setup.html">Build the lab and start</a></p>
+    <p class="card-foot"><a href="security/setup.html">Build the lab and start ›</a></p>
   </article>
 </div>
 
-<section class="access-band">
+<section class="band">
+  <span class="ico c-green">{ICONS['access']}</span>
   <div>
-    <p class="eyebrow">MTS team · Remote lab access</p>
+    <p class="card-kicker">MTS team · Remote lab access</p>
     <h2>Connect to your lab VM from anywhere</h2>
     <p>Each engineer has a personal Windows Server 2025 VM, reached over HTTPS through our Remote Desktop Gateway. Download your connection file, sign in, and start the hybrid labs.</p>
   </div>
-  <p><a class="button" href="access/index.html">Get your connection file</a></p>
+  <a class="btn primary" href="access/index.html">Get your connection file</a>
 </section>
 
-<section class="how">
-  <h2>How every lab works</h2>
-  <ol class="how-steps">
-    <li><strong>The situation.</strong> A customer question or an attacker's move: why this lab matters.</li>
-    <li><strong>The concepts.</strong> Just enough theory, in plain words, with an analogy.</li>
-    <li><strong>Step by step.</strong> Build it on your own VM, with the exact commands.</li>
-    <li><strong>Prove it.</strong> A verification command or a portal view that shows it works.</li>
-    <li><strong>Takeaway.</strong> Talking points for the customer, or the one idea to remember.</li>
-  </ol>
-</section>
+<h2 class="section-title">How every lab works</h2>
+<ol class="steps5">
+  <li><strong>The situation</strong><span>A customer question or an attacker's move: why this lab matters.</span></li>
+  <li><strong>The concepts</strong><span>Just enough theory, in plain words, with an analogy.</span></li>
+  <li><strong>Step by step</strong><span>Build it on your own VM, with the exact commands.</span></li>
+  <li><strong>Prove it</strong><span>A verification command or a portal view that shows it works.</span></li>
+  <li><strong>Takeaway</strong><span>Talking points for the customer, or the one idea to remember.</span></li>
+</ol>
 
-<section class="about">
-  <h2>What you need</h2>
-  <div class="needs">
-    <div><h3>Hybrid track</h3><p>A Windows Server 2025 VM (your instructor provides one), an Azure subscription where you can create a resource group, and about two days.</p></div>
-    <div><h3>Security track</h3><p>A Hyper-V host for four Generation 2 VMs with Secure Boot and a virtual TPM, plus Azure and Microsoft 365 trials for the cloud chapters.</p></div>
-  </div>
-</section>
+<h2 class="section-title">What you need</h2>
+<div class="cards two">
+  <div class="card plain"><h3>Hybrid track</h3><p>A Windows Server 2025 VM (your instructor provides one), an Azure subscription where you can create a resource group, and about two days.</p></div>
+  <div class="card plain"><h3>Security track</h3><p>A Hyper-V host for four Generation 2 VMs with Secure Boot and a virtual TPM, plus Azure and Microsoft 365 trials for the cloud chapters.</p></div>
+</div>
+</div>
 """
-    return shell(out, "Windows Server Labs", body)
-
+    return shell("index.html", "Windows Server Labs", body)
 
 
 # --------------------------------------------------------------------------
@@ -341,7 +495,7 @@ def access_page():
     out = "access/index.html"
     rows = "".join(
         f'<tr><td><code>{u}</code></td><td>{vm}</td><td><code>{ip}</code></td>'
-        f'<td><a class="button small" href="rdp/{u}-{vm}.rdp" download>Download {u}.rdp</a></td></tr>'
+        f'<td><a class="btn primary small" href="rdp/{u}-{vm}.rdp" download>Download {u}.rdp</a></td></tr>'
         for u, vm, ip in ENGINEERS)
     labs = "".join(f'<li><a href="{rel(out, t)}">{html.escape(re.sub(r"^Lab \d+:\s*", "", l))}</a></li>'
                    for l, t in hyb_nav[1:-1])
@@ -366,7 +520,7 @@ def access_page():
 </table></div>
 
 <h2>About the security warning</h2>
-<blockquote><p><strong>"Unknown publisher" is expected.</strong> It appears because the connection file isn't digitally signed. The connection itself is encrypted over HTTPS to <code>{GATEWAY}</code> with a trusted certificate. Check that the gateway server shown is <code>{GATEWAY}</code>, then click Connect.</p></blockquote>
+<div class="alert note"><p class="alert-title">Note</p><p><strong>"Unknown publisher" is expected.</strong> It appears because the connection file isn't digitally signed. The connection itself is encrypted over HTTPS to <code>{GATEWAY}</code> with a trusted certificate. Check that the gateway server shown is <code>{GATEWAY}</code>, then click Connect.</p></div>
 
 <h2>The labs</h2>
 <p>Nine labs, about 8 hours in total. Do them in order. Each ends with customer talking points.</p>
@@ -381,7 +535,7 @@ def access_page():
 </dl>
 <p><em>Don't forward your password outside the team.</em></p>
 """
-    return shell(out, "Hybrid lab access", body, "access",
+    return shell(out, "Hybrid lab access", body, "access", kind="Team guide",
                  head='<meta name="robots" content="noindex, nofollow">\n')
 
 # --------------------------------------------------------------------------
@@ -404,7 +558,9 @@ for (repo, src), out in pages.items():
     dst = os.path.join(OUT, out)
     os.makedirs(os.path.dirname(dst), exist_ok=True)
     with open(dst, "w", encoding="utf-8") as fh:
-        fh.write(shell(out, titles[(repo, src)], body, track, extra))
+        kind = ("Lab" if ("/lab-" in src or (repo == "hyb" and src.startswith("labs/") and "cleanup" not in src))
+                else "Chapter" if src.endswith("README.md") and src.startswith("labs/") else "Article")
+        fh.write(shell(out, titles[(repo, src)], body, track, extra, kind=kind))
 
 with open(os.path.join(OUT, "index.html"), "w", encoding="utf-8") as fh:
     fh.write(home_page())

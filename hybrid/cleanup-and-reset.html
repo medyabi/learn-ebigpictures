@@ -5,38 +5,96 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Cleanup and reset · Windows Server Labs</title>
 <meta name="description" content="Hands-on Windows Server 2025 labs: hybrid management with Azure Arc, and Windows Server security.">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../assets/site.css">
 <link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="../assets/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
 </head>
-<body class="track-hybrid">
-<a class="skip" href="#content">Skip to content</a>
-<header class="top">
-  <a class="brand" href="../index.html"><img class="brand-mark" src="../assets/favicon.svg" alt="" width="22" height="22">Windows Server Labs</a>
-  <nav class="tracks" aria-label="Tracks"><a href="index.html" aria-current="true">Hybrid</a><a href="../security/index.html">Security</a><a href="../access/index.html">Lab access</a></nav>
+<body class="t-hybrid">
+<a class="skip" href="#content">Skip to main content</a>
+<header class="masthead">
+  <a class="brand" href="../index.html"><img src="../assets/favicon.svg" alt="" width="24" height="24"><span>Windows Server Labs</span></a>
+  <span class="divider" aria-hidden="true"></span>
+  <nav class="mainnav" aria-label="Main"><a href="index.html" aria-current="true">Hybrid</a><a href="../security/index.html">Security</a><a href="../access/index.html">Lab access</a></nav>
+  <a class="gh" href="https://github.com/medyabi" rel="noopener">GitHub</a>
 </header>
-<div class="layout with-side">
-<nav class="side" aria-label="Hybrid labs"><p class="side-title">Hybrid track</p><ol class="side-list"><li><a href="index.html">Overview</a></li><li><a href="01-windows-admin-center.html">Lab 1: Windows Admin Center</a></li><li><a href="02-azure-arc-onboarding-and-azure-benefits.html">Lab 2: Azure Arc onboarding and Azure benefits</a></li><li><a href="03-hotpatching-with-azure-arc.html">Lab 3: Hotpatching with Azure Arc</a></li><li><a href="04-azure-policy-and-machine-configuration.html">Lab 4: Azure Policy and Machine Configuration</a></li><li><a href="05-azure-monitor.html">Lab 5: Azure Monitor</a></li><li><a href="06-change-tracking-and-inventory.html">Lab 6: Change Tracking and Inventory</a></li><li><a href="07-microsoft-defender-for-cloud.html">Lab 7: Microsoft Defender for Cloud</a></li><li><a href="08-windows-management-from-azure.html">Lab 8: Windows management from Azure</a></li><li><a href="09-security-baseline-with-osconfig.html">Lab 9: Security baseline with OSConfig</a></li><li><a href="cleanup-and-reset.html" aria-current="page">Cleanup and reset</a></li></ol></nav>
-<main id="content" class="prose">
-<h1 id="cleanup-and-reset">Cleanup and reset</h1>
+<div class="doc has-toc">
+<details class="toc"><summary>Table of contents</summary><nav aria-label="Hybrid management with Azure Arc"><p class="toc-title">Hybrid management with Azure Arc</p><input id="toc-filter" class="toc-filter" type="search" placeholder="Filter by title" aria-label="Filter by title"><ol class="toc-list"><li><a href="index.html">Overview</a></li><li><a href="01-windows-admin-center.html">Lab 1: Windows Admin Center</a></li><li><a href="02-azure-arc-onboarding-and-azure-benefits.html">Lab 2: Azure Arc onboarding and Azure benefits</a></li><li><a href="03-hotpatching-with-azure-arc.html">Lab 3: Hotpatching with Azure Arc</a></li><li><a href="04-azure-policy-and-machine-configuration.html">Lab 4: Azure Policy and Machine Configuration</a></li><li><a href="05-azure-monitor.html">Lab 5: Azure Monitor</a></li><li><a href="06-change-tracking-and-inventory.html">Lab 6: Change Tracking and Inventory</a></li><li><a href="07-microsoft-defender-for-cloud.html">Lab 7: Microsoft Defender for Cloud</a></li><li><a href="08-windows-management-from-azure.html">Lab 8: Windows management from Azure</a></li><li><a href="09-security-baseline-with-osconfig.html">Lab 9: Security baseline with OSConfig</a></li><li><a href="cleanup-and-reset.html" aria-current="page">Cleanup and reset</a></li></ol></nav></details>
+<main id="content" class="article">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../index.html">Labs</a></li><li><a href="index.html">Hybrid track</a></li></ol></nav>
+<article class="prose">
+<h1 id="cleanup-and-reset">Cleanup and reset</h1><p class="meta"><span>Article</span><span>1 min read</span></p>
 <nav class="pager"><a href="09-security-baseline-with-osconfig.html">← Lab 9</a> <a href="index.html">Overview</a></nav>
 <p>Always clean Azure first, then the VM. If you delete the VM first, the Arc resource stays in Azure as a disconnected "ghost" server.</p>
 <p><strong>1. Remove the server from Azure Arc</strong> (on the VM, PowerShell as administrator):</p>
-<pre><code>azcmagent disconnect
-</code></pre>
+<div class="codeblock"><div class="code-head"><span></span><button type="button" class="copy">Copy</button></div><pre><code>azcmagent disconnect</code></pre></div>
 <p>Sign in when prompted. This deletes the Arc resource in Azure and disconnects the agent. Then delete your resource group <code>rg-presales-&lt;yourname&gt;</code> in the portal.</p>
 <p>Deleting the resource group also removes your Log Analytics workspace, your DCRs and the policy assignment from Lab 4. The <strong>instructor</strong> then turns <strong>Defender for Servers</strong> off in <strong>Defender for Cloud</strong> &gt; <strong>Environment settings</strong>, so billing stops after the session.</p>
 <p><strong>2. Rebuild the VM</strong> (instructor, on the Hyper-V host). This gives a clean, AVMA-activated VM in a few minutes:</p>
-<pre><code>.\scripts\Remove-LabVM.ps1 -Name WS25-VM03
-.\scripts\New-WS2025LabVMs.ps1
-</code></pre>
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>.\scripts\Remove-LabVM.ps1 -Name WS25-VM03
+.\scripts\New-WS2025LabVMs.ps1</code></pre></div>
 <p><code>Remove-LabVM.ps1</code> deletes the VM, its disks and its folder, but never the template. <code>New-WS2025LabVMs.ps1</code> recreates only the missing VMs from the template.</p>
+</article>
+<p class="source"><a href="https://github.com/medyabi/windows-server2025-Hybrid-lab" rel="noopener">View the source on GitHub</a></p>
 </main>
-</div>
-<footer class="foot"><p><a href="https://github.com/medyabi/windows-server2025-Hybrid-lab" rel="noopener">Source on GitHub</a> · By Mohamed Dyabi, Microsoft Certified Trainer · learn.ebigpictures.com</p>
-<p class="small">Lab environments only. Several labs change security settings, lock accounts or force recovery. Never run them on production systems.</p></footer>
 
+</div>
+<footer class="sitefoot">
+  <div class="foot-in">
+    <div><strong>Windows Server Labs</strong><p>Hands-on labs by Mohamed Dyabi, Microsoft Certified Trainer.</p></div>
+    <ul>
+      <li><a href="index.html">Hybrid track</a></li>
+      <li><a href="../security/index.html">Security track</a></li>
+      <li><a href="../access/index.html">Lab access</a></li>
+      <li><a href="https://github.com/medyabi/windows-server2025-Hybrid-lab" rel="noopener">Hybrid labs on GitHub</a></li>
+      <li><a href="https://github.com/medyabi/windows-server-security-lab" rel="noopener">Security labs on GitHub</a></li>
+    </ul>
+  </div>
+  <p class="fine">Lab environments only: several labs change security settings, lock accounts or force recovery. Never run them on production systems. An independent site, not affiliated with Microsoft. © 2026 Mohamed Dyabi</p>
+</footer>
+<script>
+(function(){
+  // Table of contents: open on wide screens, collapsible on small ones
+  var toc = document.querySelector('details.toc');
+  if (toc) {
+    var mq = window.matchMedia('(min-width: 1024px)');
+    var sync = function(){ if (mq.matches) toc.open = true; };
+    sync(); if (mq.addEventListener) mq.addEventListener('change', sync);
+    var cur = toc.querySelector('[aria-current="page"]');
+    if (cur && cur.scrollIntoView && mq.matches) cur.scrollIntoView({block: 'center'});
+  }
+  // Filter by title
+  var f = document.getElementById('toc-filter');
+  if (f) f.addEventListener('input', function(){
+    var q = f.value.trim().toLowerCase();
+    document.querySelectorAll('.toc-list li').forEach(function(li){
+      var hit = !q || li.textContent.toLowerCase().indexOf(q) !== -1;
+      li.hidden = !hit;
+    });
+  });
+  // Copy buttons on code blocks
+  document.querySelectorAll('.codeblock').forEach(function(cb){
+    var btn = cb.querySelector('.copy'), code = cb.querySelector('code');
+    if (!btn || !code) return;
+    btn.addEventListener('click', function(){
+      navigator.clipboard.writeText(code.innerText).then(function(){
+        btn.textContent = 'Copied'; setTimeout(function(){ btn.textContent = 'Copy'; }, 1500);
+      }, function(){ btn.textContent = 'Select and copy'; });
+    });
+  });
+  // Highlight the current section in "In this article"
+  var links = document.querySelectorAll('.aside-toc a');
+  if (links.length && 'IntersectionObserver' in window) {
+    var map = {}; links.forEach(function(a){ map[a.getAttribute('href').slice(1)] = a; });
+    var obs = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if (e.isIntersecting) {
+        links.forEach(function(a){ a.classList.remove('on'); });
+        var a = map[e.target.id]; if (a) a.classList.add('on');
+      }});
+    }, {rootMargin: '0px 0px -75% 0px'});
+    Object.keys(map).forEach(function(id){ var h = document.getElementById(id); if (h) obs.observe(h); });
+  }
+})();
+</script>
 </body>
 </html>

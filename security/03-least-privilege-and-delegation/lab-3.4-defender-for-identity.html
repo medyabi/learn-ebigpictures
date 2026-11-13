@@ -5,22 +5,25 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Lab 3.4: Microsoft Defender for Identity · Windows Server Labs</title>
 <meta name="description" content="Hands-on Windows Server 2025 labs: hybrid management with Azure Arc, and Windows Server security.">
-<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="../../assets/site.css">
 <link rel="icon" href="../../assets/favicon.svg" type="image/svg+xml">
 <link rel="icon" href="../../assets/favicon-32.png" sizes="32x32" type="image/png">
 <link rel="apple-touch-icon" href="../../assets/apple-touch-icon.png">
 </head>
-<body class="track-security">
-<a class="skip" href="#content">Skip to content</a>
-<header class="top">
-  <a class="brand" href="../../index.html"><img class="brand-mark" src="../../assets/favicon.svg" alt="" width="22" height="22">Windows Server Labs</a>
-  <nav class="tracks" aria-label="Tracks"><a href="../../hybrid/index.html">Hybrid</a><a href="../index.html" aria-current="true">Security</a><a href="../../access/index.html">Lab access</a></nav>
+<body class="t-security">
+<a class="skip" href="#content">Skip to main content</a>
+<header class="masthead">
+  <a class="brand" href="../../index.html"><img src="../../assets/favicon.svg" alt="" width="24" height="24"><span>Windows Server Labs</span></a>
+  <span class="divider" aria-hidden="true"></span>
+  <nav class="mainnav" aria-label="Main"><a href="../../hybrid/index.html">Hybrid</a><a href="../index.html" aria-current="true">Security</a><a href="../../access/index.html">Lab access</a></nav>
+  <a class="gh" href="https://github.com/medyabi" rel="noopener">GitHub</a>
 </header>
-<div class="layout with-side">
-<nav class="side" aria-label="Security labs"><p class="side-title">Security track</p><ol class="side-list"><li><a href="../index.html">Overview</a></li><li><a href="../setup.html">Lab setup</a></li><li class="group"><a href="../01-securing-the-os/index.html">Chapter 1: Securing the Windows Server operating system</a><ol><li><a href="../01-securing-the-os/lab-1.1-password-lockout-baseline.html">1.1: Password and lockout baseline with Group Policy</a></li><li><a href="../01-securing-the-os/lab-1.2-exploit-protection.html">1.2: Exploit protection</a></li><li><a href="../01-securing-the-os/lab-1.3-app-control-wdac.html">1.3: App Control for Business (WDAC)</a></li><li><a href="../01-securing-the-os/lab-1.4-credential-guard.html">1.4: Credential Guard</a></li><li><a href="../01-securing-the-os/lab-1.5-smartscreen.html">1.5: Microsoft Defender SmartScreen</a></li><li><a href="../01-securing-the-os/lab-1.6-defender-for-endpoint.html">1.6: Microsoft Defender for Endpoint</a></li></ol></li><li class="group"><a href="../02-hybrid-ad-accounts/index.html">Chapter 2: Securing hybrid Active Directory accounts</a><ol><li><a href="../02-hybrid-ad-accounts/lab-2.1-fine-grained-password-policy.html">2.1: Fine-grained password policy</a></li><li><a href="../02-hybrid-ad-accounts/lab-2.2-entra-password-protection.html">2.2: Microsoft Entra Password Protection</a></li><li><a href="../02-hybrid-ad-accounts/lab-2.3-protected-users.html">2.3: The Protected Users group</a></li><li><a href="../02-hybrid-ad-accounts/lab-2.4-rodc.html">2.4: Read-only domain controller (RODC)</a></li><li><a href="../02-hybrid-ad-accounts/lab-2.5-authentication-policy-silos.html">2.5: Authentication policies and silos</a></li></ol></li><li class="group"><a href="index.html">Chapter 3: Least privilege and delegation</a><ol><li><a href="lab-3.1-restricted-groups.html">3.1: Built-in admin groups and Restricted Groups</a></li><li><a href="lab-3.2-delegation-of-control.html">3.2: Delegation of Control</a></li><li><a href="lab-3.3-kerberos-double-hop.html">3.3: The Kerberos double-hop</a></li><li><a href="lab-3.4-defender-for-identity.html" aria-current="page">3.4: Microsoft Defender for Identity</a></li></ol></li><li class="group"><a href="../04-watching-from-azure/index.html">Chapter 4: Watching your servers from Azure</a><ol><li><a href="../04-watching-from-azure/lab-4.1-azure-arc-log-analytics.html">4.1: Azure Arc and Log Analytics</a></li><li><a href="../04-watching-from-azure/lab-4.2-kql-hunting-and-alerts.html">4.2: Hunting with KQL and creating an alert</a></li><li><a href="../04-watching-from-azure/lab-4.3-microsoft-sentinel.html">4.3: Microsoft Sentinel</a></li><li><a href="../04-watching-from-azure/lab-4.4-secure-score.html">4.4: Improving the Secure Score with Defender for Cloud</a></li></ol></li><li class="group"><a href="../05-networking/index.html">Chapter 5: Securing Windows Server networking</a><ol><li><a href="../05-networking/lab-5.1-windows-firewall.html">5.1: Windows Defender Firewall</a></li><li><a href="../05-networking/lab-5.2-ipsec-connection-security.html">5.2: IPsec connection security rules</a></li><li><a href="../05-networking/lab-5.3-firewall-review-wac.html">5.3: Firewall review with Windows Admin Center</a></li></ol></li><li class="group"><a href="../06-storage-encryption/index.html">Chapter 6: Securing Windows Server storage</a><ol><li><a href="../06-storage-encryption/lab-6.1-bitlocker-ad-recovery.html">6.1: BitLocker with recovery keys in Active Directory</a></li><li><a href="../06-storage-encryption/lab-6.2-bitlocker-forced-recovery.html">6.2: Forcing BitLocker recovery</a></li><li><a href="../06-storage-encryption/lab-6.3-azure-disk-encryption.html">6.3: Encrypting Azure VM disks</a></li></ol></li><li><a href="../attack-to-control-map.html">Attack → control map</a></li><li><a href="../progress.html">Progress checklist</a></li></ol></nav>
-<main id="content" class="prose">
-<h1 id="lab-34-microsoft-defender-for-identity">Lab 3.4: Microsoft Defender for Identity</h1>
+<div class="doc has-toc">
+<details class="toc"><summary>Table of contents</summary><nav aria-label="Securing Windows Server"><p class="toc-title">Securing Windows Server</p><input id="toc-filter" class="toc-filter" type="search" placeholder="Filter by title" aria-label="Filter by title"><ol class="toc-list"><li><a href="../index.html">Overview</a></li><li><a href="../setup.html">Lab setup</a></li><li class="group"><details><summary>Chapter 1: Securing the Windows Server operating system</summary><ol><li><a href="../01-securing-the-os/index.html">Chapter overview</a></li><li><a href="../01-securing-the-os/lab-1.1-password-lockout-baseline.html">1.1: Password and lockout baseline with Group Policy</a></li><li><a href="../01-securing-the-os/lab-1.2-exploit-protection.html">1.2: Exploit protection</a></li><li><a href="../01-securing-the-os/lab-1.3-app-control-wdac.html">1.3: App Control for Business (WDAC)</a></li><li><a href="../01-securing-the-os/lab-1.4-credential-guard.html">1.4: Credential Guard</a></li><li><a href="../01-securing-the-os/lab-1.5-smartscreen.html">1.5: Microsoft Defender SmartScreen</a></li><li><a href="../01-securing-the-os/lab-1.6-defender-for-endpoint.html">1.6: Microsoft Defender for Endpoint</a></li></ol></details></li><li class="group"><details><summary>Chapter 2: Securing hybrid Active Directory accounts</summary><ol><li><a href="../02-hybrid-ad-accounts/index.html">Chapter overview</a></li><li><a href="../02-hybrid-ad-accounts/lab-2.1-fine-grained-password-policy.html">2.1: Fine-grained password policy</a></li><li><a href="../02-hybrid-ad-accounts/lab-2.2-entra-password-protection.html">2.2: Microsoft Entra Password Protection</a></li><li><a href="../02-hybrid-ad-accounts/lab-2.3-protected-users.html">2.3: The Protected Users group</a></li><li><a href="../02-hybrid-ad-accounts/lab-2.4-rodc.html">2.4: Read-only domain controller (RODC)</a></li><li><a href="../02-hybrid-ad-accounts/lab-2.5-authentication-policy-silos.html">2.5: Authentication policies and silos</a></li></ol></details></li><li class="group"><details open><summary>Chapter 3: Least privilege and delegation</summary><ol><li><a href="index.html">Chapter overview</a></li><li><a href="lab-3.1-restricted-groups.html">3.1: Built-in admin groups and Restricted Groups</a></li><li><a href="lab-3.2-delegation-of-control.html">3.2: Delegation of Control</a></li><li><a href="lab-3.3-kerberos-double-hop.html">3.3: The Kerberos double-hop</a></li><li><a href="lab-3.4-defender-for-identity.html" aria-current="page">3.4: Microsoft Defender for Identity</a></li></ol></details></li><li class="group"><details><summary>Chapter 4: Watching your servers from Azure</summary><ol><li><a href="../04-watching-from-azure/index.html">Chapter overview</a></li><li><a href="../04-watching-from-azure/lab-4.1-azure-arc-log-analytics.html">4.1: Azure Arc and Log Analytics</a></li><li><a href="../04-watching-from-azure/lab-4.2-kql-hunting-and-alerts.html">4.2: Hunting with KQL and creating an alert</a></li><li><a href="../04-watching-from-azure/lab-4.3-microsoft-sentinel.html">4.3: Microsoft Sentinel</a></li><li><a href="../04-watching-from-azure/lab-4.4-secure-score.html">4.4: Improving the Secure Score with Defender for Cloud</a></li></ol></details></li><li class="group"><details><summary>Chapter 5: Securing Windows Server networking</summary><ol><li><a href="../05-networking/index.html">Chapter overview</a></li><li><a href="../05-networking/lab-5.1-windows-firewall.html">5.1: Windows Defender Firewall</a></li><li><a href="../05-networking/lab-5.2-ipsec-connection-security.html">5.2: IPsec connection security rules</a></li><li><a href="../05-networking/lab-5.3-firewall-review-wac.html">5.3: Firewall review with Windows Admin Center</a></li></ol></details></li><li class="group"><details><summary>Chapter 6: Securing Windows Server storage</summary><ol><li><a href="../06-storage-encryption/index.html">Chapter overview</a></li><li><a href="../06-storage-encryption/lab-6.1-bitlocker-ad-recovery.html">6.1: BitLocker with recovery keys in Active Directory</a></li><li><a href="../06-storage-encryption/lab-6.2-bitlocker-forced-recovery.html">6.2: Forcing BitLocker recovery</a></li><li><a href="../06-storage-encryption/lab-6.3-azure-disk-encryption.html">6.3: Encrypting Azure VM disks</a></li></ol></details></li><li><a href="../attack-to-control-map.html">Attack → control map</a></li><li><a href="../progress.html">Progress checklist</a></li></ol></nav></details>
+<main id="content" class="article">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../../index.html">Labs</a></li><li><a href="../index.html">Security track</a></li><li><a href="index.html">Chapter 3</a></li></ol></nav>
+<article class="prose">
+<h1 id="lab-34-microsoft-defender-for-identity">Lab 3.4: Microsoft Defender for Identity</h1><p class="meta"><span>Lab</span><span>2 min read</span></p>
 <nav class="pager"><a href="lab-3.3-kerberos-double-hop.html">← Lab 3.3</a> <a href="index.html">Chapter overview</a> <a href="../04-watching-from-azure/lab-4.1-azure-arc-log-analytics.html">Lab 4.1 →</a></nav>
 <div class="table-wrap"><table>
 
@@ -73,24 +76,77 @@
 <li>Wait until the sensor status shows <strong>Running</strong> and <strong>Healthy</strong>.</li>
 </ol>
 <p>Now let's do some (safe) hacker activity. On SEA-CL1:</p>
-<pre><code class="language-powershell">net user /domain
-net group &quot;Domain Admins&quot; /domain
-</code></pre>
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>net user /domain
+net group "Domain Admins" /domain</code></pre></div>
 <p>These commands list every user and every Domain Admin. That's exactly what an attacker does first. Next, run a remote command from SEA-SVR1 to SEA-DC1:</p>
-<pre><code class="language-powershell">Invoke-Command -ComputerName SEA-DC1 -ScriptBlock { whoami }
-</code></pre>
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>Invoke-Command -ComputerName SEA-DC1 -ScriptBlock { whoami }</code></pre></div>
 <p>Go to <strong>Incidents &amp; alerts</strong> in the Defender portal. After a few minutes you'll see alerts like <em>User and group membership reconnaissance</em> and <em>Remote code execution attempt</em>, with the user, source and target all linked.</p>
-<blockquote>
-<p>📌 <strong>2025 note.</strong> The old MDI portal is retired. Everything now lives in the <strong>Microsoft Defender portal</strong>.</p>
-</blockquote>
+<div class="alert note"><p class="alert-title">Note</p><p>📌 <strong>2025 note.</strong> The old MDI portal is retired. Everything now lives in the <strong>Microsoft Defender portal</strong>.</p></div>
 <h2 id="key-takeaway">✅ Key takeaway</h2>
 <p>Every real attack has a reconnaissance phase. If you spot it there, you stop the attacker before they reach their goal.</p>
 <hr />
 <nav class="pager"><a href="lab-3.3-kerberos-double-hop.html">← Lab 3.3</a> <a href="index.html">Chapter overview</a> <a href="../04-watching-from-azure/lab-4.1-azure-arc-log-analytics.html">Lab 4.1 →</a></nav>
+</article>
+<p class="source"><a href="https://github.com/medyabi/windows-server-security-lab" rel="noopener">View the source on GitHub</a></p>
 </main>
+<aside class="aside-toc" aria-label="In this article"><p>In this article</p><ol><li><a href="#hacker-scenario">🥷 Hacker scenario</a></li><li><a href="#concepts">📖 Concepts</a></li><li><a href="#how-this-stops-the-attacker">🛡️ How this stops the attacker</a></li><li><a href="#step-by-step">🧪 Step by step</a></li><li><a href="#key-takeaway">✅ Key takeaway</a></li></ol></aside>
 </div>
-<footer class="foot"><p><a href="https://github.com/medyabi/windows-server-security-lab" rel="noopener">Source on GitHub</a> · By Mohamed Dyabi, Microsoft Certified Trainer · learn.ebigpictures.com</p>
-<p class="small">Lab environments only. Several labs change security settings, lock accounts or force recovery. Never run them on production systems.</p></footer>
-
+<footer class="sitefoot">
+  <div class="foot-in">
+    <div><strong>Windows Server Labs</strong><p>Hands-on labs by Mohamed Dyabi, Microsoft Certified Trainer.</p></div>
+    <ul>
+      <li><a href="../../hybrid/index.html">Hybrid track</a></li>
+      <li><a href="../index.html">Security track</a></li>
+      <li><a href="../../access/index.html">Lab access</a></li>
+      <li><a href="https://github.com/medyabi/windows-server2025-Hybrid-lab" rel="noopener">Hybrid labs on GitHub</a></li>
+      <li><a href="https://github.com/medyabi/windows-server-security-lab" rel="noopener">Security labs on GitHub</a></li>
+    </ul>
+  </div>
+  <p class="fine">Lab environments only: several labs change security settings, lock accounts or force recovery. Never run them on production systems. An independent site, not affiliated with Microsoft. © 2026 Mohamed Dyabi</p>
+</footer>
+<script>
+(function(){
+  // Table of contents: open on wide screens, collapsible on small ones
+  var toc = document.querySelector('details.toc');
+  if (toc) {
+    var mq = window.matchMedia('(min-width: 1024px)');
+    var sync = function(){ if (mq.matches) toc.open = true; };
+    sync(); if (mq.addEventListener) mq.addEventListener('change', sync);
+    var cur = toc.querySelector('[aria-current="page"]');
+    if (cur && cur.scrollIntoView && mq.matches) cur.scrollIntoView({block: 'center'});
+  }
+  // Filter by title
+  var f = document.getElementById('toc-filter');
+  if (f) f.addEventListener('input', function(){
+    var q = f.value.trim().toLowerCase();
+    document.querySelectorAll('.toc-list li').forEach(function(li){
+      var hit = !q || li.textContent.toLowerCase().indexOf(q) !== -1;
+      li.hidden = !hit;
+    });
+  });
+  // Copy buttons on code blocks
+  document.querySelectorAll('.codeblock').forEach(function(cb){
+    var btn = cb.querySelector('.copy'), code = cb.querySelector('code');
+    if (!btn || !code) return;
+    btn.addEventListener('click', function(){
+      navigator.clipboard.writeText(code.innerText).then(function(){
+        btn.textContent = 'Copied'; setTimeout(function(){ btn.textContent = 'Copy'; }, 1500);
+      }, function(){ btn.textContent = 'Select and copy'; });
+    });
+  });
+  // Highlight the current section in "In this article"
+  var links = document.querySelectorAll('.aside-toc a');
+  if (links.length && 'IntersectionObserver' in window) {
+    var map = {}; links.forEach(function(a){ map[a.getAttribute('href').slice(1)] = a; });
+    var obs = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if (e.isIntersecting) {
+        links.forEach(function(a){ a.classList.remove('on'); });
+        var a = map[e.target.id]; if (a) a.classList.add('on');
+      }});
+    }, {rootMargin: '0px 0px -75% 0px'});
+    Object.keys(map).forEach(function(id){ var h = document.getElementById(id); if (h) obs.observe(h); });
+  }
+})();
+</script>
 </body>
 </html>
