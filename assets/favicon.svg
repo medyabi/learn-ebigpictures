@@ -1,0 +1,13 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- cloud -->
+  <path d="M17 30a10 10 0 0 1 1.6-19.9A13 13 0 0 1 43.3 9.4 9.5 9.5 0 1 1 47 30Z" fill="#00A4EF"/>
+  <!-- server units -->
+  <rect x="8" y="34" width="48" height="12" rx="3" fill="#34495A"/>
+  <rect x="8" y="49" width="48" height="12" rx="3" fill="#34495A"/>
+  <rect x="14" y="38.5" width="5" height="3" rx="1" fill="#F25022"/>
+  <rect x="22" y="38.5" width="5" height="3" rx="1" fill="#7FBA00"/>
+  <rect x="14" y="53.5" width="5" height="3" rx="1" fill="#FFB900"/>
+  <rect x="22" y="53.5" width="5" height="3" rx="1" fill="#7FBA00"/>
+  <rect x="33" y="39.25" width="18" height="1.5" rx=".75" fill="#8FA3B3"/>
+  <rect x="33" y="54.25" width="18" height="1.5" rx=".75" fill="#8FA3B3"/>
+</svg>

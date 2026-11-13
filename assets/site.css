@@ -48,7 +48,7 @@ img { max-width: 100%; height: auto; }
 .top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px;
   padding: 14px 24px; border-bottom: 1px solid var(--line); background: var(--surface); position: sticky; top: 0; z-index: 5; }
 .brand { display: flex; align-items: center; gap: 10px; font: 600 1.05rem var(--font-body); color: var(--ink); text-decoration: none; }
-.brand-mark { width: 18px; height: 18px; border-radius: 4px; background: linear-gradient(135deg, var(--hybrid) 50%, var(--security) 50%); }
+.brand-mark { width: 22px; height: 22px; display: block; }
 .tracks { display: flex; gap: 6px; }
 .tracks a { padding: 6px 12px; border-radius: 6px; color: var(--muted); text-decoration: none; font-weight: 500; }
 .tracks a:hover { color: var(--ink); background: var(--bg); }
@@ -151,3 +151,12 @@ body.track-access .button { --c: var(--hybrid); }
 .faq dd { margin: 4px 0 0; color: var(--muted); max-width: 70ch; }
 .access-table td { white-space: nowrap; vertical-align: middle; }
 @media (max-width: 600px) { .access-table th:nth-child(3), .access-table td:nth-child(3) { display: none; } }
+
+/* Home: lab access band */
+.access-band { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 16px 32px;
+  background: var(--hybrid-soft); border: 1px solid var(--line); border-left: 4px solid var(--hybrid); border-radius: 10px; padding: 22px 24px; margin: 0 0 8px; }
+.access-band > div { flex: 1 1 420px; }
+.access-band .eyebrow { color: var(--hybrid); }
+.access-band h2 { margin: 0 0 6px; border: 0; padding: 0; font-size: 1.4rem; }
+.access-band p { margin: 0; }
+.access-band .button { --c: var(--hybrid); }

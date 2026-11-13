@@ -226,11 +226,14 @@ def shell(out_rel, title, body, track=None, extra="", head=""):
 <meta name="description" content="Hands-on Windows Server 2025 labs: hybrid management with Azure Arc, and Windows Server security.">
 {FONTS}
 <link rel="stylesheet" href="{css}">
+<link rel="icon" href="{rel(out_rel, 'assets/favicon.svg')}" type="image/svg+xml">
+<link rel="icon" href="{rel(out_rel, 'assets/favicon-32.png')}" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="{rel(out_rel, 'assets/apple-touch-icon.png')}">
 {head}</head>
 <body class="track-{track or 'home'}">
 <a class="skip" href="#content">Skip to content</a>
 <header class="top">
-  <a class="brand" href="{home}"><span class="brand-mark" aria-hidden="true"></span>Windows Server Labs</a>
+  <a class="brand" href="{home}"><img class="brand-mark" src="{rel(out_rel, 'assets/favicon.svg')}" alt="" width="22" height="22">Windows Server Labs</a>
   <nav class="tracks" aria-label="Tracks"><a href="{hyb}"{cur_h}>Hybrid</a><a href="{sec}"{cur_s}>Security</a><a href="{acc}"{cur_a}>Lab access</a></nav>
 </header>
 <div class="layout {layout}">
@@ -285,6 +288,15 @@ def home_page():
     <p><a class="button" href="security/setup.html">Build the lab and start</a></p>
   </article>
 </div>
+
+<section class="access-band">
+  <div>
+    <p class="eyebrow">MTS team · Remote lab access</p>
+    <h2>Connect to your lab VM from anywhere</h2>
+    <p>Each engineer has a personal Windows Server 2025 VM, reached over HTTPS through our Remote Desktop Gateway. Download your connection file, sign in, and start the hybrid labs.</p>
+  </div>
+  <p><a class="button" href="access/index.html">Get your connection file</a></p>
+</section>
 
 <section class="how">
   <h2>How every lab works</h2>
@@ -406,8 +418,16 @@ for u, vm, ip in ENGINEERS:
 with open(os.path.join(OUT, "robots.txt"), "w") as fh:
     fh.write("User-agent: *\nDisallow: /access/\n")
 
-shutil.copyfile(os.path.join(os.path.dirname(os.path.abspath(__file__)), "site.css"),
-                os.path.join(OUT, "assets", "site.css"))
+TOOLS = os.path.dirname(os.path.abspath(__file__))
+shutil.copyfile(os.path.join(TOOLS, "site.css"), os.path.join(OUT, "assets", "site.css"))
+shutil.copyfile(os.path.join(TOOLS, "favicon.svg"), os.path.join(OUT, "assets", "favicon.svg"))
+import subprocess
+from PIL import Image
+for size, name in ((32, "favicon-32.png"), (180, "apple-touch-icon.png"), (48, "_ico48.png")):
+    subprocess.run(["rsvg-convert", "-w", str(size), "-h", str(size),
+                    os.path.join(TOOLS, "favicon.svg"), "-o", os.path.join(OUT, "assets", name)], check=True)
+Image.open(os.path.join(OUT, "assets", "_ico48.png")).save(os.path.join(OUT, "favicon.ico"), sizes=[(16, 16), (32, 32), (48, 48)])
+os.remove(os.path.join(OUT, "assets", "_ico48.png"))
 with open(os.path.join(OUT, "CNAME"), "w") as fh:
     fh.write("learn.ebigpictures.com\n")
 open(os.path.join(OUT, ".nojekyll"), "w").close()
