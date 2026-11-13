@@ -142,3 +142,12 @@ li.task input { margin-right: 8px; accent-color: var(--accent); }
   .layout { padding: 20px 16px 40px; }
 }
 @media (prefers-reduced-motion: reduce) { * { scroll-behavior: auto !important; transition: none !important; } }
+
+/* Access page */
+.card-note { font-size: 0.9rem; color: var(--muted); margin: 0 0 12px; }
+.button.small { padding: 5px 10px; font-size: 0.85rem; white-space: nowrap; }
+body.track-access .button { --c: var(--hybrid); }
+.faq dt { font-weight: 600; margin-top: 14px; }
+.faq dd { margin: 4px 0 0; color: var(--muted); max-width: 70ch; }
+.access-table td { white-space: nowrap; vertical-align: middle; }
+@media (max-width: 600px) { .access-table th:nth-child(3), .access-table td:nth-child(3) { display: none; } }

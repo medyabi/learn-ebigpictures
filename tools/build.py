@@ -203,16 +203,18 @@ def sidebar(track, out_rel):
             f'<ol class="side-list">{"".join(parts)}</ol></nav>')
 
 
-def shell(out_rel, title, body, track=None, extra=""):
+def shell(out_rel, title, body, track=None, extra="", head=""):
     css = rel(out_rel, "assets/site.css")
     home = rel(out_rel, "index.html")
     hyb = rel(out_rel, "hybrid/index.html")
     sec = rel(out_rel, "security/index.html")
+    acc = rel(out_rel, "access/index.html")
+    cur_a = ' aria-current="true"' if track == "access" else ""
     cur_h = ' aria-current="true"' if track == "hybrid" else ""
     cur_s = ' aria-current="true"' if track == "security" else ""
-    side = sidebar(track, out_rel) if track else ""
-    layout = "with-side" if track else "plain"
-    repo = REPO_URL["hyb" if track == "hybrid" else "sec"] if track else None
+    side = sidebar(track, out_rel) if track in ("hybrid", "security") else ""
+    layout = "with-side" if side else "plain"
+    repo = REPO_URL["hyb" if track == "hybrid" else "sec"] if track in ("hybrid", "security") else None
     src_link = f'<a href="{repo}" rel="noopener">Source on GitHub</a> · ' if repo else ""
     full_title = f"{title} · Windows Server Labs" if title != "Windows Server Labs" else title
     return f"""<!DOCTYPE html>
@@ -224,12 +226,12 @@ def shell(out_rel, title, body, track=None, extra=""):
 <meta name="description" content="Hands-on Windows Server 2025 labs: hybrid management with Azure Arc, and Windows Server security.">
 {FONTS}
 <link rel="stylesheet" href="{css}">
-</head>
+{head}</head>
 <body class="track-{track or 'home'}">
 <a class="skip" href="#content">Skip to content</a>
 <header class="top">
   <a class="brand" href="{home}"><span class="brand-mark" aria-hidden="true"></span>Windows Server Labs</a>
-  <nav class="tracks" aria-label="Tracks"><a href="{hyb}"{cur_h}>Hybrid</a><a href="{sec}"{cur_s}>Security</a></nav>
+  <nav class="tracks" aria-label="Tracks"><a href="{hyb}"{cur_h}>Hybrid</a><a href="{sec}"{cur_s}>Security</a><a href="{acc}"{cur_a}>Lab access</a></nav>
 </header>
 <div class="layout {layout}">
 {side}
@@ -272,6 +274,7 @@ def home_page():
     <h2><a href="hybrid/index.html">Hybrid management with Azure Arc</a></h2>
     <p>One Windows Server 2025 VM per person. Connect it to Azure Arc, unlock the Software Assurance benefits, and use Hotpatch, Azure Policy, Azure Monitor, Change Tracking, Defender for Cloud and Windows Admin Center in Azure. Every lab ends with customer talking points.</p>
     <ol class="mini">{hyb_list}</ol>
+    <p class="card-note">MTS engineer? <a href="access/index.html">Get your VM connection file</a>.</p>
     <p><a class="button" href="hybrid/index.html">Start the hybrid track</a></p>
   </article>
   <article class="track-card security">
@@ -305,6 +308,70 @@ def home_page():
     return shell(out, "Windows Server Labs", body)
 
 
+
+# --------------------------------------------------------------------------
+# 5b. Lab access page (RD Gateway connection files for the MTS team)
+# --------------------------------------------------------------------------
+GATEWAY = "labs.ebigpictures.com"
+ENGINEERS = [(f"mts{i:02d}", f"WS25-VM{i:02d}", f"192.168.100.{89 + i}") for i in range(1, 9)]
+
+
+def rdp_text(user, ip):
+    return "\r\n".join([
+        f"full address:s:{ip}", f"username:s:.\\{user}", f"gatewayhostname:s:{GATEWAY}",
+        "gatewayusagemethod:i:1", "gatewayprofileusagemethod:i:1", "gatewaycredentialssource:i:0",
+        "promptcredentialonce:i:0", "authentication level:i:2", "prompt for credentials:i:1",
+        "screen mode id:i:2", "use multimon:i:0", "redirectclipboard:i:1", "redirectprinters:i:0",
+        "redirectdrives:i:0", "audiomode:i:2", ""])
+
+
+def access_page():
+    out = "access/index.html"
+    rows = "".join(
+        f'<tr><td><code>{u}</code></td><td>{vm}</td><td><code>{ip}</code></td>'
+        f'<td><a class="button small" href="rdp/{u}-{vm}.rdp" download>Download {u}.rdp</a></td></tr>'
+        for u, vm, ip in ENGINEERS)
+    labs = "".join(f'<li><a href="{rel(out, t)}">{html.escape(re.sub(r"^Lab \d+:\s*", "", l))}</a></li>'
+                   for l, t in hyb_nav[1:-1])
+    body = f"""
+<p class="eyebrow">MTS team · Windows Server 2025 · Azure Arc</p>
+<h1>Hybrid lab access</h1>
+<p class="lede">Each engineer has a personal Windows Server 2025 VM for the hybrid labs. You reach it from anywhere over HTTPS, through our Remote Desktop Gateway at <code>{GATEWAY}</code>. Your password arrives privately from Mohamed, never on this page.</p>
+
+<h2>Connect in four steps</h2>
+<ol>
+<li>Find your user name in the table below and download your connection file.</li>
+<li>Double-click the <code>.rdp</code> file. On a Mac, iPad or phone, open it with Microsoft's free <strong>Windows App</strong>.</li>
+<li>At the security warning, tick <strong>Clipboard</strong> if you want copy-paste, then click <strong>Connect</strong>.</li>
+<li>Sign in twice, with the same password both times: first the gateway as <code>RDGW01\\mtsNN</code>, then your lab VM as <code>.\\mtsNN</code>. For example <code>RDGW01\\mts03</code>, then <code>.\\mts03</code>.</li>
+</ol>
+
+<h2>Your connection file</h2>
+<p>Each user name reaches one VM only. Download only your own file.</p>
+<div class="table-wrap"><table class="access-table">
+<thead><tr><th>User</th><th>Lab VM</th><th>Address</th><th>Connection file</th></tr></thead>
+<tbody>{rows}</tbody>
+</table></div>
+
+<h2>About the security warning</h2>
+<blockquote><p><strong>"Unknown publisher" is expected.</strong> It appears because the connection file isn't digitally signed. The connection itself is encrypted over HTTPS to <code>{GATEWAY}</code> with a trusted certificate. Check that the gateway server shown is <code>{GATEWAY}</code>, then click Connect.</p></blockquote>
+
+<h2>The labs</h2>
+<p>Nine labs, about 8 hours in total. Do them in order. Each ends with customer talking points.</p>
+<ol>{labs}</ol>
+
+<h2>If something goes wrong</h2>
+<dl class="faq">
+<dt>"There was a problem connecting to the remote resource"</dt><dd>Check that you typed the gateway sign-in as <code>RDGW01\\mtsNN</code>. If you're on the same office network as the lab, try from another connection, such as a phone hotspot.</dd>
+<dt>Your account is locked</dt><dd>After Lab 9 (security baseline), three wrong passwords lock your VM account for 15 minutes. Wait, then sign in carefully.</dd>
+<dt>You broke your VM during a lab</dt><dd>That's fine. Ask Mohamed: a VM is reset to its clean baseline in a few minutes.</dd>
+<dt>Something else</dt><dd>Send Mohamed the error message, or a screenshot of it, and the time it happened.</dd>
+</dl>
+<p><em>Don't forward your password outside the team.</em></p>
+"""
+    return shell(out, "Hybrid lab access", body, "access",
+                 head='<meta name="robots" content="noindex, nofollow">\n')
+
 # --------------------------------------------------------------------------
 # 6. Build
 # --------------------------------------------------------------------------
@@ -330,6 +397,15 @@ for (repo, src), out in pages.items():
 with open(os.path.join(OUT, "index.html"), "w", encoding="utf-8") as fh:
     fh.write(home_page())
 
+os.makedirs(os.path.join(OUT, "access", "rdp"), exist_ok=True)
+with open(os.path.join(OUT, "access", "index.html"), "w", encoding="utf-8") as fh:
+    fh.write(access_page())
+for u, vm, ip in ENGINEERS:
+    with open(os.path.join(OUT, "access", "rdp", f"{u}-{vm}.rdp"), "w", encoding="utf-8", newline="") as fh:
+        fh.write(rdp_text(u, ip))
+with open(os.path.join(OUT, "robots.txt"), "w") as fh:
+    fh.write("User-agent: *\nDisallow: /access/\n")
+
 shutil.copyfile(os.path.join(os.path.dirname(os.path.abspath(__file__)), "site.css"),
                 os.path.join(OUT, "assets", "site.css"))
 with open(os.path.join(OUT, "CNAME"), "w") as fh:
@@ -341,4 +417,4 @@ nf = shell("404.html", "Page not found",
 nf = re.sub(r'(href|src)="(?!https?:|/|#)', r'\1="/', nf)
 with open(os.path.join(OUT, "404.html"), "w", encoding="utf-8") as fh:
     fh.write(nf)
-print(f"{len(pages) + 2} pages written to {OUT}")
+print(f"{len(pages) + 3} pages written to {OUT}")

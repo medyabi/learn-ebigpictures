@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Hybrid lab access · Windows Server Labs</title>
+<meta name="description" content="Hands-on Windows Server 2025 labs: hybrid management with Azure Arc, and Windows Server security.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+<meta name="robots" content="noindex, nofollow">
+</head>
+<body class="track-access">
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+  <a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true"></span>Windows Server Labs</a>
+  <nav class="tracks" aria-label="Tracks"><a href="../hybrid/index.html">Hybrid</a><a href="../security/index.html">Security</a><a href="index.html" aria-current="true">Lab access</a></nav>
+</header>
+<div class="layout plain">
+
+<main id="content" class="prose">
+
+<p class="eyebrow">MTS team · Windows Server 2025 · Azure Arc</p>
+<h1>Hybrid lab access</h1>
+<p class="lede">Each engineer has a personal Windows Server 2025 VM for the hybrid labs. You reach it from anywhere over HTTPS, through our Remote Desktop Gateway at <code>labs.ebigpictures.com</code>. Your password arrives privately from Mohamed, never on this page.</p>
+
+<h2>Connect in four steps</h2>
+<ol>
+<li>Find your user name in the table below and download your connection file.</li>
+<li>Double-click the <code>.rdp</code> file. On a Mac, iPad or phone, open it with Microsoft's free <strong>Windows App</strong>.</li>
+<li>At the security warning, tick <strong>Clipboard</strong> if you want copy-paste, then click <strong>Connect</strong>.</li>
+<li>Sign in twice, with the same password both times: first the gateway as <code>RDGW01\mtsNN</code>, then your lab VM as <code>.\mtsNN</code>. For example <code>RDGW01\mts03</code>, then <code>.\mts03</code>.</li>
+</ol>
+
+<h2>Your connection file</h2>
+<p>Each user name reaches one VM only. Download only your own file.</p>
+<div class="table-wrap"><table class="access-table">
+<thead><tr><th>User</th><th>Lab VM</th><th>Address</th><th>Connection file</th></tr></thead>
+<tbody><tr><td><code>mts01</code></td><td>WS25-VM01</td><td><code>192.168.100.90</code></td><td><a class="button small" href="rdp/mts01-WS25-VM01.rdp" download>Download mts01.rdp</a></td></tr><tr><td><code>mts02</code></td><td>WS25-VM02</td><td><code>192.168.100.91</code></td><td><a class="button small" href="rdp/mts02-WS25-VM02.rdp" download>Download mts02.rdp</a></td></tr><tr><td><code>mts03</code></td><td>WS25-VM03</td><td><code>192.168.100.92</code></td><td><a class="button small" href="rdp/mts03-WS25-VM03.rdp" download>Download mts03.rdp</a></td></tr><tr><td><code>mts04</code></td><td>WS25-VM04</td><td><code>192.168.100.93</code></td><td><a class="button small" href="rdp/mts04-WS25-VM04.rdp" download>Download mts04.rdp</a></td></tr><tr><td><code>mts05</code></td><td>WS25-VM05</td><td><code>192.168.100.94</code></td><td><a class="button small" href="rdp/mts05-WS25-VM05.rdp" download>Download mts05.rdp</a></td></tr><tr><td><code>mts06</code></td><td>WS25-VM06</td><td><code>192.168.100.95</code></td><td><a class="button small" href="rdp/mts06-WS25-VM06.rdp" download>Download mts06.rdp</a></td></tr><tr><td><code>mts07</code></td><td>WS25-VM07</td><td><code>192.168.100.96</code></td><td><a class="button small" href="rdp/mts07-WS25-VM07.rdp" download>Download mts07.rdp</a></td></tr><tr><td><code>mts08</code></td><td>WS25-VM08</td><td><code>192.168.100.97</code></td><td><a class="button small" href="rdp/mts08-WS25-VM08.rdp" download>Download mts08.rdp</a></td></tr></tbody>
+</table></div>
+
+<h2>About the security warning</h2>
+<blockquote><p><strong>"Unknown publisher" is expected.</strong> It appears because the connection file isn't digitally signed. The connection itself is encrypted over HTTPS to <code>labs.ebigpictures.com</code> with a trusted certificate. Check that the gateway server shown is <code>labs.ebigpictures.com</code>, then click Connect.</p></blockquote>
+
+<h2>The labs</h2>
+<p>Nine labs, about 8 hours in total. Do them in order. Each ends with customer talking points.</p>
+<ol><li><a href="../hybrid/01-windows-admin-center.html">Windows Admin Center</a></li><li><a href="../hybrid/02-azure-arc-onboarding-and-azure-benefits.html">Azure Arc onboarding and Azure benefits</a></li><li><a href="../hybrid/03-hotpatching-with-azure-arc.html">Hotpatching with Azure Arc</a></li><li><a href="../hybrid/04-azure-policy-and-machine-configuration.html">Azure Policy and Machine Configuration</a></li><li><a href="../hybrid/05-azure-monitor.html">Azure Monitor</a></li><li><a href="../hybrid/06-change-tracking-and-inventory.html">Change Tracking and Inventory</a></li><li><a href="../hybrid/07-microsoft-defender-for-cloud.html">Microsoft Defender for Cloud</a></li><li><a href="../hybrid/08-windows-management-from-azure.html">Windows management from Azure</a></li><li><a href="../hybrid/09-security-baseline-with-osconfig.html">Security baseline with OSConfig</a></li></ol>
+
+<h2>If something goes wrong</h2>
+<dl class="faq">
+<dt>"There was a problem connecting to the remote resource"</dt><dd>Check that you typed the gateway sign-in as <code>RDGW01\mtsNN</code>. If you're on the same office network as the lab, try from another connection, such as a phone hotspot.</dd>
+<dt>Your account is locked</dt><dd>After Lab 9 (security baseline), three wrong passwords lock your VM account for 15 minutes. Wait, then sign in carefully.</dd>
+<dt>You broke your VM during a lab</dt><dd>That's fine. Ask Mohamed: a VM is reset to its clean baseline in a few minutes.</dd>
+<dt>Something else</dt><dd>Send Mohamed the error message, or a screenshot of it, and the time it happened.</dd>
+</dl>
+<p><em>Don't forward your password outside the team.</em></p>
+
+</main>
+</div>
+<footer class="foot"><p>By Mohamed Dyabi, Microsoft Certified Trainer · learn.ebigpictures.com</p>
+<p class="small">Lab environments only. Several labs change security settings, lock accounts or force recovery. Never run them on production systems.</p></footer>
+
+</body>
+</html>
