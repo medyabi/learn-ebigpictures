@@ -107,28 +107,28 @@
 <h2 id="step-by-step">🧪 Step by step</h2>
 <p><strong>Part 1: Azure Disk Encryption.</strong></p>
 <ol>
-<li>Create a <strong>Key Vault</strong> in <strong>az801-rg</strong>. Under <strong>Access configuration</strong>, tick <strong>Azure Disk Encryption for volume encryption</strong>.</li>
+<li>Create a <strong>Key Vault</strong> in <strong>seclab-rg</strong>. Under <strong>Access configuration</strong>, tick <strong>Azure Disk Encryption for volume encryption</strong>.</li>
 <li>In the Key Vault, go to <strong>Keys &gt; Generate/Import</strong>. Name the key <strong>ade-key</strong>, type RSA, size 2048.</li>
 <li>Create a Windows Server 2025 VM called <strong>win1</strong>, with one data disk. Make sure it's <strong>running</strong>.</li>
 <li>Open the VM, go to <strong>Disks &gt; Additional settings</strong> (or <strong>Encryption</strong>). Choose <strong>OS and data disks</strong>, select your Key Vault and <strong>ade-key</strong>, and save.</li>
 </ol>
 <p>Prefer PowerShell? Here's the same thing:</p>
-<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>$kv  = Get-AzKeyVault -VaultName &lt;your-vault&gt; -ResourceGroupName az801-rg
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>$kv  = Get-AzKeyVault -VaultName &lt;your-vault&gt; -ResourceGroupName seclab-rg
 $key = Get-AzKeyVaultKey -VaultName $kv.VaultName -Name ade-key
-Set-AzVMDiskEncryptionExtension -ResourceGroupName az801-rg -VMName win1 -DiskEncryptionKeyVaultUrl $kv.VaultUri -DiskEncryptionKeyVaultId $kv.ResourceId -KeyEncryptionKeyUrl $key.Id -KeyEncryptionKeyVaultId $kv.ResourceId -VolumeType All</code></pre></div>
+Set-AzVMDiskEncryptionExtension -ResourceGroupName seclab-rg -VMName win1 -DiskEncryptionKeyVaultUrl $kv.VaultUri -DiskEncryptionKeyVaultId $kv.ResourceId -KeyEncryptionKeyUrl $key.Id -KeyEncryptionKeyVaultId $kv.ResourceId -VolumeType All</code></pre></div>
 <p>The first two lines grab the vault and the key. The last line installs the ADE extension in the VM, which turns on BitLocker for all volumes. The key-encryption key (KEK) wraps the BitLocker key, so it's never stored in plain text.</p>
 <p>Let's check:</p>
-<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>Get-AzVMDiskEncryptionStatus -ResourceGroupName az801-rg -VMName win1</code></pre></div>
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>Get-AzVMDiskEncryptionStatus -ResourceGroupName seclab-rg -VMName win1</code></pre></div>
 <p><strong>OsVolumeEncrypted</strong> and <strong>DataVolumesEncrypted</strong> both say <strong>Encrypted</strong>. Connect to the VM and run <code>manage-bde -status</code>. Yes, it's plain BitLocker inside.</p>
 <p><strong>Part 2: customer-managed key with a Disk Encryption Set.</strong></p>
 <ol>
-<li>Go to <strong>Disk Encryption Sets &gt; Create</strong>. Name it <strong>az801-des</strong>, encryption type <strong>Encryption at-rest with a customer-managed key</strong>, and choose your Key Vault and a key.</li>
-<li>Stop (deallocate) a VM. Open <strong>Disks</strong>, click the OS disk, go to <strong>Encryption</strong>, and choose <strong>az801-des</strong>. Save, then start the VM.</li>
+<li>Go to <strong>Disk Encryption Sets &gt; Create</strong>. Name it <strong>seclab-des</strong>, encryption type <strong>Encryption at-rest with a customer-managed key</strong>, and choose your Key Vault and a key.</li>
+<li>Stop (deallocate) a VM. Open <strong>Disks</strong>, click the OS disk, go to <strong>Encryption</strong>, and choose <strong>seclab-des</strong>. Save, then start the VM.</li>
 </ol>
 <p>On the disk's <strong>Encryption</strong> page you now see <strong>customer-managed key</strong>, with your key's name.</p>
-<div class="alert note"><p class="alert-title">Note</p><p>📌 <strong>2025 note.</strong> Microsoft announced that <strong>Azure Disk Encryption will be retired in September 2028</strong>, and recommends <strong>encryption at host</strong> for new VMs. Learn ADE for the exam, but use encryption at host for new real-world deployments. Check the date on Microsoft Learn before class; these things move.</p></div>
+<div class="alert note"><p class="alert-title">Note</p><p>📌 <strong>2025 note.</strong> Microsoft announced that <strong>Azure Disk Encryption will be retired in September 2028</strong>, and recommends <strong>encryption at host</strong> for new VMs. Know how ADE works, but use encryption at host for new deployments. Check the date on Microsoft Learn before class; these things move.</p></div>
 <h2 id="key-takeaway">✅ Key takeaway</h2>
-<p>You need to know which layer protects against which risk, and who holds the keys. That's also a favourite exam topic.</p>
+<p>You need to know which layer protects against which risk, and who holds the keys.</p>
 <hr />
 <nav class="pager"><a href="lab-6.2-bitlocker-forced-recovery.html">← Lab 6.2</a> <a href="index.html">Chapter overview</a></nav>
 </article>

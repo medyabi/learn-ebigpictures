@@ -104,7 +104,7 @@ New-ADUser Adam -AccountPassword $pw -Enabled $true
 New-ADUser John -AccountPassword $pw -Enabled $true
 Add-ADGroupMember "Domain Admins" -Members Adam, John</code></pre></div>
 <p>On SEA-CL1, add <strong>RSAT</strong> (the admin tools): <em>Settings &gt; System &gt; Optional features &gt; Add a feature</em>, search for <strong>RSAT</strong>, add Active Directory and Group Policy tools.</p>
-<p>For the Azure chapters you need an <strong>Azure free trial</strong> subscription, a <strong>Microsoft Entra ID P2 trial</strong>, and a resource group called <strong>az801-rg</strong>.</p>
+<p>For the Azure chapters you need an <strong>Azure free trial</strong> subscription, a <strong>Microsoft Entra ID P2 trial</strong>, and a resource group called <strong>seclab-rg</strong>.</p>
 <p>Last tip: take a <strong>checkpoint</strong> of every VM and call it <em>Baseline</em>. Some labs can lock you out of a server. With a checkpoint, you're back in 30 seconds.</p>
 <p>Ready? Let's go!</p>
 <h2 id="extra-setup-the-labs-assume">Extra setup the labs assume</h2>

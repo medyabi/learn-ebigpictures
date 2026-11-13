@@ -42,7 +42,7 @@
 </tr>
 <tr>
 <td><strong>Needs</strong></td>
-<td>Azure subscription (resource group az801-rg)</td>
+<td>Azure subscription (resource group seclab-rg)</td>
 </tr>
 <tr>
 <td><strong>Checkpoint first</strong></td>
@@ -69,8 +69,8 @@
 <p>The Security events are copied to Azure within minutes. Clearing the local log doesn't touch the copy. You still see the new account (event <strong>4720</strong>) and the group change (event <strong>4732</strong>). Even the log clearing itself shows up (event <strong>1102</strong>).</p>
 <h2 id="step-by-step">🧪 Step by step</h2>
 <ol>
-<li>In the Azure portal, create two <strong>Log Analytics workspaces</strong> in <strong>az801-rg</strong>: <strong>law-infra</strong> and <strong>law-sentinel</strong>.</li>
-<li>Go to <strong>Azure Arc &gt; Machines &gt; Add/Create &gt; Add a single server &gt; Generate script</strong>. Choose <strong>az801-rg</strong>, your region, <strong>Windows</strong>, and <strong>Public endpoint</strong>.</li>
+<li>In the Azure portal, create two <strong>Log Analytics workspaces</strong> in <strong>seclab-rg</strong>: <strong>law-infra</strong> and <strong>law-sentinel</strong>.</li>
+<li>Go to <strong>Azure Arc &gt; Machines &gt; Add/Create &gt; Add a single server &gt; Generate script</strong>. Choose <strong>seclab-rg</strong>, your region, <strong>Windows</strong>, and <strong>Public endpoint</strong>.</li>
 <li>Copy the script to SEA-SVR1 and run it in an elevated PowerShell. It asks you to sign in with a device code at <code>https://microsoft.com/devicelogin</code>.</li>
 <li>Back in the portal, SEA-SVR1 shows as <strong>Connected</strong> under Azure Arc.</li>
 </ol>

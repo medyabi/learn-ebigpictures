@@ -420,7 +420,7 @@ def home_page():
     body = f"""
 <section class="hero">
   <div class="wrap">
-    <p class="kicker">Windows Server 2025 · Azure Arc · AZ-801</p>
+    <p class="kicker">Windows Server 2025 · Azure Arc · Security</p>
     <h1>Learn Windows Server by doing it, one lab at a time</h1>
     <p class="lede">Two hands-on tracks. In the first, you take an on-premises server and manage it from Azure. In the second, you watch an attack, build the control that stops it, and prove that it works.</p>
     <p class="cta"><a class="btn primary" href="hybrid/index.html">Start the hybrid track</a><a class="btn" href="security/setup.html">Build the security lab</a></p>
@@ -438,7 +438,7 @@ def home_page():
     <p class="card-foot"><a href="hybrid/index.html">Start the hybrid track ›</a></p>
   </article>
   <article class="card">
-    <div class="card-head"><span class="ico c-red">{ICONS['security']}</span><div><p class="card-kicker">Learning path · {n_sec} labs · AZ-801</p>
+    <div class="card-head"><span class="ico c-red">{ICONS['security']}</span><div><p class="card-kicker">Learning path · {n_sec} labs · attack, then defend</p>
     <h3><a href="security/index.html">Securing Windows Server</a></h3></div></div>
     <p>Four VMs, one domain, and an attacker. Each lab shows the attack first, then builds the control that stops it: passwords and lockout, Credential Guard, App Control, Protected Users, RODC, delegation, Sentinel, IPsec and BitLocker.</p>
     <ol class="mini">{sec_list}</ol>
