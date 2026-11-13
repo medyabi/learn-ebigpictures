@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab 7: Microsoft Defender for Cloud (60 min) · Windows Server Labs</title>
+<meta name="description" content="Hands-on Windows Server 2025 labs: hybrid management with Azure Arc, and Windows Server security.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body class="track-hybrid">
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+  <a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true"></span>Windows Server Labs</a>
+  <nav class="tracks" aria-label="Tracks"><a href="index.html" aria-current="true">Hybrid</a><a href="../security/index.html">Security</a></nav>
+</header>
+<div class="layout with-side">
+<nav class="side" aria-label="Hybrid labs"><p class="side-title">Hybrid track</p><ol class="side-list"><li><a href="index.html">Overview</a></li><li><a href="01-windows-admin-center.html">Lab 1: Windows Admin Center</a></li><li><a href="02-azure-arc-onboarding-and-azure-benefits.html">Lab 2: Azure Arc onboarding and Azure benefits</a></li><li><a href="03-hotpatching-with-azure-arc.html">Lab 3: Hotpatching with Azure Arc</a></li><li><a href="04-azure-policy-and-machine-configuration.html">Lab 4: Azure Policy and Machine Configuration</a></li><li><a href="05-azure-monitor.html">Lab 5: Azure Monitor</a></li><li><a href="06-change-tracking-and-inventory.html">Lab 6: Change Tracking and Inventory</a></li><li><a href="07-microsoft-defender-for-cloud.html" aria-current="page">Lab 7: Microsoft Defender for Cloud</a></li><li><a href="08-windows-management-from-azure.html">Lab 8: Windows management from Azure</a></li><li><a href="09-security-baseline-with-osconfig.html">Lab 9: Security baseline with OSConfig</a></li><li><a href="cleanup-and-reset.html">Cleanup and reset</a></li></ol></nav>
+<main id="content" class="prose">
+<h1 id="lab-7-microsoft-defender-for-cloud-60-min">Lab 7: Microsoft Defender for Cloud (60 min)</h1>
+<nav class="pager"><a href="06-change-tracking-and-inventory.html">← Lab 6</a> <a href="index.html">Overview</a> <a href="08-windows-management-from-azure.html">Lab 8 →</a></nav>
+<p>In this lab your on-premises server gets the same protection as an Azure VM: security recommendations, a secure score, endpoint protection and alerts. And you trigger a safe test alert to see it end to end.</p>
+<p><strong>Two layers, two prices:</strong></p>
+<ul>
+<li><strong>Foundational CSPM</strong> (free) — security recommendations and a <strong>secure score</strong> for your resources.</li>
+<li><strong>Defender for Servers</strong> (paid, Plan 1 or Plan 2) — threat protection. It deploys <strong>Microsoft Defender for Endpoint</strong> on the server, adds vulnerability management, and Plan 2 adds features like agentless scanning, OS configuration assessment and file integrity monitoring.</li>
+</ul>
+<blockquote>
+<p><strong>Cost note:</strong> Defender for Servers is <strong>not</strong> part of the Azure benefits. Turning it on starts a <strong>30-day trial</strong> that can't be paused or extended. In a shared lab subscription, the <strong>instructor</strong> turns it on once, and turns it off after the session.</p>
+</blockquote>
+<h3 id="steps">Steps</h3>
+<p><strong>Part A — Instructor: turn on the plan</strong></p>
+<ol>
+<li><strong>Microsoft Defender for Cloud</strong> &gt; <strong>Environment settings</strong> &gt; select the lab subscription.</li>
+<li>Toggle <strong>Servers</strong> to <strong>On</strong>. It defaults to <strong>Plan 2</strong>; use <strong>Change plans</strong> to pick Plan 1 if you only need endpoint protection. Select <strong>Save</strong>.</li>
+</ol>
+<p><strong>Part B — Everyone: your server in Defender for Cloud</strong></p>
+<ol start="3">
+<li>Open your machine in <strong>Azure Arc</strong> &gt; <strong>Extensions</strong>. After a while you see <strong>MDE.Windows</strong> — Defender for Endpoint, deployed automatically.</li>
+<li>In <strong>Defender for Cloud</strong> &gt; <strong>Inventory</strong>, filter on your resource group. Select your server and look at its <strong>recommendations</strong> and their <strong>severity</strong>.</li>
+<li>Open <strong>Recommendations</strong> and pick one for your server. Read the <strong>remediation steps</strong>. Note which ones Lab 9 (OSConfig) will solve.</li>
+<li>Open <strong>Secure score</strong> and find your resource group's contribution.</li>
+</ol>
+<p><strong>Part C — Trigger a safe test alert</strong></p>
+<p>Microsoft documents two safe ways to check that detection works. Both create <strong>test</strong> alerts only.</p>
+<ol start="7">
+<li><strong>Sample alerts (fastest):</strong> in <strong>Defender for Cloud</strong> &gt; <strong>Security alerts</strong>, select <strong>Sample alerts</strong>, pick the subscription and the <strong>Defender for Servers</strong> plan, then <strong>Create sample alerts</strong>. They appear after a few minutes, for simulated resources.</li>
+<li><strong>A real test on your server:</strong> check that <strong>MDE.Windows</strong> is installed (step 3). Then, in <strong>Command Prompt as administrator</strong> on your VM, run the documented validation command:</li>
+</ol>
+<p><code>powershell.exe -NoExit -ExecutionPolicy Bypass -WindowStyle Hidden $ErrorActionPreference = 'silentlycontinue';(New-Object System.Net.WebClient).DownloadFile('http://127.0.0.1/1.exe', 'C:\test-MDATP-test\invoice.exe');Start-Process 'C:\test-MDATP-test\invoice.exe'</code></p>
+<p>The window closes by itself. It downloads nothing real — the address is the server itself.
+9. Within about 10 minutes, open <strong>Security alerts</strong>. You see an alert for <strong>your</strong> server. Open it and look at the details: what, where, when, and the suggested response.</p>
+<h3 id="check-yourself">Check yourself</h3>
+<ul>
+<li>What's free and what's paid? (Recommendations and secure score: free. Threat protection with Defender for Servers: paid, per server.)</li>
+<li>Does the customer need a separate Defender for Endpoint server licence? (No — Defender for Servers includes it.)</li>
+</ul>
+<h3 id="customer-talking-points">Customer talking points</h3>
+<ul>
+<li><strong>One security console</strong> for Azure, on-premises and other clouds. Arc is what brings the on-premises servers in.</li>
+<li>Start with <strong>free recommendations</strong> to show the gaps, then size <strong>Plan 1 vs Plan 2</strong> on what the customer needs to detect and prove.</li>
+<li>Defender alerts can flow into <strong>Microsoft Sentinel</strong> for the SOC.</li>
+<li>Good opening question: "Do your on-premises servers have the same EDR and security reporting as your cloud VMs?"</li>
+</ul>
+<hr />
+<nav class="pager"><a href="06-change-tracking-and-inventory.html">← Lab 6</a> <a href="index.html">Overview</a> <a href="08-windows-management-from-azure.html">Lab 8 →</a></nav>
+</main>
+</div>
+<footer class="foot"><p><a href="https://github.com/medyabi/windows-server2025-Hybrid-lab" rel="noopener">Source on GitHub</a> · By Mohamed Dyabi, Microsoft Certified Trainer · learn.ebigpictures.com</p>
+<p class="small">Lab environments only. Several labs change security settings, lock accounts or force recovery. Never run them on production systems.</p></footer>
+
+</body>
+</html>

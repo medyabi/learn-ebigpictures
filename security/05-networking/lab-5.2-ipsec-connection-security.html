@@ -1,0 +1,106 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab 5.2: IPsec connection security rules · Windows Server Labs</title>
+<meta name="description" content="Hands-on Windows Server 2025 labs: hybrid management with Azure Arc, and Windows Server security.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/site.css">
+</head>
+<body class="track-security">
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+  <a class="brand" href="../../index.html"><span class="brand-mark" aria-hidden="true"></span>Windows Server Labs</a>
+  <nav class="tracks" aria-label="Tracks"><a href="../../hybrid/index.html">Hybrid</a><a href="../index.html" aria-current="true">Security</a></nav>
+</header>
+<div class="layout with-side">
+<nav class="side" aria-label="Security labs"><p class="side-title">Security track</p><ol class="side-list"><li><a href="../index.html">Overview</a></li><li><a href="../setup.html">Lab setup</a></li><li class="group"><a href="../01-securing-the-os/index.html">Chapter 1: Securing the Windows Server operating system</a><ol><li><a href="../01-securing-the-os/lab-1.1-password-lockout-baseline.html">1.1: Password and lockout baseline with Group Policy</a></li><li><a href="../01-securing-the-os/lab-1.2-exploit-protection.html">1.2: Exploit protection</a></li><li><a href="../01-securing-the-os/lab-1.3-app-control-wdac.html">1.3: App Control for Business (WDAC)</a></li><li><a href="../01-securing-the-os/lab-1.4-credential-guard.html">1.4: Credential Guard</a></li><li><a href="../01-securing-the-os/lab-1.5-smartscreen.html">1.5: Microsoft Defender SmartScreen</a></li><li><a href="../01-securing-the-os/lab-1.6-defender-for-endpoint.html">1.6: Microsoft Defender for Endpoint</a></li></ol></li><li class="group"><a href="../02-hybrid-ad-accounts/index.html">Chapter 2: Securing hybrid Active Directory accounts</a><ol><li><a href="../02-hybrid-ad-accounts/lab-2.1-fine-grained-password-policy.html">2.1: Fine-grained password policy</a></li><li><a href="../02-hybrid-ad-accounts/lab-2.2-entra-password-protection.html">2.2: Microsoft Entra Password Protection</a></li><li><a href="../02-hybrid-ad-accounts/lab-2.3-protected-users.html">2.3: The Protected Users group</a></li><li><a href="../02-hybrid-ad-accounts/lab-2.4-rodc.html">2.4: Read-only domain controller (RODC)</a></li><li><a href="../02-hybrid-ad-accounts/lab-2.5-authentication-policy-silos.html">2.5: Authentication policies and silos</a></li></ol></li><li class="group"><a href="../03-least-privilege-and-delegation/index.html">Chapter 3: Least privilege and delegation</a><ol><li><a href="../03-least-privilege-and-delegation/lab-3.1-restricted-groups.html">3.1: Built-in admin groups and Restricted Groups</a></li><li><a href="../03-least-privilege-and-delegation/lab-3.2-delegation-of-control.html">3.2: Delegation of Control</a></li><li><a href="../03-least-privilege-and-delegation/lab-3.3-kerberos-double-hop.html">3.3: The Kerberos double-hop</a></li><li><a href="../03-least-privilege-and-delegation/lab-3.4-defender-for-identity.html">3.4: Microsoft Defender for Identity</a></li></ol></li><li class="group"><a href="../04-watching-from-azure/index.html">Chapter 4: Watching your servers from Azure</a><ol><li><a href="../04-watching-from-azure/lab-4.1-azure-arc-log-analytics.html">4.1: Azure Arc and Log Analytics</a></li><li><a href="../04-watching-from-azure/lab-4.2-kql-hunting-and-alerts.html">4.2: Hunting with KQL and creating an alert</a></li><li><a href="../04-watching-from-azure/lab-4.3-microsoft-sentinel.html">4.3: Microsoft Sentinel</a></li><li><a href="../04-watching-from-azure/lab-4.4-secure-score.html">4.4: Improving the Secure Score with Defender for Cloud</a></li></ol></li><li class="group"><a href="index.html">Chapter 5: Securing Windows Server networking</a><ol><li><a href="lab-5.1-windows-firewall.html">5.1: Windows Defender Firewall</a></li><li><a href="lab-5.2-ipsec-connection-security.html" aria-current="page">5.2: IPsec connection security rules</a></li><li><a href="lab-5.3-firewall-review-wac.html">5.3: Firewall review with Windows Admin Center</a></li></ol></li><li class="group"><a href="../06-storage-encryption/index.html">Chapter 6: Securing Windows Server storage</a><ol><li><a href="../06-storage-encryption/lab-6.1-bitlocker-ad-recovery.html">6.1: BitLocker with recovery keys in Active Directory</a></li><li><a href="../06-storage-encryption/lab-6.2-bitlocker-forced-recovery.html">6.2: Forcing BitLocker recovery</a></li><li><a href="../06-storage-encryption/lab-6.3-azure-disk-encryption.html">6.3: Encrypting Azure VM disks</a></li></ol></li><li><a href="../attack-to-control-map.html">Attack → control map</a></li><li><a href="../progress.html">Progress checklist</a></li></ol></nav>
+<main id="content" class="prose">
+<h1 id="lab-52-ipsec-connection-security-rules">Lab 5.2: IPsec connection security rules</h1>
+<nav class="pager"><a href="lab-5.1-windows-firewall.html">← Lab 5.1</a> <a href="index.html">Chapter overview</a> <a href="lab-5.3-firewall-review-wac.html">Lab 5.3 →</a></nav>
+<div class="table-wrap"><table>
+
+<tbody>
+<tr>
+<td><strong>Attack</strong></td>
+<td>Man-in-the-middle / rogue laptop on the LAN</td>
+</tr>
+<tr>
+<td><strong>Control</strong></td>
+<td>IPsec connection security rules (domain isolation)</td>
+</tr>
+<tr>
+<td><strong>Machines</strong></td>
+<td>SEA-DC1, SEA-SVR1</td>
+</tr>
+<tr>
+<td><strong>Needs</strong></td>
+<td>None</td>
+</tr>
+<tr>
+<td><strong>Checkpoint first</strong></td>
+<td>Yes, strongly recommended (can lock you out or stop a server booting)</td>
+</tr>
+<tr>
+<td><strong>Scripts</strong></td>
+<td><a href="https://github.com/medyabi/windows-server-security-lab/blob/main/scripts/lab-5.2-ipsec-connection-security.ps1" rel="noopener"><code>scripts/lab-5.2-ipsec-connection-security.ps1</code></a></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="hacker-scenario">🥷 Hacker scenario</h2>
+<p>The attacker plugs a laptop into a free network port in the meeting room. They run a <strong>man-in-the-middle</strong> attack between SEA-SVR1 and SEA-DC1, reading and changing the traffic. Or they simply try to connect to SEA-SVR1 directly from their laptop, which isn't a domain member.</p>
+<h2 id="concepts">📖 Concepts</h2>
+<p>Inside a LAN, most traffic is plain text. And any machine can talk to any machine. Not great.</p>
+<p><strong>IPsec</strong> fixes both problems. It has two protocols:</p>
+<ul>
+<li><strong>AH</strong> (Authentication Header): proves <strong>who</strong> sent the packet and that nobody changed it. No encryption.</li>
+<li><strong>ESP</strong> (Encapsulating Security Payload): <strong>encrypts</strong> the data, and can authenticate it too.</li>
+</ul>
+<p>In Windows, you configure IPsec with <strong>connection security rules</strong>. Between two servers, we use <strong>transport mode</strong>: the original IP header stays, only the data is protected.</p>
+<p>How do the two servers prove who they are? Usually with <strong>Kerberos</strong> (both are domain members) or <strong>computer certificates</strong>. Avoid pre-shared keys; they're easy to leak.</p>
+<p>When two machines agree on IPsec, they create <strong>security associations</strong> (SAs). <strong>Main mode</strong> SA is where they authenticate each other. <strong>Quick mode</strong> SA is where they agree how to protect the data.</p>
+<p>Using IPsec so only domain members can talk to each other is called <strong>domain isolation</strong>.</p>
+<h2 id="how-this-stops-the-attacker">🛡️ How this stops the attacker</h2>
+<p>The man-in-the-middle sees only ESP-encrypted packets. They can't read them, and they can't forge authenticated ones. The rogue laptop has no domain Kerberos identity, so it can't even finish the IPsec negotiation. The connection is simply refused.</p>
+<h2 id="step-by-step">🧪 Step by step</h2>
+<p>We'll do this with a GPO, so both servers get the same rules.</p>
+<ol>
+<li>On SEA-DC1, create a GPO called <strong>IPsec-DC1-SVR1</strong>. Link it to an OU that holds only the two test servers. Not the whole domain!</li>
+</ol>
+<blockquote>
+<p>⚠️ <strong>Added by this repository:</strong> a domain controller should stay in the <strong>Domain Controllers</strong> OU, so no single OU holds both machines. Link the GPO to <strong>both</strong> <code>Domain Controllers</code> and <code>Servers</code> (see <a href="../setup.html#extra-setup-the-labs-assume">lab setup</a>). Because the rule's endpoints are only <code>10.10.0.10</code> and <code>10.10.0.11</code>, it affects no other machine, but check <em>Group Policy Results</em> to be sure the GPO applies only to those two computers.
+2. Edit it: <em>Computer Configuration &gt; Policies &gt; Windows Settings &gt; Security Settings &gt; Windows Defender Firewall with Advanced Security &gt; Connection Security Rules &gt; New Rule</em>.
+3. Rule type: <strong>Server-to-server</strong>. Endpoint 1: <strong>10.10.0.10</strong> (SEA-DC1). Endpoint 2: <strong>10.10.0.11</strong> (SEA-SVR1).
+4. Requirements: <strong>Require authentication for inbound and outbound connections</strong>.
+5. Authentication method: <strong>Advanced &gt; Customize</strong>. Under <strong>First authentication</strong>, add <strong>Computer (Kerberos V5)</strong>.
+6. Profile: <strong>Domain</strong>. Name: <strong>dc1-svr1-auth</strong>.</p>
+</blockquote>
+<p>That gives us authentication. Now let's require encryption:</p>
+<ol>
+<li>In the same GPO, go to <strong>Inbound Rules &gt; New Rule &gt; Custom</strong>. All programs.</li>
+<li>Scope: local IP <strong>10.10.0.11</strong>, remote IP <strong>10.10.0.10</strong>.</li>
+<li>Action: <strong>Allow the connection if it is secure</strong>. Click <strong>Customize</strong> and choose <strong>Require the connections to be encrypted</strong>.</li>
+<li>Profile <strong>Domain</strong>, name <strong>dc1-svr1-encryption</strong>.</li>
+<li>Run <code>gpupdate /force</code> on both servers.</li>
+</ol>
+<p>Now let's generate some traffic and look at the security associations. From SEA-DC1:</p>
+<pre><code class="language-powershell">Test-NetConnection SEA-SVR1 -Port 445
+</code></pre>
+<p>Then on SEA-SVR1:</p>
+<pre><code class="language-powershell">Get-NetIPsecMainModeSA
+Get-NetIPsecQuickModeSA
+</code></pre>
+<p>The main mode SA shows <strong>Kerberos</strong> as the authentication method. The quick mode SA shows <strong>ESP</strong> with an encryption algorithm like <strong>AES</strong>. You can see the same thing in <code>wf.msc</code> under <strong>Monitoring &gt; Security Associations</strong>.</p>
+<p>One big tip: in production, start with <strong>Request authentication</strong> instead of <strong>Require</strong>. Check the SAs, then tighten. A wrong <strong>Require</strong> rule can cut a domain controller off from its servers. And that's not a fun phone call.</p>
+<h2 id="key-takeaway">✅ Key takeaway</h2>
+<p>A firewall says who can connect. IPsec makes sure they really are who they claim, and that nobody can read the traffic in between.</p>
+<hr />
+<nav class="pager"><a href="lab-5.1-windows-firewall.html">← Lab 5.1</a> <a href="index.html">Chapter overview</a> <a href="lab-5.3-firewall-review-wac.html">Lab 5.3 →</a></nav>
+</main>
+</div>
+<footer class="foot"><p><a href="https://github.com/medyabi/windows-server-security-lab" rel="noopener">Source on GitHub</a> · By Mohamed Dyabi, Microsoft Certified Trainer · learn.ebigpictures.com</p>
+<p class="small">Lab environments only. Several labs change security settings, lock accounts or force recovery. Never run them on production systems.</p></footer>
+
+</body>
+</html>

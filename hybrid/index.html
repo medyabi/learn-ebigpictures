@@ -1,0 +1,161 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Windows Server 2025 Hybrid Labs · Windows Server Labs</title>
+<meta name="description" content="Hands-on Windows Server 2025 labs: hybrid management with Azure Arc, and Windows Server security.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body class="track-hybrid">
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+  <a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true"></span>Windows Server Labs</a>
+  <nav class="tracks" aria-label="Tracks"><a href="index.html" aria-current="true">Hybrid</a><a href="../security/index.html">Security</a></nav>
+</header>
+<div class="layout with-side">
+<nav class="side" aria-label="Hybrid labs"><p class="side-title">Hybrid track</p><ol class="side-list"><li><a href="index.html" aria-current="page">Overview</a></li><li><a href="01-windows-admin-center.html">Lab 1: Windows Admin Center</a></li><li><a href="02-azure-arc-onboarding-and-azure-benefits.html">Lab 2: Azure Arc onboarding and Azure benefits</a></li><li><a href="03-hotpatching-with-azure-arc.html">Lab 3: Hotpatching with Azure Arc</a></li><li><a href="04-azure-policy-and-machine-configuration.html">Lab 4: Azure Policy and Machine Configuration</a></li><li><a href="05-azure-monitor.html">Lab 5: Azure Monitor</a></li><li><a href="06-change-tracking-and-inventory.html">Lab 6: Change Tracking and Inventory</a></li><li><a href="07-microsoft-defender-for-cloud.html">Lab 7: Microsoft Defender for Cloud</a></li><li><a href="08-windows-management-from-azure.html">Lab 8: Windows management from Azure</a></li><li><a href="09-security-baseline-with-osconfig.html">Lab 9: Security baseline with OSConfig</a></li><li><a href="cleanup-and-reset.html">Cleanup and reset</a></li></ol></nav>
+<main id="content" class="prose">
+<h1 id="windows-server-2025-hybrid-labs">Windows Server 2025 Hybrid Labs</h1>
+<p>Hands-on labs for presales engineers: Windows Server 2025 on-premises, managed from Azure with Azure Arc. One VM per person, nine labs, each ending with customer talking points.</p>
+<p>Nine labs, one VM each, about 8 hours — plan two days. Labs 2–8 are the <strong>hybrid</strong> track with Azure Arc; Labs 1 and 9 cover Windows Server 2025 on its own. Every lab ends with <strong>customer talking points</strong>, because the goal is not just to click through — it's to answer the customer's question in the meeting.</p>
+<p>So what do you get? Each presales engineer has their own <strong>Windows Server 2025 Datacenter (Desktop Experience)</strong> VM on our Dell R740 Hyper-V host. It's already activated, has Remote Desktop on, and has internet access.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Lab</th>
+<th>What you'll be able to show a customer</th>
+<th>Time</th>
+<th>Azure cost</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="01-windows-admin-center.html">1. Windows Admin Center</a></td>
+<td>Browser-based management of a server</td>
+<td>45 min</td>
+<td>None</td>
+</tr>
+<tr>
+<td><a href="02-azure-arc-onboarding-and-azure-benefits.html">2. Azure Arc onboarding and Azure benefits</a></td>
+<td>An on-premises server in the Azure portal, and the SA benefits unlocked</td>
+<td>75 min</td>
+<td>Free</td>
+</tr>
+<tr>
+<td><a href="03-hotpatching-with-azure-arc.html">3. Hotpatching with Azure Arc</a></td>
+<td>Security updates without a reboot</td>
+<td>45 min</td>
+<td>Free</td>
+</tr>
+<tr>
+<td><a href="04-azure-policy-and-machine-configuration.html">4. Azure Policy and Machine Configuration</a></td>
+<td>Compliance of every server from one dashboard</td>
+<td>45 min + 30 min wait</td>
+<td>Included with benefits</td>
+</tr>
+<tr>
+<td><a href="05-azure-monitor.html">5. Azure Monitor</a></td>
+<td>Performance, event logs and alerts for hybrid servers</td>
+<td>60 min</td>
+<td>Log ingestion billed</td>
+</tr>
+<tr>
+<td><a href="06-change-tracking-and-inventory.html">6. Change Tracking and Inventory</a></td>
+<td>"What changed on this server last night?"</td>
+<td>45 min</td>
+<td>Included; ingestion billed</td>
+</tr>
+<tr>
+<td><a href="07-microsoft-defender-for-cloud.html">7. Microsoft Defender for Cloud</a></td>
+<td>Recommendations, secure score, EDR and alerts</td>
+<td>60 min</td>
+<td>Defender for Servers billed (30-day trial)</td>
+</tr>
+<tr>
+<td><a href="08-windows-management-from-azure.html">8. Windows management from Azure</a></td>
+<td>WAC in the portal with no VPN, Best Practices Assessment, Remote Support</td>
+<td>60 min</td>
+<td>Included; ingestion billed</td>
+</tr>
+<tr>
+<td><a href="09-security-baseline-with-osconfig.html">9. Security baseline with OSConfig</a></td>
+<td>Secure-by-default: harden in one command, then see compliance rise in Azure</td>
+<td>45 min</td>
+<td>None</td>
+</tr>
+</tbody>
+</table></div>
+<p><strong>What you need:</strong></p>
+<ul>
+<li>RDP access to your VM (name and password from your lab admin).</li>
+<li>From Lab 2: an Azure subscription where you can create a resource group (<strong>Contributor</strong>). The instructor handles the steps that need more rights: the Azure benefits attestation (Lab 2), Defender for Servers (Lab 7) and role assignments (Lab 8).</li>
+<li>Do the labs in order. Labs 6 and 8 reuse the workspace from Lab 5.</li>
+</ul>
+<p><img alt="Lab architecture: one outbound HTTPS connection puts each lab VM under Azure management" src="../assets/hyb/images-lab-architecture.svg" /></p>
+<p>The Arc agent opens one outbound HTTPS connection on port 443; every Azure service in Labs 2–8 reaches the VM through it, with no inbound port open on the server.</p>
+<p>When something breaks, don't worry. Your VM can be rebuilt in a few minutes — see <a href="cleanup-and-reset.html">Cleanup and reset</a>.</p>
+<h2 id="labs">Labs</h2>
+<ol>
+<li><a href="01-windows-admin-center.html">Windows Admin Center (45 min)</a></li>
+<li><a href="02-azure-arc-onboarding-and-azure-benefits.html">Azure Arc onboarding and Azure benefits (75 min)</a></li>
+<li><a href="03-hotpatching-with-azure-arc.html">Hotpatching with Azure Arc (45 min)</a></li>
+<li><a href="04-azure-policy-and-machine-configuration.html">Azure Policy and Machine Configuration (45 min + 30 min wait)</a></li>
+<li><a href="05-azure-monitor.html">Azure Monitor (60 min)</a></li>
+<li><a href="06-change-tracking-and-inventory.html">Change Tracking and Inventory (45 min)</a></li>
+<li><a href="07-microsoft-defender-for-cloud.html">Microsoft Defender for Cloud (60 min)</a></li>
+<li><a href="08-windows-management-from-azure.html">Windows management from Azure (60 min + up to 4 h for the first assessment)</a></li>
+<li><a href="09-security-baseline-with-osconfig.html">Security baseline with OSConfig (45 min)</a></li>
+<li><a href="cleanup-and-reset.html">Cleanup and reset</a></li>
+</ol>
+<h2 id="lab-environment-instructor">Lab environment (instructor)</h2>
+<p>The <code>scripts</code> folder builds the lab on a Hyper-V host running <strong>Windows Server 2025 Datacenter</strong> (activated — the VMs activate against it with AVMA). Run in an elevated PowerShell session on the host.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Script</th>
+<th>What it does</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="https://github.com/medyabi/windows-server2025-Hybrid-lab/blob/main/scripts/New-WS2025LabVMs.ps1" rel="noopener"><code>New-WS2025LabVMs.ps1</code></a></td>
+<td>Builds a template VHDX from the Windows Server 2025 ISO (once), then creates the lab VMs as Gen 2 VMs with Secure Boot and vTPM, injects an unattend.xml with the AVMA key, and checks activation. Skips VMs that already exist.</td>
+</tr>
+<tr>
+<td><a href="https://github.com/medyabi/windows-server2025-Hybrid-lab/blob/main/scripts/Remove-LabVM.ps1" rel="noopener"><code>Remove-LabVM.ps1</code></a></td>
+<td>Deletes a VM and all its files (disks, checkpoints, folder). Never deletes the template or disks used by other VMs. Supports <code>-WhatIf</code>.</td>
+</tr>
+</tbody>
+</table></div>
+<pre><code class="language-powershell">Unblock-File .\scripts\*.ps1
+.\scripts\New-WS2025LabVMs.ps1 -VMCount 8                    # build the template + 8 VMs
+.\scripts\Remove-LabVM.ps1 -Name WS25-VM03 -WhatIf          # dry run
+.\scripts\Remove-LabVM.ps1 -Name WS25-VM03                  # delete one VM
+</code></pre>
+<p>Default ISO path, VM folder, memory and network settings are parameters at the top of <code>New-WS2025LabVMs.ps1</code>.</p>
+<h2 id="sources">Sources</h2>
+<ul>
+<li><a href="https://learn.microsoft.com/windows-server/manage/windows-admin-center/deploy/install" rel="noopener">Install Windows Admin Center</a></li>
+<li><a href="https://learn.microsoft.com/en-us/windows-server/security/osconfig/osconfig-how-to-configure-security-baselines" rel="noopener">Deploy Windows Server 2025 security baselines locally with OSConfig</a></li>
+<li><a href="https://learn.microsoft.com/azure/azure-arc/servers/quick-enable-hybrid-vm" rel="noopener">Quickstart: Connect a machine to Arc-enabled servers</a></li>
+<li><a href="https://learn.microsoft.com/azure/azure-arc/servers/windows-server-management-overview?tabs=portal" rel="noopener">Windows Server Management enabled by Azure Arc</a></li>
+<li><a href="https://learn.microsoft.com/en-us/windows-server/get-started/enable-hotpatch-azure-arc-enabled-servers" rel="noopener">Enable Hotpatch for Azure Arc-enabled servers</a></li>
+<li><a href="https://learn.microsoft.com/azure/update-manager/manage-hot-patching-arc-machines" rel="noopener">Manage hotpatches on Arc-enabled machines</a></li>
+<li><a href="https://learn.microsoft.com/azure/governance/machine-configuration/how-to/assign-built-in-policies" rel="noopener">Discover and assign built-in Machine Configuration policies</a></li>
+<li><a href="https://learn.microsoft.com/azure/governance/policy/samples/guest-configuration-baseline-windows-server-2025" rel="noopener">Windows security baseline for Windows Server 2025 (Azure Policy)</a></li>
+<li><a href="https://learn.microsoft.com/azure/azure-arc/servers/tutorial-enable-vm-insights" rel="noopener">Tutorial: Monitor a hybrid machine with VM insights</a></li>
+<li><a href="https://learn.microsoft.com/azure/azure-change-tracking-inventory/quickstart-monitor-changes-collect-inventory-azure-change-tracking-inventory" rel="noopener">Quickstart: Enable Change Tracking and Inventory</a></li>
+<li><a href="https://learn.microsoft.com/azure/defender-for-cloud/tutorial-enable-servers-plan" rel="noopener">Protect your servers with Defender for Servers</a></li>
+<li><a href="https://learn.microsoft.com/azure/defender-for-cloud/alert-validation" rel="noopener">Validate alerts in Microsoft Defender for Cloud</a></li>
+<li><a href="https://learn.microsoft.com/windows-server/manage/windows-admin-center/azure/manage-arc-hybrid-machines" rel="noopener">Manage Azure Arc-enabled servers using Windows Admin Center in Azure</a></li>
+<li><a href="https://learn.microsoft.com/windows-server/manage/azure-arc/best-practices-assessment-for-windows-server" rel="noopener">Configure Best Practices Assessment for Arc-enabled Windows servers</a></li>
+</ul>
+</main>
+</div>
+<footer class="foot"><p><a href="https://github.com/medyabi/windows-server2025-Hybrid-lab" rel="noopener">Source on GitHub</a> · By Mohamed Dyabi, Microsoft Certified Trainer · learn.ebigpictures.com</p>
+<p class="small">Lab environments only. Several labs change security settings, lock accounts or force recovery. Never run them on production systems.</p></footer>
+
+</body>
+</html>

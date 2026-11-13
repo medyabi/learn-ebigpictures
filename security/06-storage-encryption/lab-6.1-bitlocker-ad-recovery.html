@@ -1,0 +1,98 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab 6.1: BitLocker with recovery keys in Active Directory · Windows Server Labs</title>
+<meta name="description" content="Hands-on Windows Server 2025 labs: hybrid management with Azure Arc, and Windows Server security.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/site.css">
+</head>
+<body class="track-security">
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+  <a class="brand" href="../../index.html"><span class="brand-mark" aria-hidden="true"></span>Windows Server Labs</a>
+  <nav class="tracks" aria-label="Tracks"><a href="../../hybrid/index.html">Hybrid</a><a href="../index.html" aria-current="true">Security</a></nav>
+</header>
+<div class="layout with-side">
+<nav class="side" aria-label="Security labs"><p class="side-title">Security track</p><ol class="side-list"><li><a href="../index.html">Overview</a></li><li><a href="../setup.html">Lab setup</a></li><li class="group"><a href="../01-securing-the-os/index.html">Chapter 1: Securing the Windows Server operating system</a><ol><li><a href="../01-securing-the-os/lab-1.1-password-lockout-baseline.html">1.1: Password and lockout baseline with Group Policy</a></li><li><a href="../01-securing-the-os/lab-1.2-exploit-protection.html">1.2: Exploit protection</a></li><li><a href="../01-securing-the-os/lab-1.3-app-control-wdac.html">1.3: App Control for Business (WDAC)</a></li><li><a href="../01-securing-the-os/lab-1.4-credential-guard.html">1.4: Credential Guard</a></li><li><a href="../01-securing-the-os/lab-1.5-smartscreen.html">1.5: Microsoft Defender SmartScreen</a></li><li><a href="../01-securing-the-os/lab-1.6-defender-for-endpoint.html">1.6: Microsoft Defender for Endpoint</a></li></ol></li><li class="group"><a href="../02-hybrid-ad-accounts/index.html">Chapter 2: Securing hybrid Active Directory accounts</a><ol><li><a href="../02-hybrid-ad-accounts/lab-2.1-fine-grained-password-policy.html">2.1: Fine-grained password policy</a></li><li><a href="../02-hybrid-ad-accounts/lab-2.2-entra-password-protection.html">2.2: Microsoft Entra Password Protection</a></li><li><a href="../02-hybrid-ad-accounts/lab-2.3-protected-users.html">2.3: The Protected Users group</a></li><li><a href="../02-hybrid-ad-accounts/lab-2.4-rodc.html">2.4: Read-only domain controller (RODC)</a></li><li><a href="../02-hybrid-ad-accounts/lab-2.5-authentication-policy-silos.html">2.5: Authentication policies and silos</a></li></ol></li><li class="group"><a href="../03-least-privilege-and-delegation/index.html">Chapter 3: Least privilege and delegation</a><ol><li><a href="../03-least-privilege-and-delegation/lab-3.1-restricted-groups.html">3.1: Built-in admin groups and Restricted Groups</a></li><li><a href="../03-least-privilege-and-delegation/lab-3.2-delegation-of-control.html">3.2: Delegation of Control</a></li><li><a href="../03-least-privilege-and-delegation/lab-3.3-kerberos-double-hop.html">3.3: The Kerberos double-hop</a></li><li><a href="../03-least-privilege-and-delegation/lab-3.4-defender-for-identity.html">3.4: Microsoft Defender for Identity</a></li></ol></li><li class="group"><a href="../04-watching-from-azure/index.html">Chapter 4: Watching your servers from Azure</a><ol><li><a href="../04-watching-from-azure/lab-4.1-azure-arc-log-analytics.html">4.1: Azure Arc and Log Analytics</a></li><li><a href="../04-watching-from-azure/lab-4.2-kql-hunting-and-alerts.html">4.2: Hunting with KQL and creating an alert</a></li><li><a href="../04-watching-from-azure/lab-4.3-microsoft-sentinel.html">4.3: Microsoft Sentinel</a></li><li><a href="../04-watching-from-azure/lab-4.4-secure-score.html">4.4: Improving the Secure Score with Defender for Cloud</a></li></ol></li><li class="group"><a href="../05-networking/index.html">Chapter 5: Securing Windows Server networking</a><ol><li><a href="../05-networking/lab-5.1-windows-firewall.html">5.1: Windows Defender Firewall</a></li><li><a href="../05-networking/lab-5.2-ipsec-connection-security.html">5.2: IPsec connection security rules</a></li><li><a href="../05-networking/lab-5.3-firewall-review-wac.html">5.3: Firewall review with Windows Admin Center</a></li></ol></li><li class="group"><a href="index.html">Chapter 6: Securing Windows Server storage</a><ol><li><a href="lab-6.1-bitlocker-ad-recovery.html" aria-current="page">6.1: BitLocker with recovery keys in Active Directory</a></li><li><a href="lab-6.2-bitlocker-forced-recovery.html">6.2: Forcing BitLocker recovery</a></li><li><a href="lab-6.3-azure-disk-encryption.html">6.3: Encrypting Azure VM disks</a></li></ol></li><li><a href="../attack-to-control-map.html">Attack → control map</a></li><li><a href="../progress.html">Progress checklist</a></li></ol></nav>
+<main id="content" class="prose">
+<h1 id="lab-61-bitlocker-with-recovery-keys-in-active-directory">Lab 6.1: BitLocker with recovery keys in Active Directory</h1>
+<nav class="pager"><a href="../05-networking/lab-5.3-firewall-review-wac.html">← Lab 5.3</a> <a href="index.html">Chapter overview</a> <a href="lab-6.2-bitlocker-forced-recovery.html">Lab 6.2 →</a></nav>
+<div class="table-wrap"><table>
+
+<tbody>
+<tr>
+<td><strong>Attack</strong></td>
+<td>Stolen disk or copied VHDX</td>
+</tr>
+<tr>
+<td><strong>Control</strong></td>
+<td>BitLocker with recovery keys stored in Active Directory</td>
+</tr>
+<tr>
+<td><strong>Machines</strong></td>
+<td>SEA-SVR1, SEA-DC1</td>
+</tr>
+<tr>
+<td><strong>Needs</strong></td>
+<td>None (needs vTPM)</td>
+</tr>
+<tr>
+<td><strong>Checkpoint first</strong></td>
+<td>Yes, strongly recommended (can lock you out or stop a server booting)</td>
+</tr>
+<tr>
+<td><strong>Scripts</strong></td>
+<td><a href="https://github.com/medyabi/windows-server-security-lab/blob/main/scripts/lab-6.1-bitlocker-ad-recovery.ps1" rel="noopener"><code>scripts/lab-6.1-bitlocker-ad-recovery.ps1</code></a></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="hacker-scenario">🥷 Hacker scenario</h2>
+<p>A contractor copies the <code>.vhdx</code> file of SEA-SVR1 to a USB drive. At home, he double-clicks it and Windows mounts it. Every file share, database and config file with saved passwords is right there, readable.</p>
+<h2 id="concepts">📖 Concepts</h2>
+<p><strong>BitLocker</strong> encrypts a whole volume. On a server you'll usually use <strong>XTS-AES 256</strong>, the strongest option.</p>
+<p>The question is: where is the key, and how does the server unlock at boot? That's the job of <strong>protectors</strong>:</p>
+<ul>
+<li><strong>TPM</strong>: a chip on the motherboard holds the key. It only releases it if the boot process hasn't been tampered with. The server boots without anyone typing anything.</li>
+<li><strong>TPM + PIN</strong>: same, plus a PIN at startup. Stronger, but someone must type it. <strong>Network Unlock</strong> can do that automatically when the server is on the corporate network.</li>
+<li><strong>Recovery password</strong>: a 48-digit number. Your emergency key when everything else fails.</li>
+</ul>
+<p>That recovery password must be stored somewhere safe. With Group Policy, Windows can <strong>back it up to Active Directory</strong> automatically, on the computer object.</p>
+<p>One more thing. BitLocker isn't installed by default on Windows Server. It's a <strong>feature</strong> you add.</p>
+<h2 id="how-this-stops-the-attacker">🛡️ How this stops the attacker</h2>
+<p>The copied disk is AES-encrypted, and the key is sealed inside SEA-SVR1's TPM. When the contractor mounts it at home, Windows asks for a recovery key. He doesn't have one. The disk is useless to him.</p>
+<h2 id="step-by-step">🧪 Step by step</h2>
+<p>First, Group Policy. We tell Windows to back up the recovery key to AD <strong>before</strong> it encrypts anything.</p>
+<ol>
+<li>On SEA-DC1, edit a GPO linked to the servers OU: <em>Computer Configuration &gt; Policies &gt; Administrative Templates &gt; Windows Components &gt; BitLocker Drive Encryption</em>.</li>
+<li>Open <strong>Operating System Drives &gt; Choose how BitLocker-protected operating system drives can be recovered</strong>. Enable it. Tick <strong>Save BitLocker recovery information to AD DS</strong> and <strong>Do not enable BitLocker until recovery information is stored to AD DS</strong>.</li>
+<li>Open <strong>Operating System Drives &gt; Require additional authentication at startup</strong>. Enable it and allow <strong>TPM</strong>.</li>
+</ol>
+<p>To see the recovery keys in ADUC, add the BitLocker viewer on SEA-DC1:</p>
+<pre><code class="language-powershell">Install-WindowsFeature RSAT-Feature-Tools-BitLocker-BdeAducExt
+</code></pre>
+<p>Now install BitLocker on SEA-SVR1:</p>
+<pre><code class="language-powershell">Install-WindowsFeature BitLocker -IncludeAllSubFeature -IncludeManagementTools -Restart
+</code></pre>
+<p>The server reboots. Apply the GPO with <code>gpupdate /force</code>, then turn on BitLocker:</p>
+<pre><code class="language-powershell">Enable-BitLocker -MountPoint C: -EncryptionMethod XtsAes256 -UsedSpaceOnly -TpmProtector
+Add-BitLockerKeyProtector -MountPoint C: -RecoveryPasswordProtector
+</code></pre>
+<p>The first command encrypts C: with the TPM as protector. <code>-UsedSpaceOnly</code> makes it much faster on a new server. The second command adds the 48-digit recovery password, which Group Policy sends to AD.</p>
+<p>Let's check:</p>
+<pre><code class="language-powershell">manage-bde -status C:
+</code></pre>
+<p>You should see <strong>Protection On</strong> and <strong>XTS-AES 256</strong>. Now open ADUC on SEA-DC1, turn on <strong>View &gt; Advanced Features</strong>, and open the <strong>SEA-SVR1</strong> computer. There's a new tab, <strong>BitLocker Recovery</strong>, with the recovery password inside.</p>
+<p>One tip from the course recording: an error appeared because the GPO said <em>Do not allow TPM</em> while the server had no TPM. If BitLocker refuses to start, check that your startup settings don't contradict each other.</p>
+<h2 id="key-takeaway">✅ Key takeaway</h2>
+<p>Servers get stolen. Disks get swapped and sent back under warranty. VM files get copied. Without encryption, whoever holds the disk reads everything.</p>
+<hr />
+<nav class="pager"><a href="../05-networking/lab-5.3-firewall-review-wac.html">← Lab 5.3</a> <a href="index.html">Chapter overview</a> <a href="lab-6.2-bitlocker-forced-recovery.html">Lab 6.2 →</a></nav>
+</main>
+</div>
+<footer class="foot"><p><a href="https://github.com/medyabi/windows-server-security-lab" rel="noopener">Source on GitHub</a> · By Mohamed Dyabi, Microsoft Certified Trainer · learn.ebigpictures.com</p>
+<p class="small">Lab environments only. Several labs change security settings, lock accounts or force recovery. Never run them on production systems.</p></footer>
+
+</body>
+</html>

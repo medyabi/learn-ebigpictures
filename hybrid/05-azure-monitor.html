@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab 5: Azure Monitor (60 min) · Windows Server Labs</title>
+<meta name="description" content="Hands-on Windows Server 2025 labs: hybrid management with Azure Arc, and Windows Server security.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body class="track-hybrid">
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+  <a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true"></span>Windows Server Labs</a>
+  <nav class="tracks" aria-label="Tracks"><a href="index.html" aria-current="true">Hybrid</a><a href="../security/index.html">Security</a></nav>
+</header>
+<div class="layout with-side">
+<nav class="side" aria-label="Hybrid labs"><p class="side-title">Hybrid track</p><ol class="side-list"><li><a href="index.html">Overview</a></li><li><a href="01-windows-admin-center.html">Lab 1: Windows Admin Center</a></li><li><a href="02-azure-arc-onboarding-and-azure-benefits.html">Lab 2: Azure Arc onboarding and Azure benefits</a></li><li><a href="03-hotpatching-with-azure-arc.html">Lab 3: Hotpatching with Azure Arc</a></li><li><a href="04-azure-policy-and-machine-configuration.html">Lab 4: Azure Policy and Machine Configuration</a></li><li><a href="05-azure-monitor.html" aria-current="page">Lab 5: Azure Monitor</a></li><li><a href="06-change-tracking-and-inventory.html">Lab 6: Change Tracking and Inventory</a></li><li><a href="07-microsoft-defender-for-cloud.html">Lab 7: Microsoft Defender for Cloud</a></li><li><a href="08-windows-management-from-azure.html">Lab 8: Windows management from Azure</a></li><li><a href="09-security-baseline-with-osconfig.html">Lab 9: Security baseline with OSConfig</a></li><li><a href="cleanup-and-reset.html">Cleanup and reset</a></li></ol></nav>
+<main id="content" class="prose">
+<h1 id="lab-5-azure-monitor-60-min">Lab 5: Azure Monitor (60 min)</h1>
+<nav class="pager"><a href="04-azure-policy-and-machine-configuration.html">← Lab 4</a> <a href="index.html">Overview</a> <a href="06-change-tracking-and-inventory.html">Lab 6 →</a></nav>
+<p>In this lab you see your server's performance and event logs in Azure, and you query them with KQL. That's the answer to "what replaces SCOM for our hybrid servers?"</p>
+<p><strong>How does it work?</strong> Three pieces work together:</p>
+<ul>
+<li><strong>Azure Monitor Agent (AMA)</strong> — an Arc extension that collects data on the server.</li>
+<li><strong>Data collection rule (DCR)</strong> — says <strong>what</strong> to collect (counters, event logs) and <strong>where</strong> to send it.</li>
+<li><strong>Log Analytics workspace</strong> — the database where the data lands and where you query it with <strong>KQL</strong> (Kusto Query Language).</li>
+</ul>
+<p>Think of the agent as a postman, the DCR as the delivery list, and the workspace as the mailbox.</p>
+<blockquote>
+<p><strong>Cost note:</strong> Azure Monitor isn't part of the Azure benefits. Log Analytics <strong>ingestion is billed</strong> per GB. In the lab, keep collection small and delete the workspace at the end.</p>
+</blockquote>
+<h3 id="steps">Steps</h3>
+<p><strong>Part A — Workspace and VM insights</strong></p>
+<ol>
+<li>In the portal, create a <strong>Log Analytics workspace</strong> named <code>law-presales-&lt;yourname&gt;</code> in your resource group, same region as your Arc server. You reuse it in Labs 6 and 8.</li>
+<li>Open your machine in <strong>Azure Arc</strong> &gt; <strong>Monitoring</strong> &gt; <strong>Insights</strong> &gt; <strong>Configure</strong>.</li>
+<li>Select <strong>Customize infrastructure monitoring</strong> and choose your workspace. Then <strong>Review + Enable</strong> &gt; <strong>Enable</strong>. The portal installs the Azure Monitor Agent extension and creates the DCR.</li>
+<li>Open <strong>Extensions</strong> on your machine. You should see <strong>AzureMonitorWindowsAgent</strong> with status <strong>Succeeded</strong>.</li>
+<li>After 10–15 minutes, go back to <strong>Insights</strong> and look at the <strong>Performance</strong> charts: CPU, memory, disk, network.</li>
+</ol>
+<p><strong>Part B — Collect event logs and query them</strong></p>
+<ol start="6">
+<li>Search for <strong>Data collection rules</strong> &gt; <strong>Create</strong>:
+   - Name <code>dcr-events-&lt;yourname&gt;</code>, your resource group and region, platform <strong>Windows</strong>.
+   - <strong>Resources</strong>: add your Arc server.
+   - <strong>Collect and deliver</strong>: add a data source <strong>Windows Event Logs</strong>, select <strong>System</strong> and <strong>Application</strong> with levels <strong>Critical</strong>, <strong>Error</strong> and <strong>Warning</strong>. Destination: your workspace.</li>
+<li>On your VM, write a test error event:</li>
+</ol>
+<p><code>New-EventLog -LogName Application -Source PresalesLab -ErrorAction SilentlyContinue
+   Write-EventLog -LogName Application -Source PresalesLab -EventId 999 -EntryType Error -Message "Presales lab test error"</code>
+8. After about 10 minutes, open your workspace &gt; <strong>Logs</strong> and run:</p>
+<p>```
+   Heartbeat
+   | where TimeGenerated &gt; ago(1h)
+   | summarize LastSeen = max(TimeGenerated) by Computer</p>
+<p>Event
+   | where Source == "PresalesLab"
+   | project TimeGenerated, Computer, EventID, RenderedDescription
+   ```
+9. From the second query, select <strong>New alert rule</strong>. Create an alert that fires when the count is greater than 0, with an action group that emails you. Write the test event again and wait for the mail.</p>
+<h3 id="check-yourself">Check yourself</h3>
+<ul>
+<li>What decides which events are collected — the agent or the DCR? (The DCR. One DCR can target many servers.)</li>
+<li>Why does the customer care about the workspace region? (Data residency, and the DCR must be in the same region as the workspace.)</li>
+</ul>
+<h3 id="customer-talking-points">Customer talking points</h3>
+<ul>
+<li><strong>One monitoring platform</strong> for Azure VMs and on-premises servers, with the same dashboards, queries and alerts.</li>
+<li>A modern path off <strong>SCOM</strong> for hybrid servers — no management servers or SQL databases to run.</li>
+<li>The cost model is <strong>pay per GB ingested</strong>. Help the customer size it: collect what they will act on, not everything.</li>
+<li>Good opening question: "How do you know a server is in trouble before users call?"</li>
+</ul>
+<hr />
+<nav class="pager"><a href="04-azure-policy-and-machine-configuration.html">← Lab 4</a> <a href="index.html">Overview</a> <a href="06-change-tracking-and-inventory.html">Lab 6 →</a></nav>
+</main>
+</div>
+<footer class="foot"><p><a href="https://github.com/medyabi/windows-server2025-Hybrid-lab" rel="noopener">Source on GitHub</a> · By Mohamed Dyabi, Microsoft Certified Trainer · learn.ebigpictures.com</p>
+<p class="small">Lab environments only. Several labs change security settings, lock accounts or force recovery. Never run them on production systems.</p></footer>
+
+</body>
+</html>

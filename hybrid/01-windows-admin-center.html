@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab 1: Windows Admin Center (45 min) · Windows Server Labs</title>
+<meta name="description" content="Hands-on Windows Server 2025 labs: hybrid management with Azure Arc, and Windows Server security.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body class="track-hybrid">
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+  <a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true"></span>Windows Server Labs</a>
+  <nav class="tracks" aria-label="Tracks"><a href="index.html" aria-current="true">Hybrid</a><a href="../security/index.html">Security</a></nav>
+</header>
+<div class="layout with-side">
+<nav class="side" aria-label="Hybrid labs"><p class="side-title">Hybrid track</p><ol class="side-list"><li><a href="index.html">Overview</a></li><li><a href="01-windows-admin-center.html" aria-current="page">Lab 1: Windows Admin Center</a></li><li><a href="02-azure-arc-onboarding-and-azure-benefits.html">Lab 2: Azure Arc onboarding and Azure benefits</a></li><li><a href="03-hotpatching-with-azure-arc.html">Lab 3: Hotpatching with Azure Arc</a></li><li><a href="04-azure-policy-and-machine-configuration.html">Lab 4: Azure Policy and Machine Configuration</a></li><li><a href="05-azure-monitor.html">Lab 5: Azure Monitor</a></li><li><a href="06-change-tracking-and-inventory.html">Lab 6: Change Tracking and Inventory</a></li><li><a href="07-microsoft-defender-for-cloud.html">Lab 7: Microsoft Defender for Cloud</a></li><li><a href="08-windows-management-from-azure.html">Lab 8: Windows management from Azure</a></li><li><a href="09-security-baseline-with-osconfig.html">Lab 9: Security baseline with OSConfig</a></li><li><a href="cleanup-and-reset.html">Cleanup and reset</a></li></ol></nav>
+<main id="content" class="prose">
+<h1 id="lab-1-windows-admin-center-45-min">Lab 1: Windows Admin Center (45 min)</h1>
+<nav class="pager"><a href="index.html">← Overview</a> <a href="index.html">Overview</a> <a href="02-azure-arc-onboarding-and-azure-benefits.html">Lab 2 →</a></nav>
+<p>By the end of this lab you manage your server from a web browser, with no MMC consoles and no RDP. That's the demo customers remember.</p>
+<p><strong>What is Windows Admin Center (WAC)?</strong> It's a free, browser-based management tool for Windows Server. You install a small <strong>gateway</strong> on one machine, and from there you manage servers, clusters and PCs over the network. Think of it as Server Manager, Event Viewer, Device Manager and PowerShell, all in one browser tab. On Windows Server it listens on port <strong>443</strong>.</p>
+<h3 id="steps">Steps</h3>
+<ol>
+<li>RDP to your VM and open <strong>PowerShell as administrator</strong>.</li>
+<li>Download the installer:</li>
+</ol>
+<p><code>Start-BitsTransfer -Source "https://aka.ms/WACdownload" -Destination ".\WindowsAdminCenter.exe"</code>
+3. Run <code>.\WindowsAdminCenter.exe</code> and follow the wizard:
+   - Accept the licence terms.
+   - Choose <strong>Express setup</strong>.
+   - On <strong>Select TLS certificate</strong>, choose <strong>Generate a self-signed certificate</strong>. It's fine for a lab and expires after 60 days. In production, the customer uses a certificate from their own CA.
+   - Keep <strong>automatic updates</strong> on, then <strong>Install</strong>.
+4. Tick <strong>Start Windows Admin Center</strong> and select <strong>Finish</strong>. Sign in with your local <strong>Administrator</strong> account.
+5. Your server appears under <strong>All connections</strong>. Click it and take the tour:
+   - <strong>Overview</strong>: CPU, memory, disk and network in real time.
+   - <strong>Events</strong>, <strong>Services</strong>, <strong>Processes</strong>: what you would normally do in three different consoles.
+   - <strong>PowerShell</strong>: a remote PowerShell session in the browser.
+6. Make a real change from WAC:
+   - <strong>Roles &amp; features</strong> &gt; install <strong>Windows Server Backup</strong>.
+   - <strong>Firewall</strong> &gt; create an inbound rule allowing <strong>TCP 8080</strong>.
+   - <strong>Updates</strong> &gt; check for updates. Don't install them yet — we need this VM for Lab 3.
+7. Open <strong>Azure hybrid center</strong> and look at the services offered. You'll use Azure Arc in Lab 2.</p>
+<h3 id="check-yourself">Check yourself</h3>
+<ul>
+<li>Why does the customer need only <strong>one</strong> WAC gateway for many servers?</li>
+<li>What would you change before putting WAC in production? (A trusted certificate, and who's allowed to sign in.)</li>
+</ul>
+<h3 id="customer-talking-points">Customer talking points</h3>
+<ul>
+<li>WAC is <strong>included with Windows Server</strong> at no extra cost. No agent is installed on the managed servers.</li>
+<li>It replaces most of the MMC tools and works great for <strong>Server Core</strong>, where there's no desktop to RDP into.</li>
+<li>It's the easy on-ramp to hybrid: from the same browser, connect servers to <strong>Azure Arc</strong>, backup and monitoring.</li>
+<li>Good opening question: "How do your admins manage servers today — RDP to each one?"</li>
+</ul>
+<hr />
+<nav class="pager"><a href="index.html">← Overview</a> <a href="index.html">Overview</a> <a href="02-azure-arc-onboarding-and-azure-benefits.html">Lab 2 →</a></nav>
+</main>
+</div>
+<footer class="foot"><p><a href="https://github.com/medyabi/windows-server2025-Hybrid-lab" rel="noopener">Source on GitHub</a> · By Mohamed Dyabi, Microsoft Certified Trainer · learn.ebigpictures.com</p>
+<p class="small">Lab environments only. Several labs change security settings, lock accounts or force recovery. Never run them on production systems.</p></footer>
+
+</body>
+</html>

@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab 2: Azure Arc onboarding and Azure benefits (75 min) · Windows Server Labs</title>
+<meta name="description" content="Hands-on Windows Server 2025 labs: hybrid management with Azure Arc, and Windows Server security.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body class="track-hybrid">
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+  <a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true"></span>Windows Server Labs</a>
+  <nav class="tracks" aria-label="Tracks"><a href="index.html" aria-current="true">Hybrid</a><a href="../security/index.html">Security</a></nav>
+</header>
+<div class="layout with-side">
+<nav class="side" aria-label="Hybrid labs"><p class="side-title">Hybrid track</p><ol class="side-list"><li><a href="index.html">Overview</a></li><li><a href="01-windows-admin-center.html">Lab 1: Windows Admin Center</a></li><li><a href="02-azure-arc-onboarding-and-azure-benefits.html" aria-current="page">Lab 2: Azure Arc onboarding and Azure benefits</a></li><li><a href="03-hotpatching-with-azure-arc.html">Lab 3: Hotpatching with Azure Arc</a></li><li><a href="04-azure-policy-and-machine-configuration.html">Lab 4: Azure Policy and Machine Configuration</a></li><li><a href="05-azure-monitor.html">Lab 5: Azure Monitor</a></li><li><a href="06-change-tracking-and-inventory.html">Lab 6: Change Tracking and Inventory</a></li><li><a href="07-microsoft-defender-for-cloud.html">Lab 7: Microsoft Defender for Cloud</a></li><li><a href="08-windows-management-from-azure.html">Lab 8: Windows management from Azure</a></li><li><a href="09-security-baseline-with-osconfig.html">Lab 9: Security baseline with OSConfig</a></li><li><a href="cleanup-and-reset.html">Cleanup and reset</a></li></ol></nav>
+<main id="content" class="prose">
+<h1 id="lab-2-azure-arc-onboarding-and-azure-benefits-75-min">Lab 2: Azure Arc onboarding and Azure benefits (75 min)</h1>
+<nav class="pager"><a href="01-windows-admin-center.html">← Lab 1</a> <a href="index.html">Overview</a> <a href="03-hotpatching-with-azure-arc.html">Lab 3 →</a></nav>
+<p>In this lab your on-premises VM shows up in the Azure portal, next to cloud VMs, and you manage its updates from there. That's the core of every hybrid conversation.</p>
+<p><strong>What is Azure Arc?</strong> Azure Arc projects a server that runs <strong>outside Azure</strong> into Azure as a resource. A small agent, the <strong>Azure Connected Machine agent</strong>, runs on the server and talks to Azure over HTTPS (port 443). Think of it as giving your server an Azure passport: it stays at home, but Azure now knows it, can tag it, apply policy to it and update it.</p>
+<h3 id="steps">Steps</h3>
+<p><strong>Part A — Generate the onboarding script (Azure portal)</strong></p>
+<ol>
+<li>Sign in to the <a href="https://portal.azure.com" rel="noopener">Azure portal</a> and create a resource group named <code>rg-presales-&lt;yourname&gt;</code>.</li>
+<li>Search for <strong>Azure Arc</strong> &gt; <strong>Machines</strong> &gt; <strong>Onboard/Create</strong> &gt; <strong>Onboard existing machines</strong>.</li>
+<li>On <strong>Basics</strong>:
+   - Pick your subscription and <code>rg-presales-&lt;yourname&gt;</code>.
+   - <strong>Region</strong>: France Central. It supports Windows Admin Center in Azure (Lab 8).
+   - <strong>Operating system</strong>: Windows.
+   - <strong>Connectivity method</strong>: Public endpoint.
+   - <strong>Authentication method</strong>: Authenticate machines manually.</li>
+<li>On <strong>Tags</strong>, add <code>Owner = &lt;yourname&gt;</code> and <code>Purpose = presales-lab</code>.</li>
+<li>On <strong>Download and run script</strong>, select <strong>Register</strong> if the resource providers aren't registered yet, then <strong>Download</strong> the script.</li>
+</ol>
+<p><strong>Part B — Run it on your VM</strong></p>
+<ol start="6">
+<li>Copy the script to your VM (RDP clipboard works for text) and run it in <strong>PowerShell as administrator</strong>.</li>
+<li>When prompted, sign in with your Azure account. The script installs the agent and connects the server.</li>
+<li>Check the connection from the VM:</li>
+</ol>
+<p><code>azcmagent show</code></p>
+<p><strong>Agent Status</strong> should be <strong>Connected</strong>. You also see the resource name, resource group and region.</p>
+<p><strong>Part C — Manage it from Azure</strong></p>
+<ol start="9">
+<li>In the portal, open <strong>Azure Arc &gt; Machines</strong> and select your server. Look at <strong>Overview</strong> and <strong>Properties</strong>: OS version, cores, memory, IP addresses — an inventory with no extra tool.</li>
+<li>Open <strong>Updates</strong> (Azure Update Manager) &gt; <strong>Check for updates</strong>. After a few minutes you see the missing updates. <strong>Don't install them</strong> — Lab 3 needs them.</li>
+<li>Open <strong>Extensions</strong>. This is how Azure pushes extra capabilities to the server (monitoring, Defender, scripts) without logging in.</li>
+</ol>
+<p><strong>Part D — Activate Azure benefits (Windows Server Management enabled by Azure Arc)</strong></p>
+<p>Why does this matter? A customer with <strong>Software Assurance</strong> or <strong>subscription licences</strong> gets a set of Azure management services for their Arc servers <strong>at no extra cost</strong> — but only after they <strong>attest</strong> it, server by server. Arc doesn't guess it from the licence.</p>
+<p>What the attestation unlocks:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Service</th>
+<th>Used in lab</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Azure Update Manager</td>
+<td>2, 3</td>
+</tr>
+<tr>
+<td>Azure Machine Configuration</td>
+<td>4</td>
+</tr>
+<tr>
+<td>Change Tracking and Inventory</td>
+<td>6</td>
+</tr>
+<tr>
+<td>Windows Admin Center in Azure</td>
+<td>8</td>
+</tr>
+<tr>
+<td>Best Practices Assessment</td>
+<td>8</td>
+</tr>
+<tr>
+<td>Remote Support</td>
+<td>8</td>
+</tr>
+<tr>
+<td>Azure Site Recovery configuration, Network HUD, Azure File Sync discount</td>
+<td>—</td>
+</tr>
+</tbody>
+</table></div>
+<blockquote>
+<p><strong>This checkbox is a legal statement.</strong> In our lab, the instructor confirms the licences qualify before anyone ticks it. With customers, never tick it for them.</p>
+</blockquote>
+<ol start="12">
+<li>
+<p>On your VM, check the agent version. Benefits need <strong>1.47 or later</strong>:</p>
+<p><code>azcmagent version</code>
+13. In the portal, open your machine &gt; <strong>Licenses</strong> &gt; <strong>Windows Server</strong>.
+14. Under <strong>License details</strong>, check that <strong>License status</strong> is <strong>Licensed</strong> and <strong>Arc agent status</strong> is <strong>Connected</strong>. Only licensed, connected servers are eligible.
+15. Under <strong>Azure benefits</strong>, tick <strong>Activate Azure benefits</strong> and select <strong>Confirm</strong>. Within about 10 minutes the benefits show as <strong>Activated</strong>.
+16. Look at <strong>Pay-as-you-go</strong> on the same page. It's greyed out with "machine must be unlicensed to be eligible". Pay-as-you-go is the other route to the same benefits, for servers without a licence: Windows Server is billed monthly on the Azure subscription.
+17. To activate many servers at once, use <strong>Azure Arc &gt; Licenses &gt; Azure Benefits - Windows Server</strong>, select the servers and <strong>Activate benefits</strong>.</p>
+</li>
+</ol>
+<p><strong>Still billed after activation:</strong> Log Analytics ingestion (Change Tracking, Best Practices Assessment, Azure Monitor), the Azure Site Recovery service itself, storage and networking. <strong>Hotpatch</strong> isn't part of this programme — it's available to every Arc-enabled Windows Server 2025, with or without SA.</p>
+<h3 id="check-yourself">Check yourself</h3>
+<ul>
+<li>Which port must be open outbound for Arc to work? (TCP 443.)</li>
+<li>What happens to the server's workloads if the internet link drops? (Nothing. The server keeps running; Azure just loses visibility until it reconnects.)</li>
+</ul>
+<h3 id="customer-talking-points">Customer talking points</h3>
+<ul>
+<li><strong>One control plane</strong> for servers in the datacenter, at the edge, and in other clouds: same portal, same RBAC, same tags, same policy.</li>
+<li>Connecting a server to Arc is free; some services you turn on afterwards are billed. Check current pricing before quoting a number.</li>
+<li>Arc unlocks Windows Server benefits like <strong>Hotpatch</strong> (Lab 3), <strong>pay-as-you-go licensing</strong> and <strong>security baselines at scale</strong> with Azure Policy.</li>
+<li>Good opening question: "How many tools do you use today to patch and inventory your servers?"</li>
+</ul>
+<hr />
+<nav class="pager"><a href="01-windows-admin-center.html">← Lab 1</a> <a href="index.html">Overview</a> <a href="03-hotpatching-with-azure-arc.html">Lab 3 →</a></nav>
+</main>
+</div>
+<footer class="foot"><p><a href="https://github.com/medyabi/windows-server2025-Hybrid-lab" rel="noopener">Source on GitHub</a> · By Mohamed Dyabi, Microsoft Certified Trainer · learn.ebigpictures.com</p>
+<p class="small">Lab environments only. Several labs change security settings, lock accounts or force recovery. Never run them on production systems.</p></footer>
+
+</body>
+</html>

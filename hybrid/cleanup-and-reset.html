@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Cleanup and reset · Windows Server Labs</title>
+<meta name="description" content="Hands-on Windows Server 2025 labs: hybrid management with Azure Arc, and Windows Server security.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body class="track-hybrid">
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+  <a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true"></span>Windows Server Labs</a>
+  <nav class="tracks" aria-label="Tracks"><a href="index.html" aria-current="true">Hybrid</a><a href="../security/index.html">Security</a></nav>
+</header>
+<div class="layout with-side">
+<nav class="side" aria-label="Hybrid labs"><p class="side-title">Hybrid track</p><ol class="side-list"><li><a href="index.html">Overview</a></li><li><a href="01-windows-admin-center.html">Lab 1: Windows Admin Center</a></li><li><a href="02-azure-arc-onboarding-and-azure-benefits.html">Lab 2: Azure Arc onboarding and Azure benefits</a></li><li><a href="03-hotpatching-with-azure-arc.html">Lab 3: Hotpatching with Azure Arc</a></li><li><a href="04-azure-policy-and-machine-configuration.html">Lab 4: Azure Policy and Machine Configuration</a></li><li><a href="05-azure-monitor.html">Lab 5: Azure Monitor</a></li><li><a href="06-change-tracking-and-inventory.html">Lab 6: Change Tracking and Inventory</a></li><li><a href="07-microsoft-defender-for-cloud.html">Lab 7: Microsoft Defender for Cloud</a></li><li><a href="08-windows-management-from-azure.html">Lab 8: Windows management from Azure</a></li><li><a href="09-security-baseline-with-osconfig.html">Lab 9: Security baseline with OSConfig</a></li><li><a href="cleanup-and-reset.html" aria-current="page">Cleanup and reset</a></li></ol></nav>
+<main id="content" class="prose">
+<h1 id="cleanup-and-reset">Cleanup and reset</h1>
+<nav class="pager"><a href="09-security-baseline-with-osconfig.html">← Lab 9</a> <a href="index.html">Overview</a></nav>
+<p>Always clean Azure first, then the VM. If you delete the VM first, the Arc resource stays in Azure as a disconnected "ghost" server.</p>
+<p><strong>1. Remove the server from Azure Arc</strong> (on the VM, PowerShell as administrator):</p>
+<pre><code>azcmagent disconnect
+</code></pre>
+<p>Sign in when prompted. This deletes the Arc resource in Azure and disconnects the agent. Then delete your resource group <code>rg-presales-&lt;yourname&gt;</code> in the portal.</p>
+<p>Deleting the resource group also removes your Log Analytics workspace, your DCRs and the policy assignment from Lab 4. The <strong>instructor</strong> then turns <strong>Defender for Servers</strong> off in <strong>Defender for Cloud</strong> &gt; <strong>Environment settings</strong>, so billing stops after the session.</p>
+<p><strong>2. Rebuild the VM</strong> (instructor, on the Hyper-V host). This gives a clean, AVMA-activated VM in a few minutes:</p>
+<pre><code>.\scripts\Remove-LabVM.ps1 -Name WS25-VM03
+.\scripts\New-WS2025LabVMs.ps1
+</code></pre>
+<p><code>Remove-LabVM.ps1</code> deletes the VM, its disks and its folder, but never the template. <code>New-WS2025LabVMs.ps1</code> recreates only the missing VMs from the template.</p>
+</main>
+</div>
+<footer class="foot"><p><a href="https://github.com/medyabi/windows-server2025-Hybrid-lab" rel="noopener">Source on GitHub</a> · By Mohamed Dyabi, Microsoft Certified Trainer · learn.ebigpictures.com</p>
+<p class="small">Lab environments only. Several labs change security settings, lock accounts or force recovery. Never run them on production systems.</p></footer>
+
+</body>
+</html>

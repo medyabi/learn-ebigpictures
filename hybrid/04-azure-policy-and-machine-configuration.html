@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab 4: Azure Policy and Machine Configuration (45 min + 30 min wait) · Windows Server Labs</title>
+<meta name="description" content="Hands-on Windows Server 2025 labs: hybrid management with Azure Arc, and Windows Server security.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body class="track-hybrid">
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+  <a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true"></span>Windows Server Labs</a>
+  <nav class="tracks" aria-label="Tracks"><a href="index.html" aria-current="true">Hybrid</a><a href="../security/index.html">Security</a></nav>
+</header>
+<div class="layout with-side">
+<nav class="side" aria-label="Hybrid labs"><p class="side-title">Hybrid track</p><ol class="side-list"><li><a href="index.html">Overview</a></li><li><a href="01-windows-admin-center.html">Lab 1: Windows Admin Center</a></li><li><a href="02-azure-arc-onboarding-and-azure-benefits.html">Lab 2: Azure Arc onboarding and Azure benefits</a></li><li><a href="03-hotpatching-with-azure-arc.html">Lab 3: Hotpatching with Azure Arc</a></li><li><a href="04-azure-policy-and-machine-configuration.html" aria-current="page">Lab 4: Azure Policy and Machine Configuration</a></li><li><a href="05-azure-monitor.html">Lab 5: Azure Monitor</a></li><li><a href="06-change-tracking-and-inventory.html">Lab 6: Change Tracking and Inventory</a></li><li><a href="07-microsoft-defender-for-cloud.html">Lab 7: Microsoft Defender for Cloud</a></li><li><a href="08-windows-management-from-azure.html">Lab 8: Windows management from Azure</a></li><li><a href="09-security-baseline-with-osconfig.html">Lab 9: Security baseline with OSConfig</a></li><li><a href="cleanup-and-reset.html">Cleanup and reset</a></li></ol></nav>
+<main id="content" class="prose">
+<h1 id="lab-4-azure-policy-and-machine-configuration-45-min-30-min-wait">Lab 4: Azure Policy and Machine Configuration (45 min + 30 min wait)</h1>
+<nav class="pager"><a href="03-hotpatching-with-azure-arc.html">← Lab 3</a> <a href="index.html">Overview</a> <a href="05-azure-monitor.html">Lab 5 →</a></nav>
+<p>In this lab you audit <strong>every</strong> server in a scope from Azure, with one assignment. That's how the customer proves compliance across hundreds of servers. Your server isn't hardened yet — you'll do that in Lab 9 and watch this compliance go up.</p>
+<p><strong>What's the difference?</strong> <strong>Azure Policy</strong> sets rules on Azure resources. <strong>Machine Configuration</strong> (formerly Guest Configuration) carries those rules <strong>inside the operating system</strong>, through the Arc agent. Think of it as Group Policy that works for any server — domain-joined or not, on-premises or in another cloud — with one compliance dashboard.</p>
+<h3 id="steps">Steps</h3>
+<ol>
+<li>In the portal, search for <strong>Policy</strong> &gt; <strong>Definitions</strong>.</li>
+<li>Search for <strong>Windows machines should meet requirements of the Azure compute security baseline</strong> and open it. For Windows Server 2025, this baseline is powered by the same <strong>OSConfig</strong> engine you'll use in Lab 9.</li>
+<li>Select <strong>Assign policy</strong>:
+   - <strong>Scope</strong>: your resource group <code>rg-presales-&lt;yourname&gt;</code>.
+   - If the portal offers to deploy the <strong>Machine Configuration prerequisites</strong>, accept.
+   - <strong>Parameters</strong>: set <strong>Include Arc connected servers</strong> to <strong>true</strong>.
+   - <strong>Review + create</strong> &gt; <strong>Create</strong>.</li>
+<li>The first evaluation takes about <strong>30 minutes</strong>. Start Lab 5 and come back.</li>
+<li>Open <strong>Policy</strong> &gt; <strong>Compliance</strong> and select your assignment. Your server shows <strong>Compliant</strong> or <strong>Non-compliant</strong>.</li>
+<li>Select your server to see <strong>each rule</strong>, its expected value and its current value. Many will fail — the server still has default settings. Note the failing rules: Lab 9 fixes most of them.</li>
+<li>Open your machine in <strong>Azure Arc</strong> &gt; <strong>Operations</strong> &gt; <strong>Machine Configuration</strong>. You see the same assignment, from the server's point of view.</li>
+</ol>
+<h3 id="check-yourself">Check yourself</h3>
+<ul>
+<li>Why do so many rules fail? (The server still has default settings. Azure Policy here only audits and reports; you harden the server in Lab 9.)</li>
+<li>What's the scope difference with Group Policy? (Azure Policy targets subscriptions, resource groups and tags. GPO targets domains and OUs.)</li>
+</ul>
+<h3 id="customer-talking-points">Customer talking points</h3>
+<ul>
+<li><strong>One compliance dashboard</strong> for servers in the datacenter, the edge and other clouds — including servers that aren't in a domain.</li>
+<li>Audit reports are ready for <strong>auditors and regulators</strong>, without collecting RSoP from each server.</li>
+<li><strong>Azure Machine Configuration is included</strong> in Windows Server Management enabled by Azure Arc (Part D of Lab 2) for customers with SA or subscription licences.</li>
+<li>Good opening question: "How do you prove to your auditors that all your servers follow your security policy?"</li>
+</ul>
+<hr />
+<nav class="pager"><a href="03-hotpatching-with-azure-arc.html">← Lab 3</a> <a href="index.html">Overview</a> <a href="05-azure-monitor.html">Lab 5 →</a></nav>
+</main>
+</div>
+<footer class="foot"><p><a href="https://github.com/medyabi/windows-server2025-Hybrid-lab" rel="noopener">Source on GitHub</a> · By Mohamed Dyabi, Microsoft Certified Trainer · learn.ebigpictures.com</p>
+<p class="small">Lab environments only. Several labs change security settings, lock accounts or force recovery. Never run them on production systems.</p></footer>
+
+</body>
+</html>

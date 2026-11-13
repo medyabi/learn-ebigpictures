@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab 2.3: The Protected Users group · Windows Server Labs</title>
+<meta name="description" content="Hands-on Windows Server 2025 labs: hybrid management with Azure Arc, and Windows Server security.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/site.css">
+</head>
+<body class="track-security">
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+  <a class="brand" href="../../index.html"><span class="brand-mark" aria-hidden="true"></span>Windows Server Labs</a>
+  <nav class="tracks" aria-label="Tracks"><a href="../../hybrid/index.html">Hybrid</a><a href="../index.html" aria-current="true">Security</a></nav>
+</header>
+<div class="layout with-side">
+<nav class="side" aria-label="Security labs"><p class="side-title">Security track</p><ol class="side-list"><li><a href="../index.html">Overview</a></li><li><a href="../setup.html">Lab setup</a></li><li class="group"><a href="../01-securing-the-os/index.html">Chapter 1: Securing the Windows Server operating system</a><ol><li><a href="../01-securing-the-os/lab-1.1-password-lockout-baseline.html">1.1: Password and lockout baseline with Group Policy</a></li><li><a href="../01-securing-the-os/lab-1.2-exploit-protection.html">1.2: Exploit protection</a></li><li><a href="../01-securing-the-os/lab-1.3-app-control-wdac.html">1.3: App Control for Business (WDAC)</a></li><li><a href="../01-securing-the-os/lab-1.4-credential-guard.html">1.4: Credential Guard</a></li><li><a href="../01-securing-the-os/lab-1.5-smartscreen.html">1.5: Microsoft Defender SmartScreen</a></li><li><a href="../01-securing-the-os/lab-1.6-defender-for-endpoint.html">1.6: Microsoft Defender for Endpoint</a></li></ol></li><li class="group"><a href="index.html">Chapter 2: Securing hybrid Active Directory accounts</a><ol><li><a href="lab-2.1-fine-grained-password-policy.html">2.1: Fine-grained password policy</a></li><li><a href="lab-2.2-entra-password-protection.html">2.2: Microsoft Entra Password Protection</a></li><li><a href="lab-2.3-protected-users.html" aria-current="page">2.3: The Protected Users group</a></li><li><a href="lab-2.4-rodc.html">2.4: Read-only domain controller (RODC)</a></li><li><a href="lab-2.5-authentication-policy-silos.html">2.5: Authentication policies and silos</a></li></ol></li><li class="group"><a href="../03-least-privilege-and-delegation/index.html">Chapter 3: Least privilege and delegation</a><ol><li><a href="../03-least-privilege-and-delegation/lab-3.1-restricted-groups.html">3.1: Built-in admin groups and Restricted Groups</a></li><li><a href="../03-least-privilege-and-delegation/lab-3.2-delegation-of-control.html">3.2: Delegation of Control</a></li><li><a href="../03-least-privilege-and-delegation/lab-3.3-kerberos-double-hop.html">3.3: The Kerberos double-hop</a></li><li><a href="../03-least-privilege-and-delegation/lab-3.4-defender-for-identity.html">3.4: Microsoft Defender for Identity</a></li></ol></li><li class="group"><a href="../04-watching-from-azure/index.html">Chapter 4: Watching your servers from Azure</a><ol><li><a href="../04-watching-from-azure/lab-4.1-azure-arc-log-analytics.html">4.1: Azure Arc and Log Analytics</a></li><li><a href="../04-watching-from-azure/lab-4.2-kql-hunting-and-alerts.html">4.2: Hunting with KQL and creating an alert</a></li><li><a href="../04-watching-from-azure/lab-4.3-microsoft-sentinel.html">4.3: Microsoft Sentinel</a></li><li><a href="../04-watching-from-azure/lab-4.4-secure-score.html">4.4: Improving the Secure Score with Defender for Cloud</a></li></ol></li><li class="group"><a href="../05-networking/index.html">Chapter 5: Securing Windows Server networking</a><ol><li><a href="../05-networking/lab-5.1-windows-firewall.html">5.1: Windows Defender Firewall</a></li><li><a href="../05-networking/lab-5.2-ipsec-connection-security.html">5.2: IPsec connection security rules</a></li><li><a href="../05-networking/lab-5.3-firewall-review-wac.html">5.3: Firewall review with Windows Admin Center</a></li></ol></li><li class="group"><a href="../06-storage-encryption/index.html">Chapter 6: Securing Windows Server storage</a><ol><li><a href="../06-storage-encryption/lab-6.1-bitlocker-ad-recovery.html">6.1: BitLocker with recovery keys in Active Directory</a></li><li><a href="../06-storage-encryption/lab-6.2-bitlocker-forced-recovery.html">6.2: Forcing BitLocker recovery</a></li><li><a href="../06-storage-encryption/lab-6.3-azure-disk-encryption.html">6.3: Encrypting Azure VM disks</a></li></ol></li><li><a href="../attack-to-control-map.html">Attack → control map</a></li><li><a href="../progress.html">Progress checklist</a></li></ol></nav>
+<main id="content" class="prose">
+<h1 id="lab-23-the-protected-users-group">Lab 2.3: The Protected Users group</h1>
+<nav class="pager"><a href="lab-2.2-entra-password-protection.html">← Lab 2.2</a> <a href="index.html">Chapter overview</a> <a href="lab-2.4-rodc.html">Lab 2.4 →</a></nav>
+<div class="table-wrap"><table>
+
+<tbody>
+<tr>
+<td><strong>Attack</strong></td>
+<td>Credential theft when a Domain Admin signs in</td>
+</tr>
+<tr>
+<td><strong>Control</strong></td>
+<td>Protected Users group</td>
+</tr>
+<tr>
+<td><strong>Machines</strong></td>
+<td>SEA-DC1, SEA-SVR1</td>
+</tr>
+<tr>
+<td><strong>Needs</strong></td>
+<td>None</td>
+</tr>
+<tr>
+<td><strong>Checkpoint first</strong></td>
+<td>Recommended (see lab setup)</td>
+</tr>
+<tr>
+<td><strong>Scripts</strong></td>
+<td><a href="https://github.com/medyabi/windows-server-security-lab/blob/main/scripts/lab-2.3-protected-users.ps1" rel="noopener"><code>scripts/lab-2.3-protected-users.ps1</code></a></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="hacker-scenario">🥷 Hacker scenario</h2>
+<p>Adam, a Domain Admin, signs in to SEA-SVR1 to fix a printer. The attacker is already on SEA-SVR1. They grab Adam's cached credentials and NTLM hash, then replay them against the domain controller.</p>
+<h2 id="concepts">📖 Concepts</h2>
+<p><strong>Protected Users</strong> is a special security group. Put an account in it, and Windows applies strong protections automatically. You can't configure them; it's all or nothing:</p>
+<ul>
+<li><strong>No NTLM</strong> authentication. Only Kerberos.</li>
+<li><strong>No cached credentials</strong>. Nothing stays on the server after you log off.</li>
+<li><strong>No delegation</strong>. Your credentials can't be forwarded to another server.</li>
+<li><strong>Shorter Kerberos tickets</strong>: 4 hours instead of 10.</li>
+<li>No weak encryption like DES or RC4.</li>
+</ul>
+<p>Sounds great, right? There's one catch. Never put service accounts or computer accounts in this group. They often need delegation or NTLM, and they'll break.</p>
+<h2 id="how-this-stops-the-attacker">🛡️ How this stops the attacker</h2>
+<p>There's no NTLM hash to use, and nothing is cached on SEA-SVR1. Even a stolen Kerberos ticket expires in 4 hours. The loot is worthless or short-lived.</p>
+<h2 id="step-by-step">🧪 Step by step</h2>
+<ol>
+<li>Add Adam and John to the group:</li>
+</ol>
+<p><code>powershell
+   Add-ADGroupMember "Protected Users" -Members Adam, John</code></p>
+<ol start="2">
+<li>Keep one <strong>break-glass</strong> admin account outside the group. If Kerberos ever has a problem, you still have a way in.</li>
+<li>Have Adam sign out and sign back in. Group membership is only read at sign-in.</li>
+</ol>
+<p>Now sign in to SEA-SVR1 as Adam and look at the tickets:</p>
+<pre><code class="language-powershell">klist
+</code></pre>
+<p>Check the <strong>End Time</strong> of the tickets. It's 4 hours after the <strong>Start Time</strong>. Next, try a connection by IP address, which forces NTLM:</p>
+<pre><code class="language-powershell">net use \\10.10.0.10\c$
+</code></pre>
+<p>It fails. NTLM is blocked for Adam. Exactly what we want.</p>
+<blockquote>
+<p>📌 <strong>2025 note.</strong> Windows Server 2025 removed NTLMv1 completely, and Microsoft is phasing out NTLM. Protected Users gets you ready for that future today.</p>
+</blockquote>
+<h2 id="key-takeaway">✅ Key takeaway</h2>
+<p>Your admin accounts are the crown jewels. One group membership removes most of the ways an attacker can steal and reuse them.</p>
+<hr />
+<nav class="pager"><a href="lab-2.2-entra-password-protection.html">← Lab 2.2</a> <a href="index.html">Chapter overview</a> <a href="lab-2.4-rodc.html">Lab 2.4 →</a></nav>
+</main>
+</div>
+<footer class="foot"><p><a href="https://github.com/medyabi/windows-server-security-lab" rel="noopener">Source on GitHub</a> · By Mohamed Dyabi, Microsoft Certified Trainer · learn.ebigpictures.com</p>
+<p class="small">Lab environments only. Several labs change security settings, lock accounts or force recovery. Never run them on production systems.</p></footer>
+
+</body>
+</html>

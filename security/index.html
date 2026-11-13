@@ -1,0 +1,319 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Windows Server 2025 Security Lab · Windows Server Labs</title>
+<meta name="description" content="Hands-on Windows Server 2025 labs: hybrid management with Azure Arc, and Windows Server security.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body class="track-security">
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+  <a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true"></span>Windows Server Labs</a>
+  <nav class="tracks" aria-label="Tracks"><a href="../hybrid/index.html">Hybrid</a><a href="index.html" aria-current="true">Security</a></nav>
+</header>
+<div class="layout with-side">
+<nav class="side" aria-label="Security labs"><p class="side-title">Security track</p><ol class="side-list"><li><a href="index.html" aria-current="page">Overview</a></li><li><a href="setup.html">Lab setup</a></li><li class="group"><a href="01-securing-the-os/index.html">Chapter 1: Securing the Windows Server operating system</a><ol><li><a href="01-securing-the-os/lab-1.1-password-lockout-baseline.html">1.1: Password and lockout baseline with Group Policy</a></li><li><a href="01-securing-the-os/lab-1.2-exploit-protection.html">1.2: Exploit protection</a></li><li><a href="01-securing-the-os/lab-1.3-app-control-wdac.html">1.3: App Control for Business (WDAC)</a></li><li><a href="01-securing-the-os/lab-1.4-credential-guard.html">1.4: Credential Guard</a></li><li><a href="01-securing-the-os/lab-1.5-smartscreen.html">1.5: Microsoft Defender SmartScreen</a></li><li><a href="01-securing-the-os/lab-1.6-defender-for-endpoint.html">1.6: Microsoft Defender for Endpoint</a></li></ol></li><li class="group"><a href="02-hybrid-ad-accounts/index.html">Chapter 2: Securing hybrid Active Directory accounts</a><ol><li><a href="02-hybrid-ad-accounts/lab-2.1-fine-grained-password-policy.html">2.1: Fine-grained password policy</a></li><li><a href="02-hybrid-ad-accounts/lab-2.2-entra-password-protection.html">2.2: Microsoft Entra Password Protection</a></li><li><a href="02-hybrid-ad-accounts/lab-2.3-protected-users.html">2.3: The Protected Users group</a></li><li><a href="02-hybrid-ad-accounts/lab-2.4-rodc.html">2.4: Read-only domain controller (RODC)</a></li><li><a href="02-hybrid-ad-accounts/lab-2.5-authentication-policy-silos.html">2.5: Authentication policies and silos</a></li></ol></li><li class="group"><a href="03-least-privilege-and-delegation/index.html">Chapter 3: Least privilege and delegation</a><ol><li><a href="03-least-privilege-and-delegation/lab-3.1-restricted-groups.html">3.1: Built-in admin groups and Restricted Groups</a></li><li><a href="03-least-privilege-and-delegation/lab-3.2-delegation-of-control.html">3.2: Delegation of Control</a></li><li><a href="03-least-privilege-and-delegation/lab-3.3-kerberos-double-hop.html">3.3: The Kerberos double-hop</a></li><li><a href="03-least-privilege-and-delegation/lab-3.4-defender-for-identity.html">3.4: Microsoft Defender for Identity</a></li></ol></li><li class="group"><a href="04-watching-from-azure/index.html">Chapter 4: Watching your servers from Azure</a><ol><li><a href="04-watching-from-azure/lab-4.1-azure-arc-log-analytics.html">4.1: Azure Arc and Log Analytics</a></li><li><a href="04-watching-from-azure/lab-4.2-kql-hunting-and-alerts.html">4.2: Hunting with KQL and creating an alert</a></li><li><a href="04-watching-from-azure/lab-4.3-microsoft-sentinel.html">4.3: Microsoft Sentinel</a></li><li><a href="04-watching-from-azure/lab-4.4-secure-score.html">4.4: Improving the Secure Score with Defender for Cloud</a></li></ol></li><li class="group"><a href="05-networking/index.html">Chapter 5: Securing Windows Server networking</a><ol><li><a href="05-networking/lab-5.1-windows-firewall.html">5.1: Windows Defender Firewall</a></li><li><a href="05-networking/lab-5.2-ipsec-connection-security.html">5.2: IPsec connection security rules</a></li><li><a href="05-networking/lab-5.3-firewall-review-wac.html">5.3: Firewall review with Windows Admin Center</a></li></ol></li><li class="group"><a href="06-storage-encryption/index.html">Chapter 6: Securing Windows Server storage</a><ol><li><a href="06-storage-encryption/lab-6.1-bitlocker-ad-recovery.html">6.1: BitLocker with recovery keys in Active Directory</a></li><li><a href="06-storage-encryption/lab-6.2-bitlocker-forced-recovery.html">6.2: Forcing BitLocker recovery</a></li><li><a href="06-storage-encryption/lab-6.3-azure-disk-encryption.html">6.3: Encrypting Azure VM disks</a></li></ol></li><li><a href="attack-to-control-map.html">Attack → control map</a></li><li><a href="progress.html">Progress checklist</a></li></ol></nav>
+<main id="content" class="prose">
+<h1 id="windows-server-2025-security-lab">Windows Server 2025 Security Lab</h1>
+<p><img alt="Windows Server 2025" src="https://img.shields.io/badge/Windows%20Server-2025-0078D4" />
+<img alt="Exam" src="https://img.shields.io/badge/exam-AZ--801-5C2D91" />
+<img alt="PowerShell" src="https://img.shields.io/badge/PowerShell-5.1%2B-2671BE" />
+<img alt="Azure" src="https://img.shields.io/badge/Azure-Arc%20%C2%B7%20Sentinel%20%C2%B7%20Defender-0089D6" />
+<img alt="Labs" src="https://img.shields.io/badge/labs-25-2EA043" /></p>
+<p><strong>25 hands-on labs that follow one idea: show the attack first, then build the control that stops it, then prove that it works.</strong> Each lab has a <em>hacker scenario</em>, the concepts, how the control breaks the attack, a step-by-step build with verification commands, and one key takeaway.</p>
+<blockquote>
+<p>Most of the time attackers do not break in, they <strong>log in</strong>: a weak password, a hash stolen from memory, an admin account with too many rights. This lab closes those doors one by one, with tools already in Windows Server and Azure.</p>
+<p>⚠️ <strong>Lab environment only.</strong> Several labs lock accounts, change boot or authentication behaviour, or force BitLocker recovery. Run them on your own isolated virtual machines, with checkpoints, never on production systems. The attacks are <em>simulated</em> with harmless commands (failed sign-ins, a test local admin, a test firewall rule, …); this repository contains no exploit code.</p>
+</blockquote>
+<p><img alt="The cast: Mohamed, Adam, John and you" src="../assets/sec/docs-images-cast.png" /></p>
+<h2 id="the-lab">The lab</h2>
+<p>Four VMs on Hyper-V (all <strong>Generation 2, Secure Boot, virtual TPM</strong>) and an Azure subscription for the cloud chapters.</p>
+<pre class="mermaid">flowchart LR
+  subgraph LAB[&quot;Hyper-V lab network 10.10.0.0/24, domain contoso.com&quot;]
+    DC1[&quot;SEA-DC1&lt;br/&gt;Domain controller, DNS, GPO&lt;br/&gt;10.10.0.10&quot;]
+    SVR1[&quot;SEA-SVR1&lt;br/&gt;Member server, the 'victim'&lt;br/&gt;10.10.0.11&quot;]
+    SVR2[&quot;SEA-SVR2&lt;br/&gt;Becomes an RODC (lab 2.4)&lt;br/&gt;10.10.0.12&quot;]
+    CL1[&quot;SEA-CL1 (Windows 11)&lt;br/&gt;Admin workstation&lt;br/&gt;10.10.0.20&quot;]
+  end
+  subgraph AZ[&quot;Azure and Microsoft 365&quot;]
+    ARC[&quot;Azure Arc&quot;] --&gt; LAW[&quot;Log Analytics&lt;br/&gt;law-infra, law-sentinel&quot;]
+    LAW --&gt; SENT[&quot;Microsoft Sentinel&quot;]
+    DFC[&quot;Defender for Cloud&lt;br/&gt;Defender for Servers&quot;] --&gt; MDE[&quot;Defender for Endpoint&quot;]
+    MDI[&quot;Defender for Identity&quot;]
+    ENTRA[&quot;Entra ID&lt;br/&gt;Password Protection&quot;]
+    KV[&quot;Key Vault&lt;br/&gt;disk encryption&quot;]
+  end
+  SVR1 -. Azure Arc agent .-&gt; ARC
+  SVR1 -. MDE via Arc .-&gt; MDE
+  DC1 -. MDI sensor .-&gt; MDI
+  DC1 -. password filter + proxy on SVR1 .-&gt; ENTRA
+</pre>
+<p>Cast: <strong>Mohamed</strong> (normal Accounting user, later helps the helpdesk), <strong>Adam</strong> and <strong>John</strong> (Domain Admins, hackers love them) and <strong>you</strong> (the administrator who builds everything).</p>
+<h2 id="how-every-lab-works">How every lab works</h2>
+<pre class="mermaid">flowchart LR
+  A[&quot;🥷 Hacker scenario&lt;br/&gt;how the attacker abuses a missing control&quot;] --&gt; B[&quot;📖 Concepts&quot;]
+  B --&gt; C[&quot;🛡️ How this stops the attacker&quot;]
+  C --&gt; D[&quot;🧪 Step by step&lt;br/&gt;build it, then prove it works&quot;]
+  D --&gt; E[&quot;✅ Key takeaway&quot;]
+</pre>
+<h2 id="start-here">Start here</h2>
+<ol>
+<li>Read <a href="setup.html"><strong>Welcome and lab setup</strong></a>: VM table, domain, users, RSAT, Azure prerequisites and the <strong>extra setup</strong> the labs assume (switch, <code>Servers</code> OU, <code>Policies$</code> share).</li>
+<li>Take a checkpoint named <em>Baseline</em> of every VM.</li>
+<li>Do the labs <strong>in order</strong> (later labs reuse earlier results; dependencies are listed in the setup doc).</li>
+<li>At the end, use the <a href="attack-to-control-map.html">attack → control map</a> as a self-test: cover the middle column and name the control.</li>
+</ol>
+<h2 id="the-25-labs">The 25 labs</h2>
+<h3 id="chapter-1-securing-the-windows-server-operating-system">Chapter 1: <a href="01-securing-the-os/index.html">Securing the Windows Server operating system</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Lab</th>
+<th>Attack</th>
+<th>Control</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="01-securing-the-os/lab-1.1-password-lockout-baseline.html">1.1 Password and lockout baseline</a></td>
+<td>Brute force / password spray</td>
+<td>Password + lockout policy (Group Policy)</td>
+</tr>
+<tr>
+<td><a href="01-securing-the-os/lab-1.2-exploit-protection.html">1.2 Exploit protection</a></td>
+<td>Memory exploit (buffer overflow) in an unpatched app</td>
+<td>DEP, ASLR, CFG, ACG</td>
+</tr>
+<tr>
+<td><a href="01-securing-the-os/lab-1.3-app-control-wdac.html">1.3 App Control for Business (WDAC)</a></td>
+<td>Unknown malware or attacker tools dropped on the server</td>
+<td>Allow list, audit mode first</td>
+</tr>
+<tr>
+<td><a href="01-securing-the-os/lab-1.4-credential-guard.html">1.4 Credential Guard</a></td>
+<td>Pass-the-hash after reading LSASS memory</td>
+<td>Virtualization-based security</td>
+</tr>
+<tr>
+<td><a href="01-securing-the-os/lab-1.5-smartscreen.html">1.5 SmartScreen</a></td>
+<td>Phishing download / fake download site</td>
+<td>SmartScreen, prevent bypass</td>
+</tr>
+<tr>
+<td><a href="01-securing-the-os/lab-1.6-defender-for-endpoint.html">1.6 Defender for Endpoint</a></td>
+<td>Vulnerable third-party app (old 7-Zip)</td>
+<td>EDR + vulnerability management</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="chapter-2-securing-hybrid-active-directory-accounts">Chapter 2: <a href="02-hybrid-ad-accounts/index.html">Securing hybrid Active Directory accounts</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Lab</th>
+<th>Attack</th>
+<th>Control</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="02-hybrid-ad-accounts/lab-2.1-fine-grained-password-policy.html">2.1 Fine-grained password policy</a></td>
+<td>Password spray against a high-value team</td>
+<td>PSO</td>
+</tr>
+<tr>
+<td><a href="02-hybrid-ad-accounts/lab-2.2-entra-password-protection.html">2.2 Entra Password Protection</a></td>
+<td>Wordlist built from company words</td>
+<td>Global + custom banned lists</td>
+</tr>
+<tr>
+<td><a href="02-hybrid-ad-accounts/lab-2.3-protected-users.html">2.3 Protected Users</a></td>
+<td>Credential theft when a Domain Admin signs in</td>
+<td>Protected Users group</td>
+</tr>
+<tr>
+<td><a href="02-hybrid-ad-accounts/lab-2.4-rodc.html">2.4 Read-only domain controller</a></td>
+<td>Stolen branch-office domain controller</td>
+<td>RODC + Password Replication Policy</td>
+</tr>
+<tr>
+<td><a href="02-hybrid-ad-accounts/lab-2.5-authentication-policy-silos.html">2.5 Authentication policies and silos</a></td>
+<td>Stolen admin password used on a sensitive server</td>
+<td>Authentication firewall</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="chapter-3-least-privilege-and-delegation">Chapter 3: <a href="03-least-privilege-and-delegation/index.html">Least privilege and delegation</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Lab</th>
+<th>Attack</th>
+<th>Control</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="03-least-privilege-and-delegation/lab-3.1-restricted-groups.html">3.1 Restricted Groups</a></td>
+<td>Backdoor admin account (persistence)</td>
+<td>Restricted Groups</td>
+</tr>
+<tr>
+<td><a href="03-least-privilege-and-delegation/lab-3.2-delegation-of-control.html">3.2 Delegation of Control</a></td>
+<td>Over-privileged helpdesk account</td>
+<td>Scoped delegation</td>
+</tr>
+<tr>
+<td><a href="03-least-privilege-and-delegation/lab-3.3-kerberos-double-hop.html">3.3 Kerberos double-hop</a></td>
+<td>Lateral movement through delegated tickets</td>
+<td>Constrained delegation, CredSSP off after use</td>
+</tr>
+<tr>
+<td><a href="03-least-privilege-and-delegation/lab-3.4-defender-for-identity.html">3.4 Defender for Identity</a></td>
+<td>Reconnaissance and attacks against domain controllers</td>
+<td>Sensor on the DC</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="chapter-4-watching-your-servers-from-azure">Chapter 4: <a href="04-watching-from-azure/index.html">Watching your servers from Azure</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Lab</th>
+<th>Attack</th>
+<th>Control</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="04-watching-from-azure/lab-4.1-azure-arc-log-analytics.html">4.1 Azure Arc and Log Analytics</a></td>
+<td>Attacker clears the Security log</td>
+<td>Arc + Azure Monitor Agent</td>
+</tr>
+<tr>
+<td><a href="04-watching-from-azure/lab-4.2-kql-hunting-and-alerts.html">4.2 KQL hunting and alerts</a></td>
+<td>Password spray nobody notices</td>
+<td>KQL query + alert on event 4625</td>
+</tr>
+<tr>
+<td><a href="04-watching-from-azure/lab-4.3-microsoft-sentinel.html">4.3 Microsoft Sentinel</a></td>
+<td>An attack spread across several tools</td>
+<td>Correlation, analytics rules, playbooks</td>
+</tr>
+<tr>
+<td><a href="04-watching-from-azure/lab-4.4-secure-score.html">4.4 Secure Score</a></td>
+<td>Owner account without MFA, unpatched server</td>
+<td>Defender for Cloud recommendations</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="chapter-5-securing-windows-server-networking">Chapter 5: <a href="05-networking/index.html">Securing Windows Server networking</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Lab</th>
+<th>Attack</th>
+<th>Control</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="05-networking/lab-5.1-windows-firewall.html">5.1 Windows Defender Firewall</a></td>
+<td>Worm scanning for open SMB / RDP</td>
+<td>Host firewall with scoped rules</td>
+</tr>
+<tr>
+<td><a href="05-networking/lab-5.2-ipsec-connection-security.html">5.2 IPsec connection security</a></td>
+<td>Man-in-the-middle / rogue laptop on the LAN</td>
+<td>Domain isolation with IPsec</td>
+</tr>
+<tr>
+<td><a href="05-networking/lab-5.3-firewall-review-wac.html">5.3 Firewall review with Windows Admin Center</a></td>
+<td>"Allow all" inbound rule planted by the attacker</td>
+<td>Fast review and disable in WAC</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="chapter-6-securing-windows-server-storage">Chapter 6: <a href="06-storage-encryption/index.html">Securing Windows Server storage</a></h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Lab</th>
+<th>Attack</th>
+<th>Control</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="06-storage-encryption/lab-6.1-bitlocker-ad-recovery.html">6.1 BitLocker with keys in AD</a></td>
+<td>Stolen disk or copied VHDX</td>
+<td>BitLocker + recovery key in AD DS</td>
+</tr>
+<tr>
+<td><a href="06-storage-encryption/lab-6.2-bitlocker-forced-recovery.html">6.2 Forced BitLocker recovery</a></td>
+<td>Lost recovery key (availability)</td>
+<td>Recovery drill and key rotation</td>
+</tr>
+<tr>
+<td><a href="06-storage-encryption/lab-6.3-azure-disk-encryption.html">6.3 Encrypting Azure VM disks</a></td>
+<td>Azure disk export by a rogue Contributor</td>
+<td>ADE and customer-managed keys</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="what-you-need">What you need</h2>
+<div class="table-wrap"><table>
+
+<tbody>
+<tr>
+<td>Host</td>
+<td>A Hyper-V host able to run four VMs at once (three Windows Server 2025, one Windows 11 Enterprise), all Generation 2 with Secure Boot and a virtual TPM</td>
+</tr>
+<tr>
+<td>Azure</td>
+<td>Free trial subscription, resource group <code>az801-rg</code>, Microsoft Entra ID P2 trial (needed by the Azure labs: 1.6, 2.2, 4.1 to 4.4, 6.3)</td>
+</tr>
+<tr>
+<td>Microsoft 365</td>
+<td>E5 trial for Defender for Identity (Lab 3.4)</td>
+</tr>
+<tr>
+<td>Time</td>
+<td>The labs that need Azure or Microsoft 365 trials are the ones that expire: plan them together</td>
+</tr>
+</tbody>
+</table></div>
+<p>Labs that need <strong>no Azure or Microsoft 365 subscription</strong> (a few still need internet, for example the SmartScreen test page): 1.1 to 1.5, 2.1, 2.3, 2.4, 2.5, 3.1 to 3.3, 5.1 to 5.3, 6.1, 6.2.
+Labs that <strong>need Azure and/or Microsoft 365</strong>: 1.6, 2.2, 3.4, 4.1 to 4.4, 6.3.</p>
+<h2 id="repository-structure">Repository structure</h2>
+<pre><code>windows-server-security-lab/
+├── README.md
+├── docs/
+│   ├── 00-welcome-and-lab-setup.md     VMs, domain, users, extra setup, lab dependencies
+│   ├── attack-to-control-map.md        final review table: attack -&gt; control -&gt; lab
+│   ├── progress-checklist.md           tick the labs as you go
+│   ├── REVIEW-NOTES.md                 what was added or changed compared to the course text
+│   └── images/cast.png
+├── labs/
+│   ├── 01-securing-the-os/ ... 06-storage-encryption/
+│   │   ├── README.md                   chapter intro + lab table
+│   │   └── lab-N.M-&lt;name&gt;.md           one file per lab
+└── scripts/
+    └── lab-N.M-&lt;name&gt;.ps1 / .kql       the commands of each lab, copy them one by one
+</code></pre>
+<h2 id="scripts">Scripts</h2>
+<p><a href="https://github.com/medyabi/windows-server-security-lab/blob/main/scripts" rel="noopener"><code>scripts/</code></a> holds every command and KQL query from the labs, with the sentence that introduces it as a comment. They are <strong>snippets to run one by one, on the machine named in the lab</strong>, not scripts to run as a whole. All PowerShell files were checked with the PowerShell parser for syntax errors; they were <strong>not executed</strong> here (no Windows Server lab in this repository's build), so test in your own lab.</p>
+<h2 id="source-and-status">Source and status</h2>
+<p>The lab text comes from the course document <em>How to Master Windows Server Security (AZ-801)</em> (author: Mohamed), converted to Markdown without changing its content, except for the few places marked <strong>⚠️ Added by this repository</strong>, listed in <a href="https://github.com/medyabi/windows-server-security-lab/blob/main/docs/REVIEW-NOTES.md" rel="noopener"><code>docs/REVIEW-NOTES.md</code></a> together with points to double-check against current Microsoft documentation. Product names and portal paths change often: where the course adds a <em>2025 note</em>, it is kept as a 📌 note.</p>
+<h2 id="license">License</h2>
+<p>Not chosen yet (the repository is private). Decide before making it public: for example MIT for the scripts and CC BY-NC-SA 4.0 for the course text.</p>
+</main>
+</div>
+<footer class="foot"><p><a href="https://github.com/medyabi/windows-server-security-lab" rel="noopener">Source on GitHub</a> · By Mohamed Dyabi, Microsoft Certified Trainer · learn.ebigpictures.com</p>
+<p class="small">Lab environments only. Several labs change security settings, lock accounts or force recovery. Never run them on production systems.</p></footer>
+<script type="module">import mermaid from "https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.esm.min.mjs";const dark = document.documentElement.matches("[data-theme=dark]") || (window.matchMedia("(prefers-color-scheme: dark)").matches && !document.documentElement.matches("[data-theme=light]"));mermaid.initialize({startOnLoad:true, theme: dark ? "dark" : "neutral", securityLevel:"strict"});</script>
+</body>
+</html>

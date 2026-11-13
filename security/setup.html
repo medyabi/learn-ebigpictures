@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Welcome and lab setup · Windows Server Labs</title>
+<meta name="description" content="Hands-on Windows Server 2025 labs: hybrid management with Azure Arc, and Windows Server security.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body class="track-security">
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+  <a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true"></span>Windows Server Labs</a>
+  <nav class="tracks" aria-label="Tracks"><a href="../hybrid/index.html">Hybrid</a><a href="index.html" aria-current="true">Security</a></nav>
+</header>
+<div class="layout with-side">
+<nav class="side" aria-label="Security labs"><p class="side-title">Security track</p><ol class="side-list"><li><a href="index.html">Overview</a></li><li><a href="setup.html" aria-current="page">Lab setup</a></li><li class="group"><a href="01-securing-the-os/index.html">Chapter 1: Securing the Windows Server operating system</a><ol><li><a href="01-securing-the-os/lab-1.1-password-lockout-baseline.html">1.1: Password and lockout baseline with Group Policy</a></li><li><a href="01-securing-the-os/lab-1.2-exploit-protection.html">1.2: Exploit protection</a></li><li><a href="01-securing-the-os/lab-1.3-app-control-wdac.html">1.3: App Control for Business (WDAC)</a></li><li><a href="01-securing-the-os/lab-1.4-credential-guard.html">1.4: Credential Guard</a></li><li><a href="01-securing-the-os/lab-1.5-smartscreen.html">1.5: Microsoft Defender SmartScreen</a></li><li><a href="01-securing-the-os/lab-1.6-defender-for-endpoint.html">1.6: Microsoft Defender for Endpoint</a></li></ol></li><li class="group"><a href="02-hybrid-ad-accounts/index.html">Chapter 2: Securing hybrid Active Directory accounts</a><ol><li><a href="02-hybrid-ad-accounts/lab-2.1-fine-grained-password-policy.html">2.1: Fine-grained password policy</a></li><li><a href="02-hybrid-ad-accounts/lab-2.2-entra-password-protection.html">2.2: Microsoft Entra Password Protection</a></li><li><a href="02-hybrid-ad-accounts/lab-2.3-protected-users.html">2.3: The Protected Users group</a></li><li><a href="02-hybrid-ad-accounts/lab-2.4-rodc.html">2.4: Read-only domain controller (RODC)</a></li><li><a href="02-hybrid-ad-accounts/lab-2.5-authentication-policy-silos.html">2.5: Authentication policies and silos</a></li></ol></li><li class="group"><a href="03-least-privilege-and-delegation/index.html">Chapter 3: Least privilege and delegation</a><ol><li><a href="03-least-privilege-and-delegation/lab-3.1-restricted-groups.html">3.1: Built-in admin groups and Restricted Groups</a></li><li><a href="03-least-privilege-and-delegation/lab-3.2-delegation-of-control.html">3.2: Delegation of Control</a></li><li><a href="03-least-privilege-and-delegation/lab-3.3-kerberos-double-hop.html">3.3: The Kerberos double-hop</a></li><li><a href="03-least-privilege-and-delegation/lab-3.4-defender-for-identity.html">3.4: Microsoft Defender for Identity</a></li></ol></li><li class="group"><a href="04-watching-from-azure/index.html">Chapter 4: Watching your servers from Azure</a><ol><li><a href="04-watching-from-azure/lab-4.1-azure-arc-log-analytics.html">4.1: Azure Arc and Log Analytics</a></li><li><a href="04-watching-from-azure/lab-4.2-kql-hunting-and-alerts.html">4.2: Hunting with KQL and creating an alert</a></li><li><a href="04-watching-from-azure/lab-4.3-microsoft-sentinel.html">4.3: Microsoft Sentinel</a></li><li><a href="04-watching-from-azure/lab-4.4-secure-score.html">4.4: Improving the Secure Score with Defender for Cloud</a></li></ol></li><li class="group"><a href="05-networking/index.html">Chapter 5: Securing Windows Server networking</a><ol><li><a href="05-networking/lab-5.1-windows-firewall.html">5.1: Windows Defender Firewall</a></li><li><a href="05-networking/lab-5.2-ipsec-connection-security.html">5.2: IPsec connection security rules</a></li><li><a href="05-networking/lab-5.3-firewall-review-wac.html">5.3: Firewall review with Windows Admin Center</a></li></ol></li><li class="group"><a href="06-storage-encryption/index.html">Chapter 6: Securing Windows Server storage</a><ol><li><a href="06-storage-encryption/lab-6.1-bitlocker-ad-recovery.html">6.1: BitLocker with recovery keys in Active Directory</a></li><li><a href="06-storage-encryption/lab-6.2-bitlocker-forced-recovery.html">6.2: Forcing BitLocker recovery</a></li><li><a href="06-storage-encryption/lab-6.3-azure-disk-encryption.html">6.3: Encrypting Azure VM disks</a></li></ol></li><li><a href="attack-to-control-map.html">Attack → control map</a></li><li><a href="progress.html">Progress checklist</a></li></ol></nav>
+<main id="content" class="prose">
+<h1 id="welcome-and-lab-setup">Welcome and lab setup</h1>
+<nav class="pager"><a href="index.html">← Back to the README</a></nav>
+<p>Hi, and welcome to this course!</p>
+<p>Let me ask you a question first. What is the easiest way for a hacker to get into your Windows Server?</p>
+<p>Breaking some fancy encryption? Writing a zero-day exploit? Nope. Most of the time they simply <strong>log in</strong>. They guess a weak password, steal a hash from memory, or use an admin account that has way too many rights. Your server opens the door and says "welcome".</p>
+<p>In this course I'm going to show you how to close those doors, one by one. We'll use the tools that are already in Windows Server and Azure. No magic, no expensive third-party products.</p>
+<h2 id="how-every-lab-works">How every lab works</h2>
+<p>Every lab in this course follows the same five steps. Once you get used to it, you'll always know where you are:</p>
+<ol>
+<li><strong>Hacker scenario</strong>: put on your black hoodie for a minute. How would an attacker abuse your server if this control is missing? You'll meet a few new words here. Don't worry, we explain them right after.</li>
+<li><strong>Concepts</strong>: what is this thing, and how does it work? Now that you've seen the problem, the theory has a reason to exist.</li>
+<li><strong>How this stops the attacker</strong>: take the hoodie off. How exactly does our control break the attack you just saw?</li>
+<li><strong>Step by step</strong>: we build it, and then we prove it works.</li>
+<li><strong>Key takeaway</strong>: the one idea to remember when the lab is over.</li>
+</ol>
+<p>Why start with the hacker? Because a solution only makes sense when you know the problem. If I explain Credential Guard first, it's just another feature. If you first watch an attacker steal a Domain Admin's identity from memory, you <em>want</em> to know how to stop it. And typing commands without knowing why is like learning to drive by memorising which pedal to push. It works until something unexpected happens.</p>
+<p>The course was originally recorded on <strong>Windows Server 2022</strong>. I'm using <strong>Windows Server 2025</strong> in the labs. When something changed (a new name, a retired agent), you'll see a <strong>2025 note</strong>.</p>
+<h2 id="meet-the-cast">Meet the cast</h2>
+<p><img alt="The cast: Mohamed, Adam, John and you" src="../assets/sec/docs-images-cast.png" /></p>
+<p>We'll use the same users in every lab, so the stories are easy to follow:</p>
+<ul>
+<li><strong>Mohamed</strong>: a normal user who works in the Accounting team. Later he also helps the helpdesk.</li>
+<li><strong>Adam</strong> and <strong>John</strong>: our Domain Admins. Very powerful accounts. Hackers love them.</li>
+<li><strong>You</strong>: the administrator who builds everything.</li>
+</ul>
+<h2 id="building-the-lab">Building the lab</h2>
+<p>You start from nothing, so let's build the lab first. I'm using Hyper-V. Here's what we need:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>VM</th>
+<th>Role</th>
+<th>OS</th>
+<th>IP address</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>SEA-DC1</td>
+<td>Domain controller, DNS, Group Policy</td>
+<td>Windows Server 2025</td>
+<td>10.10.0.10</td>
+</tr>
+<tr>
+<td>SEA-SVR1</td>
+<td>Member server, our "victim"</td>
+<td>Windows Server 2025</td>
+<td>10.10.0.11</td>
+</tr>
+<tr>
+<td>SEA-SVR2</td>
+<td>Becomes a read-only DC in chapter 2</td>
+<td>Windows Server 2025</td>
+<td>10.10.0.12</td>
+</tr>
+<tr>
+<td>SEA-CL1</td>
+<td>Admin workstation</td>
+<td>Windows 11 Enterprise</td>
+<td>10.10.0.20</td>
+</tr>
+</tbody>
+</table></div>
+<p>One important thing: create every VM as <strong>Generation 2</strong> with <strong>Secure Boot</strong> and a <strong>virtual TPM</strong>. Why? Credential Guard and BitLocker need them. If you skip this now, you'll be rebuilding VMs in chapter 1. Trust me, I've been there.</p>
+<p>Here's how to turn on the virtual TPM on a VM:</p>
+<pre><code class="language-powershell">Set-VMKeyProtector -VMName SEA-SVR1 -NewLocalKeyProtector
+Enable-VMTPM -VMName SEA-SVR1
+</code></pre>
+<p>The first command gives the VM a key protector. The second one adds the TPM chip. Do this for every VM.</p>
+<p>Now the domain. On SEA-DC1:</p>
+<pre><code class="language-powershell">Install-WindowsFeature AD-Domain-Services -IncludeManagementTools
+Install-ADDSForest -DomainName contoso.com -InstallDns
+</code></pre>
+<p>The server reboots and becomes the first domain controller of <strong>contoso.com</strong>. Join SEA-SVR1, SEA-SVR2 and SEA-CL1 to the domain.</p>
+<p>Let's create our cast:</p>
+<pre><code class="language-powershell">New-ADOrganizationalUnit -Name Staff
+New-ADGroup -Name Accounting -GroupScope Global -Path &quot;OU=Staff,DC=contoso,DC=com&quot;
+$pw = Read-Host -AsSecureString &quot;Password&quot;
+New-ADUser Mohamed -Path &quot;OU=Staff,DC=contoso,DC=com&quot; -AccountPassword $pw -Enabled $true
+New-ADUser Adam -AccountPassword $pw -Enabled $true
+New-ADUser John -AccountPassword $pw -Enabled $true
+Add-ADGroupMember &quot;Domain Admins&quot; -Members Adam, John
+</code></pre>
+<p>On SEA-CL1, add <strong>RSAT</strong> (the admin tools): <em>Settings &gt; System &gt; Optional features &gt; Add a feature</em>, search for <strong>RSAT</strong>, add Active Directory and Group Policy tools.</p>
+<p>For the Azure chapters you need an <strong>Azure free trial</strong> subscription, a <strong>Microsoft Entra ID P2 trial</strong>, and a resource group called <strong>az801-rg</strong>.</p>
+<p>Last tip: take a <strong>checkpoint</strong> of every VM and call it <em>Baseline</em>. Some labs can lock you out of a server. With a checkpoint, you're back in 30 seconds.</p>
+<p>Ready? Let's go!</p>
+<h2 id="extra-setup-the-labs-assume">Extra setup the labs assume</h2>
+<blockquote>
+<p>⚠️ <strong>Added by this repository, not in the original course text.</strong> The course uses things it never creates. Do these once, before Chapter 1, so the labs work as written.</p>
+</blockquote>
+<h3 id="1-hyper-v-networking">1. Hyper-V networking</h3>
+<p>The course gives IP addresses (<code>10.10.0.0/24</code>) but not the virtual switch. A simple layout:</p>
+<ul>
+<li>One <strong>Internal</strong> (or Private) switch for the lab network <code>10.10.0.0/24</code>. Connect all four VMs to it.</li>
+<li>SEA-DC1 is the DNS server. Give each VM a static address, for example on SEA-DC1 (adapt the interface name):</li>
+</ul>
+<p><code>powershell
+  New-NetIPAddress -InterfaceAlias "Ethernet" -IPAddress 10.10.0.10 -PrefixLength 24</code></p>
+<p>On the other VMs, set their own address and point DNS to the domain controller:</p>
+<p><code>powershell
+  New-NetIPAddress -InterfaceAlias "Ethernet" -IPAddress 10.10.0.11 -PrefixLength 24
+  Set-DnsClientServerAddress -InterfaceAlias "Ethernet" -ServerAddresses 10.10.0.10</code></p>
+<ul>
+<li>Labs that need <strong>internet</strong> (1.5 SmartScreen test page, 1.6, 2.2, 3.4, 4.1 to 4.4) require a second network adapter on an <strong>External or NAT switch</strong> on SEA-SVR1 and SEA-CL1 (and on SEA-DC1 for Lab 3.4, whose sensor reports to the cloud). Keep the lab adapter without a default gateway so that names still resolve through the DC.</li>
+</ul>
+<h3 id="2-a-servers-ou">2. A "Servers" OU</h3>
+<p>Many labs say "edit a GPO linked to the <strong>servers OU</strong>" (1.2, 1.3, 1.4, 3.1, 6.1), but the course only creates the <code>Staff</code> OU. Create the OU and move the member server into it (on SEA-DC1):</p>
+<pre><code class="language-powershell">New-ADOrganizationalUnit -Name Servers
+Get-ADComputer SEA-SVR1 | Move-ADObject -TargetPath &quot;OU=Servers,DC=contoso,DC=com&quot;
+</code></pre>
+<p>Leave SEA-DC1 (and later SEA-SVR2, the RODC) in <strong>Domain Controllers</strong>. Do not move a domain controller out of that OU.</p>
+<h3 id="3-a-policies-share">3. A policies share</h3>
+<p>Labs 1.2 (exploit-protection XML) and 1.3 (App Control <code>.p7b</code>) copy a file to <code>\SEA-DC1\Policies$</code>. Create it on SEA-DC1 and let computer accounts read it:</p>
+<pre><code class="language-powershell">New-Item C:\Policies -ItemType Directory
+New-SmbShare -Name 'Policies$' -Path C:\Policies -ReadAccess 'Domain Computers' -FullAccess 'Domain Admins'
+</code></pre>
+<h3 id="4-checkpoints">4. Checkpoints</h3>
+<p>Take a Hyper-V checkpoint named <strong>Baseline</strong> of every VM after the setup above, and another one before each lab marked <em>Checkpoint first: Yes</em> (App Control, Credential Guard, RODC, authentication silos, IPsec, BitLocker).</p>
+<h3 id="5-lab-dependencies">5. Lab dependencies</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Lab</th>
+<th>Needs first</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1.6 Defender for Endpoint</td>
+<td>Azure subscription; connect SEA-SVR1 with Azure Arc (the connection itself is in <a href="04-watching-from-azure/lab-4.1-azure-arc-log-analytics.html">Lab 4.1</a>)</td>
+</tr>
+<tr>
+<td>2.4 RODC</td>
+<td>Setup above (SEA-SVR2 joined to the domain)</td>
+</tr>
+<tr>
+<td>4.2, 4.3, 4.4</td>
+<td><a href="04-watching-from-azure/lab-4.1-azure-arc-log-analytics.html">Lab 4.1</a></td>
+</tr>
+<tr>
+<td>6.2 Forced BitLocker recovery</td>
+<td><a href="06-storage-encryption/lab-6.1-bitlocker-ad-recovery.html">Lab 6.1</a></td>
+</tr>
+<tr>
+<td>3.3 CredSSP test</td>
+<td>Use the built-in <strong>Administrator</strong>, not Adam or John: members of <em>Protected Users</em> (<a href="02-hybrid-ad-accounts/lab-2.3-protected-users.html">Lab 2.3</a>) cannot use CredSSP or delegation</td>
+</tr>
+</tbody>
+</table></div>
+</main>
+</div>
+<footer class="foot"><p><a href="https://github.com/medyabi/windows-server-security-lab" rel="noopener">Source on GitHub</a> · By Mohamed Dyabi, Microsoft Certified Trainer · learn.ebigpictures.com</p>
+<p class="small">Lab environments only. Several labs change security settings, lock accounts or force recovery. Never run them on production systems.</p></footer>
+
+</body>
+</html>

@@ -1,0 +1,71 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab 8: Windows management from Azure (60 min + up to 4 h for the first assessment) · Windows Server Labs</title>
+<meta name="description" content="Hands-on Windows Server 2025 labs: hybrid management with Azure Arc, and Windows Server security.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body class="track-hybrid">
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+  <a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true"></span>Windows Server Labs</a>
+  <nav class="tracks" aria-label="Tracks"><a href="index.html" aria-current="true">Hybrid</a><a href="../security/index.html">Security</a></nav>
+</header>
+<div class="layout with-side">
+<nav class="side" aria-label="Hybrid labs"><p class="side-title">Hybrid track</p><ol class="side-list"><li><a href="index.html">Overview</a></li><li><a href="01-windows-admin-center.html">Lab 1: Windows Admin Center</a></li><li><a href="02-azure-arc-onboarding-and-azure-benefits.html">Lab 2: Azure Arc onboarding and Azure benefits</a></li><li><a href="03-hotpatching-with-azure-arc.html">Lab 3: Hotpatching with Azure Arc</a></li><li><a href="04-azure-policy-and-machine-configuration.html">Lab 4: Azure Policy and Machine Configuration</a></li><li><a href="05-azure-monitor.html">Lab 5: Azure Monitor</a></li><li><a href="06-change-tracking-and-inventory.html">Lab 6: Change Tracking and Inventory</a></li><li><a href="07-microsoft-defender-for-cloud.html">Lab 7: Microsoft Defender for Cloud</a></li><li><a href="08-windows-management-from-azure.html" aria-current="page">Lab 8: Windows management from Azure</a></li><li><a href="09-security-baseline-with-osconfig.html">Lab 9: Security baseline with OSConfig</a></li><li><a href="cleanup-and-reset.html">Cleanup and reset</a></li></ol></nav>
+<main id="content" class="prose">
+<h1 id="lab-8-windows-management-from-azure-60-min-up-to-4-h-for-the-first-assessment">Lab 8: Windows management from Azure (60 min + up to 4 h for the first assessment)</h1>
+<nav class="pager"><a href="07-microsoft-defender-for-cloud.html">← Lab 7</a> <a href="index.html">Overview</a> <a href="09-security-baseline-with-osconfig.html">Lab 9 →</a></nav>
+<p>In this lab you manage the server from the Azure portal with <strong>no VPN and no inbound port</strong>, run a best-practices health check, and see how Microsoft Support can get controlled access. All three come with the Azure benefits from Lab 2, Part D.</p>
+<blockquote>
+<p><strong>Start Part B first.</strong> The first Best Practices Assessment can take <strong>up to 4 hours</strong> to return results. Launch it, do Part A, and check the results at the end of the day.</p>
+</blockquote>
+<h3 id="steps">Steps</h3>
+<p><strong>Part B — Best Practices Assessment (start it now)</strong></p>
+<ol>
+<li>Open your machine in <strong>Azure Arc</strong> &gt; <strong>Windows management</strong> &gt; <strong>Best Practices Assessment</strong>.</li>
+<li>Select <strong>Get Started</strong>. Choose your resource group and your workspace <code>law-presales-&lt;yourname&gt;</code>, then <strong>Set up</strong>. It installs three extensions (assessment platform, Windows Server assessment, Azure Monitor Agent) — up to 15 minutes.</li>
+<li>When it's ready, select <strong>Run assessment</strong>. Come back later for the results.</li>
+</ol>
+<p><strong>Part A — Windows Admin Center in Azure</strong></p>
+<blockquote>
+<p><strong>Heads-up:</strong> turning this on <strong>replaces</strong> the Windows Admin Center you installed locally in Lab 1. Fine in the lab. With a customer who uses one WAC gateway to manage many servers, plan this first.</p>
+</blockquote>
+<ol start="4">
+<li>Give yourself the right role. On your machine, open <strong>Access control (IAM)</strong> &gt; <strong>Add role assignment</strong> &gt; <strong>Windows Admin Center Administrator Login</strong> &gt; assign it to your account. Connecting needs this role even if you're Owner.</li>
+<li>Open <strong>Windows management</strong> &gt; <strong>Windows Admin Center</strong> &gt; <strong>Install</strong>. Keep the default port. Wait for the extension to finish.</li>
+<li>Select <strong>Connect</strong> and sign in with the VM's local <strong>Administrator</strong> account.</li>
+<li>Use it like the local WAC from Lab 1: <strong>Files</strong>, <strong>Registry</strong>, <strong>Services</strong>, <strong>PowerShell</strong>. Then open <strong>Remote Desktop</strong> — a desktop session in the browser, through Azure, with no RDP port open on the server.</li>
+</ol>
+<p><strong>Part C — Remote Support (walkthrough)</strong></p>
+<ol start="8">
+<li>Open <strong>Windows management</strong> &gt; <strong>Remote Support</strong>. Read the page; don't grant access. The idea: when the customer opens a ticket, they give <strong>Microsoft Support</strong> time-limited (<strong>just-in-time</strong>) access to the server, with a <strong>transcript</strong> of every command and the right to revoke it at any time. It's for customers with a Microsoft professional support plan.</li>
+</ol>
+<p><strong>Back to Part B</strong></p>
+<ol start="9">
+<li>When the assessment is complete, open <strong>Best Practices Assessment</strong> again. Look at the issues found, their <strong>severity</strong> and the <strong>remediation</strong> guidance. Keep the list — compare it after Lab 9.</li>
+</ol>
+<h3 id="check-yourself">Check yourself</h3>
+<ul>
+<li>Why doesn't WAC in Azure need an inbound port? (The Arc agent opens an <strong>outbound</strong> reverse-proxy connection. Azure comes to the server through it.)</li>
+<li>Which of these three services need a Log Analytics workspace? (Best Practices Assessment. Ingestion is billed.)</li>
+</ul>
+<h3 id="customer-talking-points">Customer talking points</h3>
+<ul>
+<li>Manage any Arc server from the portal <strong>without VPN, jump host or public IP</strong> — a strong story for branch offices and edge sites.</li>
+<li><strong>Best Practices Assessment</strong> turns Microsoft's field experience into a to-do list for each server.</li>
+<li><strong>Remote Support</strong> gives Microsoft engineers controlled, audited, time-limited access — no shared admin passwords.</li>
+<li>All three are <strong>included</strong> with Software Assurance or subscription licences through Windows Server Management enabled by Azure Arc.</li>
+</ul>
+<hr />
+<nav class="pager"><a href="07-microsoft-defender-for-cloud.html">← Lab 7</a> <a href="index.html">Overview</a> <a href="09-security-baseline-with-osconfig.html">Lab 9 →</a></nav>
+</main>
+</div>
+<footer class="foot"><p><a href="https://github.com/medyabi/windows-server2025-Hybrid-lab" rel="noopener">Source on GitHub</a> · By Mohamed Dyabi, Microsoft Certified Trainer · learn.ebigpictures.com</p>
+<p class="small">Lab environments only. Several labs change security settings, lock accounts or force recovery. Never run them on production systems.</p></footer>
+
+</body>
+</html>

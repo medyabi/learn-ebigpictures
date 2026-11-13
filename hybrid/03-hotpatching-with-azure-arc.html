@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab 3: Hotpatching with Azure Arc (45 min) · Windows Server Labs</title>
+<meta name="description" content="Hands-on Windows Server 2025 labs: hybrid management with Azure Arc, and Windows Server security.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../assets/site.css">
+</head>
+<body class="track-hybrid">
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+  <a class="brand" href="../index.html"><span class="brand-mark" aria-hidden="true"></span>Windows Server Labs</a>
+  <nav class="tracks" aria-label="Tracks"><a href="index.html" aria-current="true">Hybrid</a><a href="../security/index.html">Security</a></nav>
+</header>
+<div class="layout with-side">
+<nav class="side" aria-label="Hybrid labs"><p class="side-title">Hybrid track</p><ol class="side-list"><li><a href="index.html">Overview</a></li><li><a href="01-windows-admin-center.html">Lab 1: Windows Admin Center</a></li><li><a href="02-azure-arc-onboarding-and-azure-benefits.html">Lab 2: Azure Arc onboarding and Azure benefits</a></li><li><a href="03-hotpatching-with-azure-arc.html" aria-current="page">Lab 3: Hotpatching with Azure Arc</a></li><li><a href="04-azure-policy-and-machine-configuration.html">Lab 4: Azure Policy and Machine Configuration</a></li><li><a href="05-azure-monitor.html">Lab 5: Azure Monitor</a></li><li><a href="06-change-tracking-and-inventory.html">Lab 6: Change Tracking and Inventory</a></li><li><a href="07-microsoft-defender-for-cloud.html">Lab 7: Microsoft Defender for Cloud</a></li><li><a href="08-windows-management-from-azure.html">Lab 8: Windows management from Azure</a></li><li><a href="09-security-baseline-with-osconfig.html">Lab 9: Security baseline with OSConfig</a></li><li><a href="cleanup-and-reset.html">Cleanup and reset</a></li></ol></nav>
+<main id="content" class="prose">
+<h1 id="lab-3-hotpatching-with-azure-arc-45-min">Lab 3: Hotpatching with Azure Arc (45 min)</h1>
+<nav class="pager"><a href="02-azure-arc-onboarding-and-azure-benefits.html">← Lab 2</a> <a href="index.html">Overview</a> <a href="04-azure-policy-and-machine-configuration.html">Lab 4 →</a></nav>
+<p>In this lab you turn on <strong>Hotpatch</strong> and install a security update with <strong>no reboot</strong>. For a customer running 24/7 workloads, this is the feature that gets attention.</p>
+<p><strong>What is Hotpatch?</strong> A normal security update replaces files on disk, so the server must restart to load them. A hotpatch changes the code <strong>in memory</strong>, while it runs. Think of changing a tyre while the car keeps driving.</p>
+<p>Hotpatch follows a <strong>quarterly rhythm</strong>:</p>
+<ul>
+<li><strong>Baseline months</strong> — January, April, July, October. A full cumulative update. <strong>Restart required.</strong></li>
+<li><strong>Hotpatch months</strong> — the other eight months. Security updates only. <strong>No restart.</strong></li>
+</ul>
+<p>So instead of 12 reboots a year, the server restarts about 4 times.</p>
+<p><strong>Requirements:</strong> Windows Server 2025 Standard or Datacenter, connected to Azure Arc, with <strong>virtualization-based security (VBS)</strong> running. On Hyper-V that means a <strong>Generation 2</strong> VM with <strong>Secure Boot</strong> — your VM already has both.</p>
+<h3 id="steps">Steps</h3>
+<ol>
+<li>On your VM, check that VBS is running:</li>
+</ol>
+<p><code>Get-CimInstance -Namespace root/Microsoft/Windows/DeviceGuard -ClassName Win32_DeviceGuard |
+     Select-Object -ExpandProperty VirtualizationBasedSecurityStatus</code></p>
+<p><strong>2</strong> means running. If you get anything else, enable it and restart:</p>
+<p><code>New-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\DeviceGuard' -Name 'EnableVirtualizationBasedSecurity' -PropertyType DWord -Value 1 -Force
+   Restart-Computer</code>
+2. Check the OS build with <code>winver</code>. Hotpatch needs build <strong>26100.1742 or later</strong> — our ISO is far newer.
+3. In the portal, go to <strong>Azure Arc &gt; Machines</strong> &gt; your server &gt; <strong>Hotpatch</strong> &gt; <strong>Confirm</strong>.
+4. Wait about <strong>10 minutes</strong>. The status moves from <strong>Pending</strong> to enabled. If it stays on Pending, ask your instructor to check the Arc agent.
+5. Open <strong>Updates</strong> (Azure Update Manager) &gt; <strong>Check for updates</strong>. Look at the update list: a hotpatch update is marked as not needing a reboot.
+6. Select <strong>One-time update</strong>, choose the available security update, and install it.
+7. When it finishes, open <strong>History</strong> in Update Manager. Look at the <strong>reboot status</strong> column. Then check uptime on the VM — it didn't restart:</p>
+<p><code>(Get-Date) - (Get-CimInstance Win32_OperatingSystem).LastBootUpTime</code></p>
+<blockquote>
+<p><strong>If the update still asks for a reboot:</strong> the VM may not be on the expected baseline. It then gets a normal update until the next baseline month (January), and hotpatches work from there. That's also a real-world lesson: hotpatch only works when servers stay on the baseline.</p>
+</blockquote>
+<h3 id="check-yourself">Check yourself</h3>
+<ul>
+<li>How many restarts a year does a hotpatched server need for security updates? (About 4, in baseline months.)</li>
+<li>Why does Hotpatch need VBS? (The in-memory patching relies on the virtualization-based protection layer.)</li>
+</ul>
+<h3 id="customer-talking-points">Customer talking points</h3>
+<ul>
+<li><strong>From 12 to about 4 reboots a year</strong> for security updates, on servers in their own datacenter.</li>
+<li>Since <strong>19 May 2026</strong>, Hotpatch for Arc-enabled Windows Server 2025 Standard and Datacenter has <strong>no extra cost</strong> — Hyper-V, VMware or any other platform.</li>
+<li>Patches land <strong>the day they're released</strong>, instead of waiting for the next maintenance window. Shorter exposure to known vulnerabilities.</li>
+<li>It's a strong reason to <strong>move to Windows Server 2025 and connect to Arc</strong> in the same project.</li>
+</ul>
+<hr />
+<nav class="pager"><a href="02-azure-arc-onboarding-and-azure-benefits.html">← Lab 2</a> <a href="index.html">Overview</a> <a href="04-azure-policy-and-machine-configuration.html">Lab 4 →</a></nav>
+</main>
+</div>
+<footer class="foot"><p><a href="https://github.com/medyabi/windows-server2025-Hybrid-lab" rel="noopener">Source on GitHub</a> · By Mohamed Dyabi, Microsoft Certified Trainer · learn.ebigpictures.com</p>
+<p class="small">Lab environments only. Several labs change security settings, lock accounts or force recovery. Never run them on production systems.</p></footer>
+
+</body>
+</html>

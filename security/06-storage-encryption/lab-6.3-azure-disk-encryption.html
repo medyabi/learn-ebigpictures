@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab 6.3: Encrypting Azure VM disks · Windows Server Labs</title>
+<meta name="description" content="Hands-on Windows Server 2025 labs: hybrid management with Azure Arc, and Windows Server security.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/site.css">
+</head>
+<body class="track-security">
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+  <a class="brand" href="../../index.html"><span class="brand-mark" aria-hidden="true"></span>Windows Server Labs</a>
+  <nav class="tracks" aria-label="Tracks"><a href="../../hybrid/index.html">Hybrid</a><a href="../index.html" aria-current="true">Security</a></nav>
+</header>
+<div class="layout with-side">
+<nav class="side" aria-label="Security labs"><p class="side-title">Security track</p><ol class="side-list"><li><a href="../index.html">Overview</a></li><li><a href="../setup.html">Lab setup</a></li><li class="group"><a href="../01-securing-the-os/index.html">Chapter 1: Securing the Windows Server operating system</a><ol><li><a href="../01-securing-the-os/lab-1.1-password-lockout-baseline.html">1.1: Password and lockout baseline with Group Policy</a></li><li><a href="../01-securing-the-os/lab-1.2-exploit-protection.html">1.2: Exploit protection</a></li><li><a href="../01-securing-the-os/lab-1.3-app-control-wdac.html">1.3: App Control for Business (WDAC)</a></li><li><a href="../01-securing-the-os/lab-1.4-credential-guard.html">1.4: Credential Guard</a></li><li><a href="../01-securing-the-os/lab-1.5-smartscreen.html">1.5: Microsoft Defender SmartScreen</a></li><li><a href="../01-securing-the-os/lab-1.6-defender-for-endpoint.html">1.6: Microsoft Defender for Endpoint</a></li></ol></li><li class="group"><a href="../02-hybrid-ad-accounts/index.html">Chapter 2: Securing hybrid Active Directory accounts</a><ol><li><a href="../02-hybrid-ad-accounts/lab-2.1-fine-grained-password-policy.html">2.1: Fine-grained password policy</a></li><li><a href="../02-hybrid-ad-accounts/lab-2.2-entra-password-protection.html">2.2: Microsoft Entra Password Protection</a></li><li><a href="../02-hybrid-ad-accounts/lab-2.3-protected-users.html">2.3: The Protected Users group</a></li><li><a href="../02-hybrid-ad-accounts/lab-2.4-rodc.html">2.4: Read-only domain controller (RODC)</a></li><li><a href="../02-hybrid-ad-accounts/lab-2.5-authentication-policy-silos.html">2.5: Authentication policies and silos</a></li></ol></li><li class="group"><a href="../03-least-privilege-and-delegation/index.html">Chapter 3: Least privilege and delegation</a><ol><li><a href="../03-least-privilege-and-delegation/lab-3.1-restricted-groups.html">3.1: Built-in admin groups and Restricted Groups</a></li><li><a href="../03-least-privilege-and-delegation/lab-3.2-delegation-of-control.html">3.2: Delegation of Control</a></li><li><a href="../03-least-privilege-and-delegation/lab-3.3-kerberos-double-hop.html">3.3: The Kerberos double-hop</a></li><li><a href="../03-least-privilege-and-delegation/lab-3.4-defender-for-identity.html">3.4: Microsoft Defender for Identity</a></li></ol></li><li class="group"><a href="../04-watching-from-azure/index.html">Chapter 4: Watching your servers from Azure</a><ol><li><a href="../04-watching-from-azure/lab-4.1-azure-arc-log-analytics.html">4.1: Azure Arc and Log Analytics</a></li><li><a href="../04-watching-from-azure/lab-4.2-kql-hunting-and-alerts.html">4.2: Hunting with KQL and creating an alert</a></li><li><a href="../04-watching-from-azure/lab-4.3-microsoft-sentinel.html">4.3: Microsoft Sentinel</a></li><li><a href="../04-watching-from-azure/lab-4.4-secure-score.html">4.4: Improving the Secure Score with Defender for Cloud</a></li></ol></li><li class="group"><a href="../05-networking/index.html">Chapter 5: Securing Windows Server networking</a><ol><li><a href="../05-networking/lab-5.1-windows-firewall.html">5.1: Windows Defender Firewall</a></li><li><a href="../05-networking/lab-5.2-ipsec-connection-security.html">5.2: IPsec connection security rules</a></li><li><a href="../05-networking/lab-5.3-firewall-review-wac.html">5.3: Firewall review with Windows Admin Center</a></li></ol></li><li class="group"><a href="index.html">Chapter 6: Securing Windows Server storage</a><ol><li><a href="lab-6.1-bitlocker-ad-recovery.html">6.1: BitLocker with recovery keys in Active Directory</a></li><li><a href="lab-6.2-bitlocker-forced-recovery.html">6.2: Forcing BitLocker recovery</a></li><li><a href="lab-6.3-azure-disk-encryption.html" aria-current="page">6.3: Encrypting Azure VM disks</a></li></ol></li><li><a href="../attack-to-control-map.html">Attack → control map</a></li><li><a href="../progress.html">Progress checklist</a></li></ol></nav>
+<main id="content" class="prose">
+<h1 id="lab-63-encrypting-azure-vm-disks">Lab 6.3: Encrypting Azure VM disks</h1>
+<nav class="pager"><a href="lab-6.2-bitlocker-forced-recovery.html">← Lab 6.2</a> <a href="index.html">Chapter overview</a></nav>
+<div class="table-wrap"><table>
+
+<tbody>
+<tr>
+<td><strong>Attack</strong></td>
+<td>Azure disk export by a rogue Contributor</td>
+</tr>
+<tr>
+<td><strong>Control</strong></td>
+<td>Azure Disk Encryption, customer-managed keys</td>
+</tr>
+<tr>
+<td><strong>Machines</strong></td>
+<td>Azure portal / Azure PowerShell</td>
+</tr>
+<tr>
+<td><strong>Needs</strong></td>
+<td>Azure subscription, Key Vault, a Windows Server 2025 Azure VM (costs apply)</td>
+</tr>
+<tr>
+<td><strong>Checkpoint first</strong></td>
+<td>Not applicable (Azure only): delete the resources when you are done to avoid costs</td>
+</tr>
+<tr>
+<td><strong>Scripts</strong></td>
+<td><a href="https://github.com/medyabi/windows-server-security-lab/blob/main/scripts/lab-6.3-azure-disk-encryption.ps1" rel="noopener"><code>scripts/lab-6.3-azure-disk-encryption.ps1</code></a></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="hacker-scenario">🥷 Hacker scenario</h2>
+<p>An attacker steals an account with the <strong>Contributor</strong> role on your Azure subscription. Contributor can't sign in to your VMs, so you feel safe. But it can manage the disks. The attacker creates a temporary download link for the OS disk of a VM, downloads the whole disk, and mounts it on their own laptop.</p>
+<p>But wait, aren't Azure disks always encrypted? They are. And yet, the attacker can read every file. How is that possible? The answer is in <em>which</em> encryption you use, and <em>who</em> holds the key.</p>
+<h2 id="concepts">📖 Concepts</h2>
+<p>In Azure, nobody walks out with your server. But there are other risks: <strong>disk exports</strong>, <strong>snapshots</strong>, and people with too many rights on storage.</p>
+<p>Azure has several encryption layers. Students mix them up a lot, so here's the whole picture in one table:</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Layer</th>
+<th>What it protects</th>
+<th>Who holds the key</th>
+<th>Still encrypted after a disk export?</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Server-side encryption (SSE), platform key</td>
+<td>Data at rest in Azure storage</td>
+<td>Microsoft</td>
+<td>No</td>
+</tr>
+<tr>
+<td>SSE with customer-managed key</td>
+<td>Same, but you control and can revoke the key</td>
+<td>You, in Key Vault, through a Disk Encryption Set</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Encryption at host</td>
+<td>Also the temp disk and caches, end to end on the host</td>
+<td>Microsoft or you</td>
+<td>No</td>
+</tr>
+<tr>
+<td>Azure Disk Encryption (ADE)</td>
+<td>BitLocker inside the guest OS</td>
+<td>You, in Key Vault</td>
+<td>Yes</td>
+</tr>
+</tbody>
+</table></div>
+<p>See the last column? That's the key point. SSE encrypts the data in storage, but when someone with the right permissions exports the disk, Azure decrypts it for them. With <strong>ADE</strong>, the disk is BitLocker-encrypted inside the VM, so the export is still encrypted.</p>
+<p>Two more terms:</p>
+<ul>
+<li><strong>Key Vault</strong>: the Azure service that stores keys and secrets.</li>
+<li><strong>Disk Encryption Set</strong> (DES): links a Key Vault key to managed disks, for SSE with a customer-managed key. It's <strong>not</strong> used for ADE.</li>
+</ul>
+<h2 id="how-this-stops-the-attacker">🛡️ How this stops the attacker</h2>
+<p>With ADE, the downloaded disk is still BitLocker-encrypted, and the key sits in a Key Vault the attacker can't access. With a customer-managed key, you can also <strong>revoke</strong> the key, and the disks become unreadable instantly.</p>
+<h2 id="step-by-step">🧪 Step by step</h2>
+<p><strong>Part 1: Azure Disk Encryption.</strong></p>
+<ol>
+<li>Create a <strong>Key Vault</strong> in <strong>az801-rg</strong>. Under <strong>Access configuration</strong>, tick <strong>Azure Disk Encryption for volume encryption</strong>.</li>
+<li>In the Key Vault, go to <strong>Keys &gt; Generate/Import</strong>. Name the key <strong>ade-key</strong>, type RSA, size 2048.</li>
+<li>Create a Windows Server 2025 VM called <strong>win1</strong>, with one data disk. Make sure it's <strong>running</strong>.</li>
+<li>Open the VM, go to <strong>Disks &gt; Additional settings</strong> (or <strong>Encryption</strong>). Choose <strong>OS and data disks</strong>, select your Key Vault and <strong>ade-key</strong>, and save.</li>
+</ol>
+<p>Prefer PowerShell? Here's the same thing:</p>
+<pre><code class="language-powershell">$kv  = Get-AzKeyVault -VaultName &lt;your-vault&gt; -ResourceGroupName az801-rg
+$key = Get-AzKeyVaultKey -VaultName $kv.VaultName -Name ade-key
+Set-AzVMDiskEncryptionExtension -ResourceGroupName az801-rg -VMName win1 -DiskEncryptionKeyVaultUrl $kv.VaultUri -DiskEncryptionKeyVaultId $kv.ResourceId -KeyEncryptionKeyUrl $key.Id -KeyEncryptionKeyVaultId $kv.ResourceId -VolumeType All
+</code></pre>
+<p>The first two lines grab the vault and the key. The last line installs the ADE extension in the VM, which turns on BitLocker for all volumes. The key-encryption key (KEK) wraps the BitLocker key, so it's never stored in plain text.</p>
+<p>Let's check:</p>
+<pre><code class="language-powershell">Get-AzVMDiskEncryptionStatus -ResourceGroupName az801-rg -VMName win1
+</code></pre>
+<p><strong>OsVolumeEncrypted</strong> and <strong>DataVolumesEncrypted</strong> both say <strong>Encrypted</strong>. Connect to the VM and run <code>manage-bde -status</code>. Yes, it's plain BitLocker inside.</p>
+<p><strong>Part 2: customer-managed key with a Disk Encryption Set.</strong></p>
+<ol>
+<li>Go to <strong>Disk Encryption Sets &gt; Create</strong>. Name it <strong>az801-des</strong>, encryption type <strong>Encryption at-rest with a customer-managed key</strong>, and choose your Key Vault and a key.</li>
+<li>Stop (deallocate) a VM. Open <strong>Disks</strong>, click the OS disk, go to <strong>Encryption</strong>, and choose <strong>az801-des</strong>. Save, then start the VM.</li>
+</ol>
+<p>On the disk's <strong>Encryption</strong> page you now see <strong>customer-managed key</strong>, with your key's name.</p>
+<blockquote>
+<p>📌 <strong>2025 note.</strong> Microsoft announced that <strong>Azure Disk Encryption will be retired in September 2028</strong>, and recommends <strong>encryption at host</strong> for new VMs. Learn ADE for the exam, but use encryption at host for new real-world deployments. Check the date on Microsoft Learn before class; these things move.</p>
+</blockquote>
+<h2 id="key-takeaway">✅ Key takeaway</h2>
+<p>You need to know which layer protects against which risk, and who holds the keys. That's also a favourite exam topic.</p>
+<hr />
+<nav class="pager"><a href="lab-6.2-bitlocker-forced-recovery.html">← Lab 6.2</a> <a href="index.html">Chapter overview</a></nav>
+</main>
+</div>
+<footer class="foot"><p><a href="https://github.com/medyabi/windows-server-security-lab" rel="noopener">Source on GitHub</a> · By Mohamed Dyabi, Microsoft Certified Trainer · learn.ebigpictures.com</p>
+<p class="small">Lab environments only. Several labs change security settings, lock accounts or force recovery. Never run them on production systems.</p></footer>
+
+</body>
+</html>

@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab 5.3: Firewall review with Windows Admin Center · Windows Server Labs</title>
+<meta name="description" content="Hands-on Windows Server 2025 labs: hybrid management with Azure Arc, and Windows Server security.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="../../assets/site.css">
+</head>
+<body class="track-security">
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+  <a class="brand" href="../../index.html"><span class="brand-mark" aria-hidden="true"></span>Windows Server Labs</a>
+  <nav class="tracks" aria-label="Tracks"><a href="../../hybrid/index.html">Hybrid</a><a href="../index.html" aria-current="true">Security</a></nav>
+</header>
+<div class="layout with-side">
+<nav class="side" aria-label="Security labs"><p class="side-title">Security track</p><ol class="side-list"><li><a href="../index.html">Overview</a></li><li><a href="../setup.html">Lab setup</a></li><li class="group"><a href="../01-securing-the-os/index.html">Chapter 1: Securing the Windows Server operating system</a><ol><li><a href="../01-securing-the-os/lab-1.1-password-lockout-baseline.html">1.1: Password and lockout baseline with Group Policy</a></li><li><a href="../01-securing-the-os/lab-1.2-exploit-protection.html">1.2: Exploit protection</a></li><li><a href="../01-securing-the-os/lab-1.3-app-control-wdac.html">1.3: App Control for Business (WDAC)</a></li><li><a href="../01-securing-the-os/lab-1.4-credential-guard.html">1.4: Credential Guard</a></li><li><a href="../01-securing-the-os/lab-1.5-smartscreen.html">1.5: Microsoft Defender SmartScreen</a></li><li><a href="../01-securing-the-os/lab-1.6-defender-for-endpoint.html">1.6: Microsoft Defender for Endpoint</a></li></ol></li><li class="group"><a href="../02-hybrid-ad-accounts/index.html">Chapter 2: Securing hybrid Active Directory accounts</a><ol><li><a href="../02-hybrid-ad-accounts/lab-2.1-fine-grained-password-policy.html">2.1: Fine-grained password policy</a></li><li><a href="../02-hybrid-ad-accounts/lab-2.2-entra-password-protection.html">2.2: Microsoft Entra Password Protection</a></li><li><a href="../02-hybrid-ad-accounts/lab-2.3-protected-users.html">2.3: The Protected Users group</a></li><li><a href="../02-hybrid-ad-accounts/lab-2.4-rodc.html">2.4: Read-only domain controller (RODC)</a></li><li><a href="../02-hybrid-ad-accounts/lab-2.5-authentication-policy-silos.html">2.5: Authentication policies and silos</a></li></ol></li><li class="group"><a href="../03-least-privilege-and-delegation/index.html">Chapter 3: Least privilege and delegation</a><ol><li><a href="../03-least-privilege-and-delegation/lab-3.1-restricted-groups.html">3.1: Built-in admin groups and Restricted Groups</a></li><li><a href="../03-least-privilege-and-delegation/lab-3.2-delegation-of-control.html">3.2: Delegation of Control</a></li><li><a href="../03-least-privilege-and-delegation/lab-3.3-kerberos-double-hop.html">3.3: The Kerberos double-hop</a></li><li><a href="../03-least-privilege-and-delegation/lab-3.4-defender-for-identity.html">3.4: Microsoft Defender for Identity</a></li></ol></li><li class="group"><a href="../04-watching-from-azure/index.html">Chapter 4: Watching your servers from Azure</a><ol><li><a href="../04-watching-from-azure/lab-4.1-azure-arc-log-analytics.html">4.1: Azure Arc and Log Analytics</a></li><li><a href="../04-watching-from-azure/lab-4.2-kql-hunting-and-alerts.html">4.2: Hunting with KQL and creating an alert</a></li><li><a href="../04-watching-from-azure/lab-4.3-microsoft-sentinel.html">4.3: Microsoft Sentinel</a></li><li><a href="../04-watching-from-azure/lab-4.4-secure-score.html">4.4: Improving the Secure Score with Defender for Cloud</a></li></ol></li><li class="group"><a href="index.html">Chapter 5: Securing Windows Server networking</a><ol><li><a href="lab-5.1-windows-firewall.html">5.1: Windows Defender Firewall</a></li><li><a href="lab-5.2-ipsec-connection-security.html">5.2: IPsec connection security rules</a></li><li><a href="lab-5.3-firewall-review-wac.html" aria-current="page">5.3: Firewall review with Windows Admin Center</a></li></ol></li><li class="group"><a href="../06-storage-encryption/index.html">Chapter 6: Securing Windows Server storage</a><ol><li><a href="../06-storage-encryption/lab-6.1-bitlocker-ad-recovery.html">6.1: BitLocker with recovery keys in Active Directory</a></li><li><a href="../06-storage-encryption/lab-6.2-bitlocker-forced-recovery.html">6.2: Forcing BitLocker recovery</a></li><li><a href="../06-storage-encryption/lab-6.3-azure-disk-encryption.html">6.3: Encrypting Azure VM disks</a></li></ol></li><li><a href="../attack-to-control-map.html">Attack → control map</a></li><li><a href="../progress.html">Progress checklist</a></li></ol></nav>
+<main id="content" class="prose">
+<h1 id="lab-53-firewall-review-with-windows-admin-center">Lab 5.3: Firewall review with Windows Admin Center</h1>
+<nav class="pager"><a href="lab-5.2-ipsec-connection-security.html">← Lab 5.2</a> <a href="index.html">Chapter overview</a> <a href="../06-storage-encryption/lab-6.1-bitlocker-ad-recovery.html">Lab 6.1 →</a></nav>
+<div class="table-wrap"><table>
+
+<tbody>
+<tr>
+<td><strong>Attack</strong></td>
+<td>"Allow all" inbound rule planted by the attacker</td>
+</tr>
+<tr>
+<td><strong>Control</strong></td>
+<td>Firewall review with Windows Admin Center</td>
+</tr>
+<tr>
+<td><strong>Machines</strong></td>
+<td>SEA-SVR1, SEA-CL1, SEA-DC1</td>
+</tr>
+<tr>
+<td><strong>Needs</strong></td>
+<td>Windows Admin Center download</td>
+</tr>
+<tr>
+<td><strong>Checkpoint first</strong></td>
+<td>Recommended (see lab setup)</td>
+</tr>
+<tr>
+<td><strong>Scripts</strong></td>
+<td><a href="https://github.com/medyabi/windows-server-security-lab/blob/main/scripts/lab-5.3-firewall-review-wac.ps1" rel="noopener"><code>scripts/lab-5.3-firewall-review-wac.ps1</code></a></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="hacker-scenario">🥷 Hacker scenario</h2>
+<p>During an incident, you suspect the attacker created an "allow all" inbound rule on SEA-SVR1 for their remote access tool. You need to confirm it, and close it, in two minutes.</p>
+<h2 id="concepts">📖 Concepts</h2>
+<p><strong>Windows Admin Center</strong> (WAC) is a browser-based management tool for Windows Server. You add your servers once, then manage them from one place: services, events, storage, and the <strong>firewall</strong>.</p>
+<p>For the firewall, WAC is great for <strong>quick checks</strong>: which profiles are on, which rules exist, enable or disable a rule. It can create simple port rules. For anything advanced (custom rules, IPsec), you still use <code>wf.msc</code> or Group Policy.</p>
+<h2 id="how-this-stops-the-attacker">🛡️ How this stops the attacker</h2>
+<p>With WAC, you spot the unknown rule fast and disable it on the spot. The attacker's remote access is cut during the incident, not weeks later during an audit.</p>
+<h2 id="step-by-step">🧪 Step by step</h2>
+<p>First, let's plant a "malicious" rule on SEA-SVR1, so we have something to find:</p>
+<pre><code class="language-powershell">New-NetFirewallRule -DisplayName &quot;Windows Update Helper&quot; -Direction Inbound -Action Allow -Protocol TCP -LocalPort 4444
+</code></pre>
+<p>Notice the innocent name. Attackers love names like that. Port 4444 is a classic for remote shells.</p>
+<ol>
+<li>Install Windows Admin Center on SEA-CL1 (download it from Microsoft) and open it in the browser.</li>
+<li>Click <strong>Add</strong> and add SEA-SVR1 and SEA-DC1.</li>
+<li>Click <strong>SEA-SVR1</strong>, then <strong>Firewall</strong> in the left menu.</li>
+<li>Check the profiles, then open <strong>Incoming rules</strong>. Sort by <strong>Action</strong> or search for the port.</li>
+<li>Find <strong>Windows Update Helper</strong> on port 4444. Select it and click <strong>Disable</strong>.</li>
+</ol>
+<p>Let's confirm on the server:</p>
+<pre><code class="language-powershell">Get-NetFirewallRule -DisplayName &quot;Windows Update Helper&quot; | Select DisplayName, Enabled
+</code></pre>
+<p><strong>Enabled: False</strong>. The attacker's door is closed. Clean up by deleting the rule with <code>Remove-NetFirewallRule</code>.</p>
+<blockquote>
+<p>📌 <strong>2025 note.</strong> For Arc-connected servers, WAC is also available right inside the Azure portal. You can do this review from Azure without opening any inbound port to the server.</p>
+</blockquote>
+<h2 id="key-takeaway">✅ Key takeaway</h2>
+<p>During an incident, speed matters. Opening RDP to ten servers one by one takes forever. WAC shows you all of them from one browser tab.</p>
+<hr />
+<nav class="pager"><a href="lab-5.2-ipsec-connection-security.html">← Lab 5.2</a> <a href="index.html">Chapter overview</a> <a href="../06-storage-encryption/lab-6.1-bitlocker-ad-recovery.html">Lab 6.1 →</a></nav>
+</main>
+</div>
+<footer class="foot"><p><a href="https://github.com/medyabi/windows-server-security-lab" rel="noopener">Source on GitHub</a> · By Mohamed Dyabi, Microsoft Certified Trainer · learn.ebigpictures.com</p>
+<p class="small">Lab environments only. Several labs change security settings, lock accounts or force recovery. Never run them on production systems.</p></footer>
+
+</body>
+</html>

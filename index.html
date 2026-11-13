@@ -1,0 +1,69 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Windows Server Labs</title>
+<meta name="description" content="Hands-on Windows Server 2025 labs: hybrid management with Azure Arc, and Windows Server security.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link href="https://fonts.googleapis.com/css2?family=Newsreader:opsz,wght@6..72,500;6..72,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="assets/site.css">
+</head>
+<body class="track-home">
+<a class="skip" href="#content">Skip to content</a>
+<header class="top">
+  <a class="brand" href="index.html"><span class="brand-mark" aria-hidden="true"></span>Windows Server Labs</a>
+  <nav class="tracks" aria-label="Tracks"><a href="hybrid/index.html">Hybrid</a><a href="security/index.html">Security</a></nav>
+</header>
+<div class="layout plain">
+
+<main id="content" class="prose">
+
+<section class="hero">
+  <p class="eyebrow">Windows Server 2025 · Azure Arc · AZ-801</p>
+  <h1>Learn Windows Server by doing it, one lab at a time</h1>
+  <p class="lede">Two hands-on tracks. In the first, you take an on-premises server and manage it from Azure. In the second, you watch an attack, build the control that stops it, and prove that it works.</p>
+</section>
+
+<div class="tracks-grid">
+  <article class="track-card hybrid">
+    <p class="eyebrow">Track 1 · 9 labs · about 8 hours</p>
+    <h2><a href="hybrid/index.html">Hybrid management with Azure Arc</a></h2>
+    <p>One Windows Server 2025 VM per person. Connect it to Azure Arc, unlock the Software Assurance benefits, and use Hotpatch, Azure Policy, Azure Monitor, Change Tracking, Defender for Cloud and Windows Admin Center in Azure. Every lab ends with customer talking points.</p>
+    <ol class="mini"><li><a href="hybrid/01-windows-admin-center.html">Windows Admin Center</a></li><li><a href="hybrid/02-azure-arc-onboarding-and-azure-benefits.html">Azure Arc onboarding and Azure benefits</a></li><li><a href="hybrid/03-hotpatching-with-azure-arc.html">Hotpatching with Azure Arc</a></li><li><a href="hybrid/04-azure-policy-and-machine-configuration.html">Azure Policy and Machine Configuration</a></li><li><a href="hybrid/05-azure-monitor.html">Azure Monitor</a></li><li><a href="hybrid/06-change-tracking-and-inventory.html">Change Tracking and Inventory</a></li><li><a href="hybrid/07-microsoft-defender-for-cloud.html">Microsoft Defender for Cloud</a></li><li><a href="hybrid/08-windows-management-from-azure.html">Windows management from Azure</a></li><li><a href="hybrid/09-security-baseline-with-osconfig.html">Security baseline with OSConfig</a></li></ol>
+    <p><a class="button" href="hybrid/index.html">Start the hybrid track</a></p>
+  </article>
+  <article class="track-card security">
+    <p class="eyebrow">Track 2 · 25 labs · AZ-801</p>
+    <h2><a href="security/index.html">Securing Windows Server</a></h2>
+    <p>Four VMs, one domain, and an attacker. Each lab shows the attack first, then builds the control that stops it: passwords and lockout, Credential Guard, App Control, Protected Users, RODC, delegation, Sentinel, IPsec and BitLocker.</p>
+    <ol class="mini"><li><a href="security/01-securing-the-os/index.html">Securing the Windows Server operating system</a> <span class="count">6 labs</span></li><li><a href="security/02-hybrid-ad-accounts/index.html">Securing hybrid Active Directory accounts</a> <span class="count">5 labs</span></li><li><a href="security/03-least-privilege-and-delegation/index.html">Least privilege and delegation</a> <span class="count">4 labs</span></li><li><a href="security/04-watching-from-azure/index.html">Watching your servers from Azure</a> <span class="count">4 labs</span></li><li><a href="security/05-networking/index.html">Securing Windows Server networking</a> <span class="count">3 labs</span></li><li><a href="security/06-storage-encryption/index.html">Securing Windows Server storage</a> <span class="count">3 labs</span></li></ol>
+    <p><a class="button" href="security/setup.html">Build the lab and start</a></p>
+  </article>
+</div>
+
+<section class="how">
+  <h2>How every lab works</h2>
+  <ol class="how-steps">
+    <li><strong>The situation.</strong> A customer question or an attacker's move: why this lab matters.</li>
+    <li><strong>The concepts.</strong> Just enough theory, in plain words, with an analogy.</li>
+    <li><strong>Step by step.</strong> Build it on your own VM, with the exact commands.</li>
+    <li><strong>Prove it.</strong> A verification command or a portal view that shows it works.</li>
+    <li><strong>Takeaway.</strong> Talking points for the customer, or the one idea to remember.</li>
+  </ol>
+</section>
+
+<section class="about">
+  <h2>What you need</h2>
+  <div class="needs">
+    <div><h3>Hybrid track</h3><p>A Windows Server 2025 VM (your instructor provides one), an Azure subscription where you can create a resource group, and about two days.</p></div>
+    <div><h3>Security track</h3><p>A Hyper-V host for four Generation 2 VMs with Secure Boot and a virtual TPM, plus Azure and Microsoft 365 trials for the cloud chapters.</p></div>
+  </div>
+</section>
+
+</main>
+</div>
+<footer class="foot"><p>By Mohamed Dyabi, Microsoft Certified Trainer · learn.ebigpictures.com</p>
+<p class="small">Lab environments only. Several labs change security settings, lock accounts or force recovery. Never run them on production systems.</p></footer>
+
+</body>
+</html>
