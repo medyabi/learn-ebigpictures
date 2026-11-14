@@ -332,9 +332,9 @@ def shell(out_rel, title, body, track=None, extra="", head="", kind="Article"):
     css = rel(out_rel, "assets/site.css")
     home = rel(out_rel, "index.html")
     nav = [("Hybrid", "hybrid/index.html", "hybrid"), ("Security", "security/index.html", "security"),
-           ("Lab access", "access/index.html", "access")]
+           ("Lab access", "https://access.ebigpictures.com/", "access")]
     cur = ' aria-current="true"'
-    nav_html = "".join(f'<a href="{rel(out_rel, t)}"{cur if track == k else ""}>{l}</a>' for l, t, k in nav)
+    nav_html = "".join(f'<a href="{t if t.startswith("http") else rel(out_rel, t)}"{cur if track == k else ""}>{l}</a>' for l, t, k in nav)
     full_title = f"{title} · Windows Server Labs" if title != "Windows Server Labs" else title
     is_doc = track in ("hybrid", "security", "access")
     if is_doc:
@@ -391,7 +391,7 @@ def shell(out_rel, title, body, track=None, extra="", head="", kind="Article"):
     <ul>
       <li><a href="{rel(out_rel, 'hybrid/index.html')}">Hybrid track</a></li>
       <li><a href="{rel(out_rel, 'security/index.html')}">Security track</a></li>
-      <li><a href="{rel(out_rel, 'access/index.html')}">Lab access</a></li>
+      <li><a href="https://access.ebigpictures.com/">Lab access (team sign-in)</a></li>
       <li><a href="{REPO_URL['hyb']}" rel="noopener">Hybrid labs on GitHub</a></li>
       <li><a href="{REPO_URL['sec']}" rel="noopener">Security labs on GitHub</a></li>
     </ul>
@@ -451,9 +451,9 @@ def home_page():
   <div>
     <p class="card-kicker">MTS team · Remote lab access</p>
     <h2>Connect to your lab VM from anywhere</h2>
-    <p>Each engineer has a personal Windows Server 2025 VM, reached over HTTPS through our Remote Desktop Gateway. Download your connection file, sign in, and start the hybrid labs.</p>
+    <p>Each engineer has a personal Windows Server 2025 VM, reached over HTTPS through our Remote Desktop Gateway. Sign in with your invited Microsoft account, download your connection file, and start the hybrid labs. Access is by invitation only.</p>
   </div>
-  <a class="btn primary" href="access/index.html">Get your connection file</a>
+  <a class="btn primary" href="https://access.ebigpictures.com/">Sign in to get your file</a>
 </section>
 
 <h2 class="section-title">How every lab works</h2>
@@ -565,14 +565,8 @@ for (repo, src), out in pages.items():
 with open(os.path.join(OUT, "index.html"), "w", encoding="utf-8") as fh:
     fh.write(home_page())
 
-os.makedirs(os.path.join(OUT, "access", "rdp"), exist_ok=True)
-with open(os.path.join(OUT, "access", "index.html"), "w", encoding="utf-8") as fh:
-    fh.write(access_page())
-for u, vm, ip in ENGINEERS:
-    with open(os.path.join(OUT, "access", "rdp", f"{u}-{vm}.rdp"), "w", encoding="utf-8", newline="") as fh:
-        fh.write(rdp_text(u, ip))
-with open(os.path.join(OUT, "robots.txt"), "w") as fh:
-    fh.write("User-agent: *\nDisallow: /access/\n")
+# The lab access page lives in the private repo medyabi/mts-lab-access
+# (Azure Static Web Apps, sign-in + invitation), at https://access.ebigpictures.com
 
 TOOLS = os.path.dirname(os.path.abspath(__file__))
 shutil.copyfile(os.path.join(TOOLS, "site.css"), os.path.join(OUT, "assets", "site.css"))
@@ -593,4 +587,4 @@ nf = shell("404.html", "Page not found",
 nf = re.sub(r'(href|src)="(?!https?:|/|#)', r'\1="/', nf)
 with open(os.path.join(OUT, "404.html"), "w", encoding="utf-8") as fh:
     fh.write(nf)
-print(f"{len(pages) + 3} pages written to {OUT}")
+print(f"{len(pages) + 2} pages written to {OUT}")
