@@ -391,6 +391,7 @@ def shell(out_rel, title, body, track=None, extra="", head="", kind="Article"):
     <ul>
       <li><a href="{rel(out_rel, 'hybrid/index.html')}">Hybrid track</a></li>
       <li><a href="{rel(out_rel, 'security/index.html')}">Security track</a></li>
+      <li><a href="https://bookings.cloud.microsoft/book/WindowsServer2025Lab@ebigpictures.com/" rel="noopener">Book a lab slot</a></li>
       <li><a href="https://access.ebigpictures.com/">Lab access (team sign-in)</a></li>
       <li><a href="{REPO_URL['hyb']}" rel="noopener">Hybrid labs on GitHub</a></li>
       <li><a href="{REPO_URL['sec']}" rel="noopener">Security labs on GitHub</a></li>
@@ -450,10 +451,10 @@ def home_page():
   <span class="ico c-green">{ICONS['access']}</span>
   <div>
     <p class="card-kicker">MTS team · Remote lab access</p>
-    <h2>Connect to your lab VM from anywhere</h2>
-    <p>Each engineer has a personal Windows Server 2025 VM, reached over HTTPS through our Remote Desktop Gateway. Sign in with your invited Microsoft account, download your connection file, and start the hybrid labs. Access is by invitation only.</p>
+    <h2>Book a lab slot and connect from anywhere</h2>
+    <p>Book a 2-hour slot (Wednesday to Friday, 10:00 to 20:00, Morocco time) on your own Windows Server 2025 VM, reached over HTTPS through our Remote Desktop Gateway. You get your sign-in details before the slot, then download your connection file and start the hybrid labs.</p>
   </div>
-  <a class="btn primary" href="https://access.ebigpictures.com/">Sign in to get your file</a>
+  <div class="band-actions"><a class="btn primary" href="https://bookings.cloud.microsoft/book/WindowsServer2025Lab@ebigpictures.com/" target="_blank" rel="noopener">Book a lab slot</a><a class="btn" href="https://access.ebigpictures.com/">Sign in to get your file</a></div>
 </section>
 
 <h2 class="section-title">How every lab works</h2>

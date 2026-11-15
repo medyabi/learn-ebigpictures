@@ -230,3 +230,4 @@ li.task input { margin-right: 8px; accent-color: var(--blue); }
   .wrap { padding: 0 16px; }
 }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+.band-actions { display: flex; flex-wrap: wrap; gap: 10px; }
