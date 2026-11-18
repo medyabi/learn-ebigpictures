@@ -254,6 +254,7 @@ LANG_LABEL = {"powershell": "PowerShell", "kusto": "Kusto", "bash": "Bash", "jso
 ICONS = {
     "hybrid": '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18a5 5 0 0 1-.6-9.96A6.5 6.5 0 0 1 18.8 9.1 4.5 4.5 0 0 1 18 18Z" fill="currentColor"/></svg>',
     "security": '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5Z" fill="currentColor"/></svg>',
+    "ai": '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-8l-5 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm8 2.5c-.4 2.3-1.2 3.1-3.5 3.5 2.3.4 3.1 1.2 3.5 3.5.4-2.3 1.2-3.1 3.5-3.5-2.3-.4-3.1-1.2-3.5-3.5Z" fill="currentColor"/></svg>',
     "access": '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2" fill="currentColor"/><rect x="8" y="18" width="8" height="2" rx="1" fill="currentColor"/></svg>',
 }
 
@@ -332,7 +333,8 @@ def shell(out_rel, title, body, track=None, extra="", head="", kind="Article"):
     css = rel(out_rel, "assets/site.css")
     home = rel(out_rel, "index.html")
     nav = [("Hybrid", "hybrid/index.html", "hybrid"), ("Security", "security/index.html", "security"),
-           ("Lab access", "https://access.ebigpictures.com/", "access")]
+           ("Lab access", "https://access.ebigpictures.com/", "access"),
+           ("AI Labs", "https://ai.ebigpictures.com/", "ai")]
     cur = ' aria-current="true"'
     nav_html = "".join(f'<a href="{t if t.startswith("http") else rel(out_rel, t)}"{cur if track == k else ""}>{l}</a>' for l, t, k in nav)
     full_title = f"{title} · Windows Server Labs" if title != "Windows Server Labs" else title
@@ -393,6 +395,7 @@ def shell(out_rel, title, body, track=None, extra="", head="", kind="Article"):
       <li><a href="{rel(out_rel, 'security/index.html')}">Security track</a></li>
       <li><a href="https://bookings.cloud.microsoft/book/WindowsServer2025Lab@ebigpictures.com/" rel="noopener">Book a lab slot</a></li>
       <li><a href="https://access.ebigpictures.com/">Lab access (team sign-in)</a></li>
+      <li><a href="https://ai.ebigpictures.com/">AI Labs: Copilot Studio and Cowork</a></li>
       <li><a href="{REPO_URL['hyb']}" rel="noopener">Hybrid labs on GitHub</a></li>
       <li><a href="{REPO_URL['sec']}" rel="noopener">Security labs on GitHub</a></li>
     </ul>
@@ -455,6 +458,16 @@ def home_page():
     <p>Book a 2-hour slot (Wednesday to Friday, 10:00 to 20:00, Morocco time) on your own Windows Server 2025 VM, reached over HTTPS through our Remote Desktop Gateway. You get your sign-in details before the slot, then download your connection file and start the hybrid labs.</p>
   </div>
   <div class="band-actions"><a class="btn primary" href="https://bookings.cloud.microsoft/book/WindowsServer2025Lab@ebigpictures.com/" target="_blank" rel="noopener">Book a lab slot</a><a class="btn" href="https://access.ebigpictures.com/">Sign in to get your file</a></div>
+</section>
+
+<section class="band">
+  <span class="ico c-purple">{ICONS['ai']}</span>
+  <div>
+    <p class="card-kicker">New · AI Labs</p>
+    <h2>Copilot Studio and Copilot Cowork labs</h2>
+    <p>Build AI agents step by step: from a simple Agent Builder agent to Copilot Studio agents with tools, workflows, human approval and connected agents. Plus a hands-on Copilot Cowork workshop.</p>
+  </div>
+  <div class="band-actions"><a class="btn primary" href="https://ai.ebigpictures.com/copilot-studio/index.html">Copilot Studio labs</a><a class="btn" href="https://ai.ebigpictures.com/cowork/index.html">Copilot Cowork labs</a></div>
 </section>
 
 <h2 class="section-title">How every lab works</h2>

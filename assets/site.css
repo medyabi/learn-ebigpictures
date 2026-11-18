@@ -16,7 +16,7 @@
   --note: #0065b3;      --note-bg: #eff6fc;
   --important: #8661c5; --important-bg: #f2edfa;
   --warning: #8a6116;   --warning-bg: #fff8e1;
-  --c-blue: #0078d4; --c-red: #d13438; --c-green: #107c10;
+  --c-blue: #0078d4; --c-red: #d13438; --c-green: #107c10; --c-purple: #8661c5;
   --font: "Segoe UI", SegoeUI, -apple-system, BlinkMacSystemFont, "Helvetica Neue", Helvetica, Arial, sans-serif;
   --mono: SFMono-Regular, Consolas, "Liberation Mono", Menlo, Courier, monospace;
   color-scheme: light;
@@ -29,7 +29,7 @@
     --hero: linear-gradient(110deg, #0f2338 0%, #13202c 55%, #12231a 100%);
     --note: #75b6e7; --note-bg: #0f2438; --important: #b59ae6; --important-bg: #261d38;
     --warning: #ffd36b; --warning-bg: #2f2610;
-    --c-blue: #4ca3eb; --c-red: #f1707b; --c-green: #54b054;
+    --c-blue: #4ca3eb; --c-red: #f1707b; --c-green: #54b054; --c-purple: #b39ce8;
     color-scheme: dark;
   }
 }
@@ -195,7 +195,7 @@ li.task input { margin-right: 8px; accent-color: var(--blue); }
 .card-kicker { margin: 0 0 2px !important; font-size: 0.8rem; font-weight: 600; text-transform: uppercase; letter-spacing: 0.04em; color: var(--ink-2); }
 .ico { flex: none; width: 44px; height: 44px; border-radius: 8px; display: grid; place-items: center; color: #fff; }
 .ico svg { width: 26px; height: 26px; }
-.c-blue { background: var(--c-blue); } .c-red { background: var(--c-red); } .c-green { background: var(--c-green); }
+.c-blue { background: var(--c-blue); } .c-red { background: var(--c-red); } .c-green { background: var(--c-green); } .c-purple { background: var(--c-purple); }
 @media (prefers-color-scheme: dark) { .ico { color: #111; } }
 .mini { margin: 4px 0 16px; padding-left: 1.4em; font-size: 0.93rem; }
 .mini li + li { margin-top: 4px; }
