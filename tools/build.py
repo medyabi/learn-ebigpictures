@@ -492,7 +492,7 @@ def home_page():
 <section class="hero">
   <div class="wrap">
     <p class="kicker">Windows Server 2025 · Azure Arc · Security · Azure Local</p>
-    <h1>Learn Windows Server and Azure Local by doing it</h1>
+    <h1>Learn hybrid cloud by doing it</h1>
     <p class="lede">Three hands-on tracks. Take an on-premises server and manage it from Azure. Watch an attack, build the control that stops it, and prove that it works. And deploy Azure Local in a nested lab, with every real-world error and its fix.</p>
     <p class="cta"><a class="btn primary" href="hybrid/index.html">Start the hybrid track</a><a class="btn" href="security/setup.html">Build the security lab</a></p>
   </div>
