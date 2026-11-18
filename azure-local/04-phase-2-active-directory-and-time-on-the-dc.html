@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>4. Phase 2 — Active Directory and time (on the DC) · Windows Server Labs</title>
+<meta name="description" content="Hands-on Windows Server 2025 labs: hybrid management with Azure Arc, and Windows Server security.">
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+</head>
+<body class="t-azlocal">
+<a class="skip" href="#content">Skip to main content</a>
+<header class="masthead">
+  <a class="brand" href="../index.html"><img src="../assets/favicon.svg" alt="" width="24" height="24"><span>Windows Server Labs</span></a>
+  <span class="divider" aria-hidden="true"></span>
+  <nav class="mainnav" aria-label="Main"><a href="../hybrid/index.html">Hybrid</a><a href="../security/index.html">Security</a><a href="index.html" aria-current="true">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
+  <a class="gh" href="https://github.com/medyabi" rel="noopener">GitHub</a>
+</header>
+<div class="doc has-toc">
+<details class="toc"><summary>Table of contents</summary><nav aria-label="Azure Local in a nested lab"><p class="toc-title">Azure Local in a nested lab</p><input id="toc-filter" class="toc-filter" type="search" placeholder="Filter by title" aria-label="Filter by title"><ol class="toc-list"><li><a href="index.html">Overview</a></li><li><a href="01-prerequisites.html">1. Prerequisites</a></li><li><a href="02-phase-0-tools-on-the-hyper-v-host.html">2. Phase 0 — Tools on the Hyper-V host</a></li><li><a href="03-phase-1-azure-preparation.html">3. Phase 1 — Azure preparation</a></li><li><a href="04-phase-2-active-directory-and-time-on-the-dc.html" aria-current="page">4. Phase 2 — Active Directory and time (on the DC)</a></li><li><a href="05-phase-3-create-the-node-vm.html">5. Phase 3 — Create the node VM</a></li><li><a href="06-phase-4-install-the-os.html">6. Phase 4 — Install the OS</a></li><li><a href="07-phase-5-network-time-zone-name-from-the-host.html">7. Phase 5 — Network, time zone, name (from the host)</a></li><li><a href="08-phase-6-register-with-azure-arc.html">8. Phase 6 — Register with Azure Arc</a></li><li><a href="09-phase-7-deploy-from-the-portal.html">9. Phase 7 — Deploy from the portal</a></li><li><a href="10-fix-router-ipv6-dns-breaks-create-the-cluster.html">10. Fix: router IPv6 DNS breaks &quot;Create the cluster&quot;</a></li><li><a href="11-after-deployment.html">11. After deployment</a></li><li><a href="12-troubleshooting-every-error-we-hit.html">12. Troubleshooting — every error we hit</a></li><li><a href="13-checklist.html">13. Checklist</a></li><li><a href="99-appendix-changes-from-version-2-0.html">Appendix — Changes from version 2.0</a></li></ol></nav></details>
+<main id="content" class="article">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../index.html">Labs</a></li><li><a href="index.html">Azure Local track</a></li></ol></nav>
+<article class="prose">
+<h1 id="4-phase-2-active-directory-and-time-on-the-dc">4. Phase 2 — Active Directory and time (on the DC)</h1><p class="meta"><span>Guide</span><span>2 min read</span></p>
+<h2 id="41-password-checker">4.1 Password checker</h2>
+<p>Paste this function into your host PowerShell window. The AD and node steps use it.</p>
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>function Test-AzLPassword ([securestring]$Secure) {
+$p = [System.Net.NetworkCredential]::new('', $Secure).Password
+$issues = @()
+if ($p.Length -lt 14) { $issues += '14+ characters' }
+if ($p -cnotmatch '[a-z]') { $issues += 'a lowercase letter' }
+if ($p -cnotmatch '[A-Z]') { $issues += 'an uppercase letter' }
+if ($p -notmatch '\d') { $issues += 'a number' }
+if ($p -notmatch '[^a-zA-Z0-9]') { $issues += 'a special character' }
+if ($p -match '["''$&amp;&lt;&gt;;]' -or $p.Contains([string][char]96)) { $issues += 'none of " '' $ &amp; &lt; &gt; ; or backtick' }
+$issues
+}</code></pre></div>
+<h2 id="42-create-the-ou-and-deployment-account-through-powershell-direct">4.2 Create the OU and deployment account (through PowerShell Direct)</h2>
+<p>Why on the DC? Because the AD tool needs the <strong>ActiveDirectory</strong> and <strong>GroupPolicy</strong> modules. Running it on the host failed with *"The specified module ‘ActiveDirectory’ was not loaded"*. PowerShell Direct gets you onto the DC from the host without RDP:</p>
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>$daCred = Get-Credential -UserName 'MCT\Administrator' -Message 'Domain admin'
+do {
+$lcmCred = Get-Credential -UserName 'AzLDeployUser' -Message 'Password for the deployment account'
+$problems = Test-AzLPassword $lcmCred.Password
+if ($problems) { Write-Host "Password needs: $($problems -join ', ')" -ForegroundColor Yellow }
+} while ($problems)
+Invoke-Command -VMName $DCVM -Credential $daCred -ArgumentList $lcmCred, $OU -ScriptBlock {
+param($lcmCred, $OU)
+[Net.ServicePointManager]::SecurityProtocol = [Net.SecurityProtocolType]::Tls12
+Install-Module AsHciADArtifactsPreCreationTool -Repository PSGallery -Force
+New-HciAdObjectsPreCreation -AzureStackLCMUserCredential $lcmCred -AsHciOUName $OU
+Set-ADUser -Identity 'AzLDeployUser' -PasswordNeverExpires $true
+Get-ADUser 'AzLDeployUser' -Properties PasswordNeverExpires | Select-Object SamAccountName, Enabled, PasswordNeverExpires, DistinguishedName
+}</code></pre></div>
+<p>Expected output: Successfully verified DC=MCT,DC=LAB, created AzureLocal organization unit, created ‘AzLDeployUser’, Access permissions … granted, and Gpo inheritance blocked … True.</p>
+<div class="alert note"><p class="alert-title">Note</p><p><strong>Note:</strong> The tool <strong>creates</strong> the account. To change its password later, use Set-ADAccountPassword -Identity AzLDeployUser -Reset -NewPassword (Read-Host -AsSecureString) on the DC. If the DC has no internet access, install the module on the host and copy it to the DC with Copy-Item -ToSession.</p></div>
+<h2 id="43-time-on-the-dc">4.3 Time on the DC</h2>
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>Invoke-Command -VMName $DCVM -Credential $daCred -ScriptBlock {
+Set-TimeZone -Id 'Morocco Standard Time'
+w32tm /config /manualpeerlist:"pool.ntp.org" /syncfromflags:manual /reliable:YES /update
+Restart-Service w32time
+w32tm /resync /force
+w32tm /query /status | Select-String 'Source|Stratum|Last Successful'
+}
+Disable-VMIntegrationService -VMName $DCVM -Name 'Time Synchronization'</code></pre></div>
+<p>Expected: Source: pool.ntp.org and Stratum 2 or 3. Check the time zone too. Our DC was still on Pacific time, which made the logs confusing.</p>
+<h2 id="44-dns-sanity-check-on-the-dc">4.4 DNS sanity check on the DC</h2>
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>Invoke-Command -VMName $DCVM -Credential $daCred -ScriptBlock {
+Get-DnsServerForwarder | Select-Object IPAddress
+Get-DnsClientServerAddress | Where-Object ServerAddresses | Select-Object InterfaceAlias, AddressFamily, ServerAddresses
+}</code></pre></div>
+<ul>
+<li>
+<p><strong>Forwarders:</strong> there must be at least one, or the node can’t resolve Azure names. To add one: Add-DnsServerForwarder -IPAddress 8.8.8.8.</p>
+</li>
+<li>
+<p><strong>DNS client:</strong> the DC should list only itself (and ::1). If you see fe80::1, your router is handing out IPv6 DNS. Fix the router (section 1.5), or apply the section 10 fix to the DC too.</p>
+</li>
+</ul>
+</article>
+<p class="source"><a href="https://github.com/medyabi/Azure-Local-Lab-Deployment-Guide" rel="noopener">View the source on GitHub</a></p>
+<nav class="pager"><a href="03-phase-1-azure-preparation.html">‹ 3. Phase 1 — Azure preparation</a><a href="05-phase-3-create-the-node-vm.html">5. Phase 3 — Create the node VM ›</a></nav>
+</main>
+<aside class="aside-toc" aria-label="In this article"><p>In this article</p><ol><li><a href="#41-password-checker">4.1 Password checker</a></li><li><a href="#42-create-the-ou-and-deployment-account-through-powershell-direct">4.2 Create the OU and deployment account (through PowerShell Direct)</a></li><li><a href="#43-time-on-the-dc">4.3 Time on the DC</a></li><li><a href="#44-dns-sanity-check-on-the-dc">4.4 DNS sanity check on the DC</a></li></ol></aside>
+</div>
+<footer class="sitefoot">
+  <div class="foot-in">
+    <div><strong>Windows Server Labs</strong><p>Hands-on labs by Mohamed Dyabi, Microsoft Certified Trainer.</p></div>
+    <ul>
+      <li><a href="../hybrid/index.html">Hybrid track</a></li>
+      <li><a href="../security/index.html">Security track</a></li>
+      <li><a href="index.html">Azure Local track</a></li>
+      <li><a href="https://bookings.cloud.microsoft/book/WindowsServer2025Lab@ebigpictures.com/" rel="noopener">Book a lab slot</a></li>
+      <li><a href="https://access.ebigpictures.com/">Lab access (team sign-in)</a></li>
+      <li><a href="https://ai.ebigpictures.com/">AI Labs: Copilot Studio and Cowork</a></li>
+      <li><a href="https://github.com/medyabi/windows-server2025-Hybrid-lab" rel="noopener">Hybrid labs on GitHub</a></li>
+      <li><a href="https://github.com/medyabi/windows-server-security-lab" rel="noopener">Security labs on GitHub</a></li>
+      <li><a href="https://github.com/medyabi/Azure-Local-Lab-Deployment-Guide" rel="noopener">Azure Local guide on GitHub</a></li>
+    </ul>
+  </div>
+  <p class="fine">Lab environments only: several labs change security settings, lock accounts or force recovery. Never run them on production systems. An independent site, not affiliated with Microsoft. © 2026 Mohamed Dyabi</p>
+</footer>
+<script>
+(function(){
+  // Table of contents: open on wide screens, collapsible on small ones
+  var toc = document.querySelector('details.toc');
+  if (toc) {
+    var mq = window.matchMedia('(min-width: 1024px)');
+    var sync = function(){ if (mq.matches) toc.open = true; };
+    sync(); if (mq.addEventListener) mq.addEventListener('change', sync);
+    var cur = toc.querySelector('[aria-current="page"]');
+    if (cur && cur.scrollIntoView && mq.matches) cur.scrollIntoView({block: 'center'});
+  }
+  // Filter by title
+  var f = document.getElementById('toc-filter');
+  if (f) f.addEventListener('input', function(){
+    var q = f.value.trim().toLowerCase();
+    document.querySelectorAll('.toc-list li').forEach(function(li){
+      var hit = !q || li.textContent.toLowerCase().indexOf(q) !== -1;
+      li.hidden = !hit;
+    });
+  });
+  // Copy buttons on code blocks
+  document.querySelectorAll('.codeblock').forEach(function(cb){
+    var btn = cb.querySelector('.copy'), code = cb.querySelector('code');
+    if (!btn || !code) return;
+    btn.addEventListener('click', function(){
+      navigator.clipboard.writeText(code.innerText).then(function(){
+        btn.textContent = 'Copied'; setTimeout(function(){ btn.textContent = 'Copy'; }, 1500);
+      }, function(){ btn.textContent = 'Select and copy'; });
+    });
+  });
+  // Highlight the current section in "In this article"
+  var links = document.querySelectorAll('.aside-toc a');
+  if (links.length && 'IntersectionObserver' in window) {
+    var map = {}; links.forEach(function(a){ map[a.getAttribute('href').slice(1)] = a; });
+    var obs = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if (e.isIntersecting) {
+        links.forEach(function(a){ a.classList.remove('on'); });
+        var a = map[e.target.id]; if (a) a.classList.add('on');
+      }});
+    }, {rootMargin: '0px 0px -75% 0px'});
+    Object.keys(map).forEach(function(id){ var h = document.getElementById(id); if (h) obs.observe(h); });
+  }
+})();
+</script>
+</body>
+</html>

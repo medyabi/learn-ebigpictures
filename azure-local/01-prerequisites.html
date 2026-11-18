@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>1. Prerequisites · Windows Server Labs</title>
+<meta name="description" content="Hands-on Windows Server 2025 labs: hybrid management with Azure Arc, and Windows Server security.">
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+</head>
+<body class="t-azlocal">
+<a class="skip" href="#content">Skip to main content</a>
+<header class="masthead">
+  <a class="brand" href="../index.html"><img src="../assets/favicon.svg" alt="" width="24" height="24"><span>Windows Server Labs</span></a>
+  <span class="divider" aria-hidden="true"></span>
+  <nav class="mainnav" aria-label="Main"><a href="../hybrid/index.html">Hybrid</a><a href="../security/index.html">Security</a><a href="index.html" aria-current="true">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
+  <a class="gh" href="https://github.com/medyabi" rel="noopener">GitHub</a>
+</header>
+<div class="doc has-toc">
+<details class="toc"><summary>Table of contents</summary><nav aria-label="Azure Local in a nested lab"><p class="toc-title">Azure Local in a nested lab</p><input id="toc-filter" class="toc-filter" type="search" placeholder="Filter by title" aria-label="Filter by title"><ol class="toc-list"><li><a href="index.html">Overview</a></li><li><a href="01-prerequisites.html" aria-current="page">1. Prerequisites</a></li><li><a href="02-phase-0-tools-on-the-hyper-v-host.html">2. Phase 0 — Tools on the Hyper-V host</a></li><li><a href="03-phase-1-azure-preparation.html">3. Phase 1 — Azure preparation</a></li><li><a href="04-phase-2-active-directory-and-time-on-the-dc.html">4. Phase 2 — Active Directory and time (on the DC)</a></li><li><a href="05-phase-3-create-the-node-vm.html">5. Phase 3 — Create the node VM</a></li><li><a href="06-phase-4-install-the-os.html">6. Phase 4 — Install the OS</a></li><li><a href="07-phase-5-network-time-zone-name-from-the-host.html">7. Phase 5 — Network, time zone, name (from the host)</a></li><li><a href="08-phase-6-register-with-azure-arc.html">8. Phase 6 — Register with Azure Arc</a></li><li><a href="09-phase-7-deploy-from-the-portal.html">9. Phase 7 — Deploy from the portal</a></li><li><a href="10-fix-router-ipv6-dns-breaks-create-the-cluster.html">10. Fix: router IPv6 DNS breaks &quot;Create the cluster&quot;</a></li><li><a href="11-after-deployment.html">11. After deployment</a></li><li><a href="12-troubleshooting-every-error-we-hit.html">12. Troubleshooting — every error we hit</a></li><li><a href="13-checklist.html">13. Checklist</a></li><li><a href="99-appendix-changes-from-version-2-0.html">Appendix — Changes from version 2.0</a></li></ol></nav></details>
+<main id="content" class="article">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../index.html">Labs</a></li><li><a href="index.html">Azure Local track</a></li></ol></nav>
+<article class="prose">
+<h1 id="1-prerequisites">1. Prerequisites</h1><p class="meta"><span>Guide</span><span>2 min read</span></p>
+<h2 id="11-hyper-v-host">1.1 Hyper-V host</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th><strong>Component</strong></th>
+<th><strong>Requirement</strong></th>
+<th><strong>In our lab</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>OS</td>
+<td>Windows Server 2022/2025 or Windows 11 with Hyper-V; CPU with nested virtualization</td>
+<td>Windows Server 2025</td>
+</tr>
+<tr>
+<td>RAM</td>
+<td>48 GB free (the VM uses 32 GB static)</td>
+<td></td>
+</tr>
+<tr>
+<td>CPU</td>
+<td>8 free logical processors (4 minimum)</td>
+<td>8 vCPUs</td>
+</tr>
+<tr>
+<td>Disk</td>
+<td>About 130 GB for the OS disk + about 2 TB for two 1 TB data disks (dynamic)</td>
+<td>OS on C:, data disks on E:\DataDisk</td>
+</tr>
+<tr>
+<td>Network</td>
+<td>External vSwitch on a <strong>1 Gbps or faster</strong> link</td>
+<td>Broadcom NetXtreme Gigabit Ethernet #3 - Virtual Switch</td>
+</tr>
+<tr>
+<td>Internet</td>
+<td>Outbound HTTPS from the host and the node VM</td>
+<td></td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="12-azure">1.2 Azure</h2>
+<ul>
+<li>
+<p>A subscription where you are <strong>Owner</strong>. A Visual Studio subscription works.</p>
+</li>
+<li>
+<p>A <strong>personal Microsoft account</strong> works for the portal. For Arc registration it’s more reliable to use a service principal (section 3.3).</p>
+</li>
+<li>
+<p>A region that supports Azure Local. This guide uses westeurope.</p>
+</li>
+</ul>
+<h2 id="13-active-directory">1.3 Active Directory</h2>
+<ul>
+<li>
+<p>A DC VM on the same host. In this guide that’s MCT-DC, domain MCT.LAB, at 192.168.100.80.</p>
+</li>
+<li>
+<p>A dedicated OU. The AD tool creates it, along with the deployment account.</p>
+</li>
+</ul>
+<h2 id="14-passwords-the-rule-azure-local-enforces">1.4 Passwords: the rule Azure Local enforces</h2>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th><strong>Account</strong></th>
+<th><strong>Rule</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Deployment account (AzLDeployUser)</td>
+<td><strong>14+ characters</strong>, with a lowercase letter, an uppercase letter, a number and a special character. Username: 1–20 characters, using letters, numbers, - and _. It can’t start with a number or -, can’t be admin, and must be different from the local admin name.</td>
+</tr>
+<tr>
+<td>Node local Administrator</td>
+<td>The same password rule</td>
+</tr>
+<tr>
+<td>Practical advice</td>
+<td>Avoid " ' $ &amp; \&lt; &gt; ; and the backtick, which break scripts and JSON. Turn on PasswordNeverExpires in a lab.</td>
+</tr>
+</tbody>
+</table></div>
+<div class="alert note"><p class="alert-title">Note</p><p><strong>Important:</strong> Active Directory accepted R00t123456789 (13 characters, no special character), but Azure Local would have rejected it later in the deployment. The default domain policy is much weaker than the Azure Local rule, so always check your passwords with the script in section 4.1.</p></div>
+<h2 id="15-your-lan-router-check-this-first">1.5 Your LAN router (check this first)</h2>
+<p>Why does the router matter? Because many home and office routers advertise <strong>themselves as an IPv6 DNS server</strong> (through router advertisements or DHCPv6). Windows then asks the router *and* your DC. The router answers "name does not exist" for MCT.LAB, Windows keeps that answer, and the node loses the domain.</p>
+<p>In our lab this broke <strong>"Create the cluster"</strong> with DNS name does not exist for AZLNode1.mct.lab. The router was 192.168.100.1, which also answered over IPv6 as fe80::1.</p>
+<p><strong>Best fix:</strong> turn off IPv6 DNS advertisement (RDNSS/DHCPv6) on the router before you start. If you can’t change the router, section 10 has the tested fix for the node.</p>
+<p><strong>Quick test, from any Windows machine on the LAN</strong> (here the host):</p>
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>Get-DnsClientServerAddress -AddressFamily IPv6 |
+Where-Object ServerAddresses | Select-Object InterfaceAlias, ServerAddresses
+# Anything like fe80::1 here = your router hands out IPv6 DNS</code></pre></div>
+</article>
+<p class="source"><a href="https://github.com/medyabi/Azure-Local-Lab-Deployment-Guide" rel="noopener">View the source on GitHub</a></p>
+<nav class="pager"><a href="index.html">‹ Overview</a><a href="02-phase-0-tools-on-the-hyper-v-host.html">2. Phase 0 — Tools on the Hyper-V host ›</a></nav>
+</main>
+<aside class="aside-toc" aria-label="In this article"><p>In this article</p><ol><li><a href="#11-hyper-v-host">1.1 Hyper-V host</a></li><li><a href="#12-azure">1.2 Azure</a></li><li><a href="#13-active-directory">1.3 Active Directory</a></li><li><a href="#14-passwords-the-rule-azure-local-enforces">1.4 Passwords: the rule Azure Local enforces</a></li><li><a href="#15-your-lan-router-check-this-first">1.5 Your LAN router (check this first)</a></li></ol></aside>
+</div>
+<footer class="sitefoot">
+  <div class="foot-in">
+    <div><strong>Windows Server Labs</strong><p>Hands-on labs by Mohamed Dyabi, Microsoft Certified Trainer.</p></div>
+    <ul>
+      <li><a href="../hybrid/index.html">Hybrid track</a></li>
+      <li><a href="../security/index.html">Security track</a></li>
+      <li><a href="index.html">Azure Local track</a></li>
+      <li><a href="https://bookings.cloud.microsoft/book/WindowsServer2025Lab@ebigpictures.com/" rel="noopener">Book a lab slot</a></li>
+      <li><a href="https://access.ebigpictures.com/">Lab access (team sign-in)</a></li>
+      <li><a href="https://ai.ebigpictures.com/">AI Labs: Copilot Studio and Cowork</a></li>
+      <li><a href="https://github.com/medyabi/windows-server2025-Hybrid-lab" rel="noopener">Hybrid labs on GitHub</a></li>
+      <li><a href="https://github.com/medyabi/windows-server-security-lab" rel="noopener">Security labs on GitHub</a></li>
+      <li><a href="https://github.com/medyabi/Azure-Local-Lab-Deployment-Guide" rel="noopener">Azure Local guide on GitHub</a></li>
+    </ul>
+  </div>
+  <p class="fine">Lab environments only: several labs change security settings, lock accounts or force recovery. Never run them on production systems. An independent site, not affiliated with Microsoft. © 2026 Mohamed Dyabi</p>
+</footer>
+<script>
+(function(){
+  // Table of contents: open on wide screens, collapsible on small ones
+  var toc = document.querySelector('details.toc');
+  if (toc) {
+    var mq = window.matchMedia('(min-width: 1024px)');
+    var sync = function(){ if (mq.matches) toc.open = true; };
+    sync(); if (mq.addEventListener) mq.addEventListener('change', sync);
+    var cur = toc.querySelector('[aria-current="page"]');
+    if (cur && cur.scrollIntoView && mq.matches) cur.scrollIntoView({block: 'center'});
+  }
+  // Filter by title
+  var f = document.getElementById('toc-filter');
+  if (f) f.addEventListener('input', function(){
+    var q = f.value.trim().toLowerCase();
+    document.querySelectorAll('.toc-list li').forEach(function(li){
+      var hit = !q || li.textContent.toLowerCase().indexOf(q) !== -1;
+      li.hidden = !hit;
+    });
+  });
+  // Copy buttons on code blocks
+  document.querySelectorAll('.codeblock').forEach(function(cb){
+    var btn = cb.querySelector('.copy'), code = cb.querySelector('code');
+    if (!btn || !code) return;
+    btn.addEventListener('click', function(){
+      navigator.clipboard.writeText(code.innerText).then(function(){
+        btn.textContent = 'Copied'; setTimeout(function(){ btn.textContent = 'Copy'; }, 1500);
+      }, function(){ btn.textContent = 'Select and copy'; });
+    });
+  });
+  // Highlight the current section in "In this article"
+  var links = document.querySelectorAll('.aside-toc a');
+  if (links.length && 'IntersectionObserver' in window) {
+    var map = {}; links.forEach(function(a){ map[a.getAttribute('href').slice(1)] = a; });
+    var obs = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if (e.isIntersecting) {
+        links.forEach(function(a){ a.classList.remove('on'); });
+        var a = map[e.target.id]; if (a) a.classList.add('on');
+      }});
+    }, {rootMargin: '0px 0px -75% 0px'});
+    Object.keys(map).forEach(function(id){ var h = document.getElementById(id); if (h) obs.observe(h); });
+  }
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Azure Local in a nested lab · Windows Server Labs</title>
+<meta name="description" content="Hands-on Windows Server 2025 labs: hybrid management with Azure Arc, and Windows Server security.">
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+</head>
+<body class="t-azlocal">
+<a class="skip" href="#content">Skip to main content</a>
+<header class="masthead">
+  <a class="brand" href="../index.html"><img src="../assets/favicon.svg" alt="" width="24" height="24"><span>Windows Server Labs</span></a>
+  <span class="divider" aria-hidden="true"></span>
+  <nav class="mainnav" aria-label="Main"><a href="../hybrid/index.html">Hybrid</a><a href="../security/index.html">Security</a><a href="index.html" aria-current="true">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
+  <a class="gh" href="https://github.com/medyabi" rel="noopener">GitHub</a>
+</header>
+<div class="doc has-toc">
+<details class="toc"><summary>Table of contents</summary><nav aria-label="Azure Local in a nested lab"><p class="toc-title">Azure Local in a nested lab</p><input id="toc-filter" class="toc-filter" type="search" placeholder="Filter by title" aria-label="Filter by title"><ol class="toc-list"><li><a href="index.html" aria-current="page">Overview</a></li><li><a href="01-prerequisites.html">1. Prerequisites</a></li><li><a href="02-phase-0-tools-on-the-hyper-v-host.html">2. Phase 0 — Tools on the Hyper-V host</a></li><li><a href="03-phase-1-azure-preparation.html">3. Phase 1 — Azure preparation</a></li><li><a href="04-phase-2-active-directory-and-time-on-the-dc.html">4. Phase 2 — Active Directory and time (on the DC)</a></li><li><a href="05-phase-3-create-the-node-vm.html">5. Phase 3 — Create the node VM</a></li><li><a href="06-phase-4-install-the-os.html">6. Phase 4 — Install the OS</a></li><li><a href="07-phase-5-network-time-zone-name-from-the-host.html">7. Phase 5 — Network, time zone, name (from the host)</a></li><li><a href="08-phase-6-register-with-azure-arc.html">8. Phase 6 — Register with Azure Arc</a></li><li><a href="09-phase-7-deploy-from-the-portal.html">9. Phase 7 — Deploy from the portal</a></li><li><a href="10-fix-router-ipv6-dns-breaks-create-the-cluster.html">10. Fix: router IPv6 DNS breaks &quot;Create the cluster&quot;</a></li><li><a href="11-after-deployment.html">11. After deployment</a></li><li><a href="12-troubleshooting-every-error-we-hit.html">12. Troubleshooting — every error we hit</a></li><li><a href="13-checklist.html">13. Checklist</a></li><li><a href="99-appendix-changes-from-version-2-0.html">Appendix — Changes from version 2.0</a></li></ol></nav></details>
+<main id="content" class="article">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../index.html">Labs</a></li></ol></nav>
+<article class="prose">
+<h1 id="azure-local-in-a-nested-lab">Azure Local in a nested lab</h1><p class="meta"><span>Guide</span><span>3 min read</span></p>
+<p><strong>Single node · nested Hyper-V · field-tested</strong></p>
+<p><img alt="Azure Local lab architecture: Hyper-V host with MCT-DC and AZLNode1 VMs, LAN router, and Azure resources" src="../assets/azl/docs-lab-architecture.svg" /></p>
+<p><em>Every step and fix in this guide comes from a real deployment that completed on 9 November 2026.</em></p>
+<div class="alert note"><p class="alert-title">Note</p><p><strong>Lab and training use only.</strong> Microsoft doesn't support nested Azure Local for production. The original Word version is in <a href="https://github.com/medyabi/Azure-Local-Lab-Deployment-Guide/blob/main/docs/AzureLocal-Lab-Deployment-Guide-v3.docx" rel="noopener"><code>docs/AzureLocal-Lab-Deployment-Guide-v3.docx</code></a>.</p></div>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th><strong>Item</strong></th>
+<th><strong>Value</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>ISO</td>
+<td>AzureLocal24H2.26100.32230.LCM.12.2608.0.3020.x64.en-us.iso</td>
+</tr>
+<tr>
+<td>Version deployed</td>
+<td>Release <strong>2608</strong> (OS 26100.33296), then updated from the portal</td>
+</tr>
+<tr>
+<td>Lab</td>
+<td>Host + MCT-DC (domain MCT.LAB) + node AZLNode1, network 192.168.100.0/24</td>
+</tr>
+<tr>
+<td>Guide version</td>
+<td>3.0 — November 2026 (replaces 2.0)</td>
+</tr>
+</tbody>
+</table></div>
+<h2 id="the-phases">The phases</h2>
+<ul>
+<li><a href="01-prerequisites.html">1. Prerequisites</a></li>
+<li><a href="02-phase-0-tools-on-the-hyper-v-host.html">2. Phase 0 — Tools on the Hyper-V host</a></li>
+<li><a href="03-phase-1-azure-preparation.html">3. Phase 1 — Azure preparation</a></li>
+<li><a href="04-phase-2-active-directory-and-time-on-the-dc.html">4. Phase 2 — Active Directory and time (on the DC)</a></li>
+<li><a href="05-phase-3-create-the-node-vm.html">5. Phase 3 — Create the node VM</a></li>
+<li><a href="06-phase-4-install-the-os.html">6. Phase 4 — Install the OS</a></li>
+<li><a href="07-phase-5-network-time-zone-name-from-the-host.html">7. Phase 5 — Network, time zone, name (from the host)</a></li>
+<li><a href="08-phase-6-register-with-azure-arc.html">8. Phase 6 — Register with Azure Arc</a></li>
+<li><a href="09-phase-7-deploy-from-the-portal.html">9. Phase 7 — Deploy from the portal</a></li>
+<li><a href="10-fix-router-ipv6-dns-breaks-create-the-cluster.html">10. Fix: router IPv6 DNS breaks "Create the cluster"</a></li>
+<li><a href="11-after-deployment.html">11. After deployment</a></li>
+<li><a href="12-troubleshooting-every-error-we-hit.html">12. Troubleshooting — every error we hit</a></li>
+<li><a href="13-checklist.html">13. Checklist</a></li>
+<li><a href="99-appendix-changes-from-version-2-0.html">Appendix — Changes from version 2.0</a></li>
+</ul>
+<h2 id="before-you-start">Before you start</h2>
+<div class="alert note"><p class="alert-title">Note</p><p><strong>Important:</strong> Lab and training use only. Microsoft doesn’t support nested Azure Local for production, and it runs much slower than physical hardware.</p></div>
+<p>This guide builds a <strong>single-node Azure Local instance inside a Hyper-V VM</strong>. Version 2.0 described the documented path. This version adds what actually happened when we ran it: every error we hit, why it happened, and the fix that worked. The fixes are built into the steps, so if you follow the guide in order, you shouldn’t hit them.</p>
+<h3 id="the-ten-lessons-that-matter-most">The ten lessons that matter most</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th><strong>#</strong></th>
+<th><strong>Lesson</strong></th>
+<th><strong>Section</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>1</td>
+<td><strong>Your router can break the deployment.</strong> A home or office router that advertises itself as an IPv6 DNS server makes the node lose the domain at the "Create the cluster" step. Check for it before you start.</td>
+<td>1.5, 10</td>
+</tr>
+<tr>
+<td>2</td>
+<td>The Azure Local password rule (14+ characters, all four character types) is <strong>stricter than AD’s</strong>. AD accepts passwords that later fail deployment. Check them with the script in 4.1.</td>
+<td>4.1</td>
+</tr>
+<tr>
+<td>3</td>
+<td>Don’t force TargetSolutionVersion. The ISO only accepts certain targets. Leave it out, register in an <strong>interactive</strong> session, and pick from the list.</td>
+<td>8</td>
+</tr>
+<tr>
+<td>4</td>
+<td>Your Az PowerShell needs the <strong>Az.Resources</strong> module, and the AD tool needs the <strong>ActiveDirectory</strong> and <strong>GroupPolicy</strong> modules. Run the AD step <strong>on the DC</strong>.</td>
+<td>2, 4.2</td>
+</tr>
+<tr>
+<td>5</td>
+<td>Give each deployment a <strong>uniquely named</strong> service principal. Several apps with the same name break every script that looks it up by name.</td>
+<td>3.3</td>
+</tr>
+<tr>
+<td>6</td>
+<td>Turn off <strong>RDMA</strong> on every intent with *Customize network settings*. A nested VM can’t do RDMA, and leaving it on also triggers the 10 Gbps bandwidth check.</td>
+<td>9.3</td>
+</tr>
+<tr>
+<td>7</td>
+<td>"Network Infra Connection — The parameter is incorrect" was a one-off timing failure. <strong>Run validation again</strong> before you change anything.</td>
+<td>9.5</td>
+</tr>
+<tr>
+<td>8</td>
+<td>The portal installs the Arc extensions when you add the machine. <strong>You don’t install them yourself.</strong></td>
+<td>9.2</td>
+</tr>
+<tr>
+<td>9</td>
+<td>Watch the <strong>host’s link speed</strong>. Ours negotiated 100 Mbps, which makes downloads and deployment very slow.</td>
+<td>1.1, 7.3</td>
+</tr>
+<tr>
+<td>10</td>
+<td>Never paste passwords or secrets into a chat, a ticket or a script. Use Get-Credential or Read-Host -AsSecureString.</td>
+<td>All</td>
+</tr>
+</tbody>
+</table></div>
+<h3 id="how-the-deployment-flows">How the deployment flows</h3>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th><strong>Phase</strong></th>
+<th><strong>What you do</strong></th>
+<th><strong>Where</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>0. Tools</td>
+<td>Az modules and AD tools</td>
+<td>Hyper-V host</td>
+</tr>
+<tr>
+<td>1. Azure</td>
+<td>Resource providers, resource group, service principal + roles</td>
+<td>Hyper-V host</td>
+</tr>
+<tr>
+<td>2. AD + time</td>
+<td>OU, deployment account, NTP, DNS sanity check</td>
+<td>DC (via PowerShell Direct)</td>
+</tr>
+<tr>
+<td>3. VM</td>
+<td>Create the node VM</td>
+<td>Hyper-V host</td>
+</tr>
+<tr>
+<td>4. OS</td>
+<td>Install from the ISO, local admin password</td>
+<td>VM console</td>
+</tr>
+<tr>
+<td>5. Network</td>
+<td>NIC names, static IP, time zone, NTP, rename, RDP</td>
+<td>Hyper-V host (PowerShell Direct)</td>
+</tr>
+<tr>
+<td>6. Arc</td>
+<td>Register with Arc; the node updates its OS</td>
+<td>Interactive session on the node</td>
+</tr>
+<tr>
+<td>7. Portal</td>
+<td>Extensions, validation, deployment</td>
+<td>Azure portal</td>
+</tr>
+<tr>
+<td>8. Fix-ups</td>
+<td>DNS fix if "Create the cluster" fails</td>
+<td>Hyper-V host</td>
+</tr>
+<tr>
+<td>9. After</td>
+<td>Update, clean up secrets</td>
+<td>Portal + host</td>
+</tr>
+</tbody>
+</table></div>
+</article>
+<p class="source"><a href="https://github.com/medyabi/Azure-Local-Lab-Deployment-Guide" rel="noopener">View the source on GitHub</a></p>
+<nav class="pager"><a href="01-prerequisites.html">1. Prerequisites ›</a></nav>
+</main>
+<aside class="aside-toc" aria-label="In this article"><p>In this article</p><ol><li><a href="#the-phases">The phases</a></li><li><a href="#before-you-start">Before you start</a></li></ol></aside>
+</div>
+<footer class="sitefoot">
+  <div class="foot-in">
+    <div><strong>Windows Server Labs</strong><p>Hands-on labs by Mohamed Dyabi, Microsoft Certified Trainer.</p></div>
+    <ul>
+      <li><a href="../hybrid/index.html">Hybrid track</a></li>
+      <li><a href="../security/index.html">Security track</a></li>
+      <li><a href="index.html">Azure Local track</a></li>
+      <li><a href="https://bookings.cloud.microsoft/book/WindowsServer2025Lab@ebigpictures.com/" rel="noopener">Book a lab slot</a></li>
+      <li><a href="https://access.ebigpictures.com/">Lab access (team sign-in)</a></li>
+      <li><a href="https://ai.ebigpictures.com/">AI Labs: Copilot Studio and Cowork</a></li>
+      <li><a href="https://github.com/medyabi/windows-server2025-Hybrid-lab" rel="noopener">Hybrid labs on GitHub</a></li>
+      <li><a href="https://github.com/medyabi/windows-server-security-lab" rel="noopener">Security labs on GitHub</a></li>
+      <li><a href="https://github.com/medyabi/Azure-Local-Lab-Deployment-Guide" rel="noopener">Azure Local guide on GitHub</a></li>
+    </ul>
+  </div>
+  <p class="fine">Lab environments only: several labs change security settings, lock accounts or force recovery. Never run them on production systems. An independent site, not affiliated with Microsoft. © 2026 Mohamed Dyabi</p>
+</footer>
+<script>
+(function(){
+  // Table of contents: open on wide screens, collapsible on small ones
+  var toc = document.querySelector('details.toc');
+  if (toc) {
+    var mq = window.matchMedia('(min-width: 1024px)');
+    var sync = function(){ if (mq.matches) toc.open = true; };
+    sync(); if (mq.addEventListener) mq.addEventListener('change', sync);
+    var cur = toc.querySelector('[aria-current="page"]');
+    if (cur && cur.scrollIntoView && mq.matches) cur.scrollIntoView({block: 'center'});
+  }
+  // Filter by title
+  var f = document.getElementById('toc-filter');
+  if (f) f.addEventListener('input', function(){
+    var q = f.value.trim().toLowerCase();
+    document.querySelectorAll('.toc-list li').forEach(function(li){
+      var hit = !q || li.textContent.toLowerCase().indexOf(q) !== -1;
+      li.hidden = !hit;
+    });
+  });
+  // Copy buttons on code blocks
+  document.querySelectorAll('.codeblock').forEach(function(cb){
+    var btn = cb.querySelector('.copy'), code = cb.querySelector('code');
+    if (!btn || !code) return;
+    btn.addEventListener('click', function(){
+      navigator.clipboard.writeText(code.innerText).then(function(){
+        btn.textContent = 'Copied'; setTimeout(function(){ btn.textContent = 'Copy'; }, 1500);
+      }, function(){ btn.textContent = 'Select and copy'; });
+    });
+  });
+  // Highlight the current section in "In this article"
+  var links = document.querySelectorAll('.aside-toc a');
+  if (links.length && 'IntersectionObserver' in window) {
+    var map = {}; links.forEach(function(a){ map[a.getAttribute('href').slice(1)] = a; });
+    var obs = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if (e.isIntersecting) {
+        links.forEach(function(a){ a.classList.remove('on'); });
+        var a = map[e.target.id]; if (a) a.classList.add('on');
+      }});
+    }, {rootMargin: '0px 0px -75% 0px'});
+    Object.keys(map).forEach(function(id){ var h = document.getElementById(id); if (h) obs.observe(h); });
+  }
+})();
+</script>
+</body>
+</html>

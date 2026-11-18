@@ -15,16 +15,16 @@
 <header class="masthead">
   <a class="brand" href="index.html"><img src="assets/favicon.svg" alt="" width="24" height="24"><span>Windows Server Labs</span></a>
   <span class="divider" aria-hidden="true"></span>
-  <nav class="mainnav" aria-label="Main"><a href="hybrid/index.html">Hybrid</a><a href="security/index.html">Security</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
+  <nav class="mainnav" aria-label="Main"><a href="hybrid/index.html">Hybrid</a><a href="security/index.html">Security</a><a href="azure-local/index.html">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
   <a class="gh" href="https://github.com/medyabi" rel="noopener">GitHub</a>
 </header>
 <main id="content" class="home">
 
 <section class="hero">
   <div class="wrap">
-    <p class="kicker">Windows Server 2025 · Azure Arc · Security</p>
+    <p class="kicker">Windows Server 2025 · Azure Arc · Security · Azure Local</p>
     <h1>Learn Windows Server by doing it</h1>
-    <p class="lede">Two hands-on tracks. In the first, you take an on-premises server and manage it from Azure. In the second, you watch an attack, build the control that stops it, and prove that it works.</p>
+    <p class="lede">Three hands-on tracks. Take an on-premises server and manage it from Azure. Watch an attack, build the control that stops it, and prove that it works. And deploy Azure Local in a nested lab, with every real-world error and its fix.</p>
     <p class="cta"><a class="btn primary" href="hybrid/index.html">Start the hybrid track</a><a class="btn" href="security/setup.html">Build the security lab</a></p>
   </div>
 </section>
@@ -45,6 +45,13 @@
     <p>Four VMs, one domain, and an attacker. Each lab shows the attack first, then builds the control that stops it: passwords and lockout, Credential Guard, App Control, Protected Users, RODC, delegation, Sentinel, IPsec and BitLocker.</p>
     <ol class="mini"><li><a href="security/01-securing-the-os/index.html">Securing the Windows Server operating system</a> <span class="count">6 labs</span></li><li><a href="security/02-hybrid-ad-accounts/index.html">Securing hybrid Active Directory accounts</a> <span class="count">5 labs</span></li><li><a href="security/03-least-privilege-and-delegation/index.html">Least privilege and delegation</a> <span class="count">4 labs</span></li><li><a href="security/04-watching-from-azure/index.html">Watching your servers from Azure</a> <span class="count">4 labs</span></li><li><a href="security/05-networking/index.html">Securing Windows Server networking</a> <span class="count">3 labs</span></li><li><a href="security/06-storage-encryption/index.html">Securing Windows Server storage</a> <span class="count">3 labs</span></li></ol>
     <p class="card-foot"><a href="security/setup.html">Build the lab and start ›</a></p>
+  </article>
+  <article class="card">
+    <div class="card-head"><span class="ico c-purple"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3h16v6H4zm0 8h16v6H4zm3-6v2h2V5zm0 8v2h2v-2zM9 19h6v2H9z" fill="currentColor"/></svg></span><div><p class="card-kicker">Deployment guide · 14 steps · field-tested</p>
+    <h3><a href="azure-local/index.html">Azure Local in a nested lab</a></h3></div></div>
+    <p>Deploy a single-node Azure Local instance inside a Hyper-V VM, from an empty host to a running cluster in the Azure portal. Every step comes from a real deployment, with every error we hit and the fix that worked built in.</p>
+    <ol class="mini"><li><a href="azure-local/01-prerequisites.html">Prerequisites</a></li><li><a href="azure-local/02-phase-0-tools-on-the-hyper-v-host.html">Phase 0 — Tools on the Hyper-V host</a></li><li><a href="azure-local/03-phase-1-azure-preparation.html">Phase 1 — Azure preparation</a></li><li><a href="azure-local/04-phase-2-active-directory-and-time-on-the-dc.html">Phase 2 — Active Directory and time (on the DC)</a></li><li><a href="azure-local/05-phase-3-create-the-node-vm.html">Phase 3 — Create the node VM</a></li><li><a href="azure-local/06-phase-4-install-the-os.html">Phase 4 — Install the OS</a></li><li><a href="azure-local/07-phase-5-network-time-zone-name-from-the-host.html">Phase 5 — Network, time zone, name (from the host)</a></li><li><a href="azure-local/08-phase-6-register-with-azure-arc.html">Phase 6 — Register with Azure Arc</a></li><li><a href="azure-local/09-phase-7-deploy-from-the-portal.html">Phase 7 — Deploy from the portal</a></li><li><a href="azure-local/10-fix-router-ipv6-dns-breaks-create-the-cluster.html">Fix: router IPv6 DNS breaks &quot;Create the cluster&quot;</a></li><li><a href="azure-local/11-after-deployment.html">After deployment</a></li><li><a href="azure-local/12-troubleshooting-every-error-we-hit.html">Troubleshooting — every error we hit</a></li><li><a href="azure-local/13-checklist.html">Checklist</a></li><li><a href="azure-local/99-appendix-changes-from-version-2-0.html">Appendix — Changes from version 2.0</a></li></ol>
+    <p class="card-foot"><a href="azure-local/index.html">Start the Azure Local guide ›</a></p>
   </article>
 </div>
 
@@ -91,11 +98,13 @@
     <ul>
       <li><a href="hybrid/index.html">Hybrid track</a></li>
       <li><a href="security/index.html">Security track</a></li>
+      <li><a href="azure-local/index.html">Azure Local track</a></li>
       <li><a href="https://bookings.cloud.microsoft/book/WindowsServer2025Lab@ebigpictures.com/" rel="noopener">Book a lab slot</a></li>
       <li><a href="https://access.ebigpictures.com/">Lab access (team sign-in)</a></li>
       <li><a href="https://ai.ebigpictures.com/">AI Labs: Copilot Studio and Cowork</a></li>
       <li><a href="https://github.com/medyabi/windows-server2025-Hybrid-lab" rel="noopener">Hybrid labs on GitHub</a></li>
       <li><a href="https://github.com/medyabi/windows-server-security-lab" rel="noopener">Security labs on GitHub</a></li>
+      <li><a href="https://github.com/medyabi/Azure-Local-Lab-Deployment-Guide" rel="noopener">Azure Local guide on GitHub</a></li>
     </ul>
   </div>
   <p class="fine">Lab environments only: several labs change security settings, lock accounts or force recovery. Never run them on production systems. An independent site, not affiliated with Microsoft. © 2026 Mohamed Dyabi</p>

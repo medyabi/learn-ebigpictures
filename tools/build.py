@@ -1,7 +1,7 @@
 #!/usr/bin/env python3
 """Builds learn.ebigpictures.com from the two lab repositories.
 
-Usage: python3 build.py <hybrid-repo> <security-repo> <output-dir>
+Usage: python3 build.py <hybrid-repo> <security-repo> <azure-local-repo> <output-dir>
 """
 import html
 import os
@@ -12,16 +12,58 @@ import sys
 
 import markdown
 
-HYB, SEC, OUT = (os.path.abspath(p) for p in sys.argv[1:4])
+HYB, SEC, AZL_SRC, OUT = (os.path.abspath(p) for p in sys.argv[1:5])
 GH = {
     "hyb": "https://github.com/medyabi/windows-server2025-Hybrid-lab/blob/main/",
+    "azl": "https://github.com/medyabi/Azure-Local-Lab-Deployment-Guide/blob/main/",
     "sec": "https://github.com/medyabi/windows-server-security-lab/blob/main/",
 }
 REPO_URL = {
     "hyb": "https://github.com/medyabi/windows-server2025-Hybrid-lab",
+    "azl": "https://github.com/medyabi/Azure-Local-Lab-Deployment-Guide",
     "sec": "https://github.com/medyabi/windows-server-security-lab",
 }
-ROOTS = {"hyb": HYB, "sec": SEC}
+# --------------------------------------------------------------------------
+# The Azure Local guide is one long README: split it into one page per phase
+# --------------------------------------------------------------------------
+import tempfile
+AZL = tempfile.mkdtemp(prefix="azl-")
+shutil.copytree(os.path.join(AZL_SRC, "docs"), os.path.join(AZL, "docs"))
+_readme = open(os.path.join(AZL_SRC, "README.md"), encoding="utf-8").read()
+_parts = re.split(r"(?m)^## ", _readme)
+_head, _secs = _parts[0], _parts[1:]
+_contents = {}
+for _line in re.findall(r"- \[(.+?)\]\(#([^)]+)\)", _readme):
+    _contents[_line[0].strip()] = _line[1]
+azl_files = []   # (file, title)
+_anchor_to_file = {}
+_overview_extra = ""
+for _sec in _secs:
+    _title, _, _body = _sec.partition("\n")
+    _title = _title.strip()
+    if _title == "Contents":
+        continue
+    if _title == "Before you start":
+        _overview_extra = "## Before you start\n" + _body
+        _anchor_to_file[_contents.get(_title, "")] = "00-overview.md"
+        continue
+    _m = re.match(r"(\d+)\.\s*(.*)", _title)
+    _fn = (f"{int(_m.group(1)):02d}-" if _m else "99-") + re.sub(r"[^a-z0-9]+", "-", (_m.group(2) if _m else _title).lower()).strip("-")[:50] + ".md"
+    _body = re.sub(r"(?m)^### ", "## ", re.sub(r"(?m)^#### ", "### ", _body))
+    open(os.path.join(AZL, _fn), "w", encoding="utf-8").write(f"# {_title}\n{_body}")
+    azl_files.append((_fn, _title))
+    _anchor_to_file[_contents.get(_title, "")] = _fn
+_head = re.sub(r"(?m)^# .*$", "# Azure Local in a nested lab", _head, count=1)
+_toc = "## The phases\n\n" + "\n".join(f"- [{t}]({f})" for f, t in azl_files) + "\n\n"
+open(os.path.join(AZL, "00-overview.md"), "w", encoding="utf-8").write(_head + _toc + _overview_extra)
+for _f in ["00-overview.md"] + [f for f, _ in azl_files]:
+    _p = os.path.join(AZL, _f)
+    _t = open(_p, encoding="utf-8").read()
+    _t = _t.replace("\\$", "$")
+    _t = re.sub(r"\]\(#([^)]+)\)", lambda m: "](" + _anchor_to_file.get(m.group(1), "#" + m.group(1)) + ")", _t)
+    open(_p, "w", encoding="utf-8").write(_t)
+
+ROOTS = {"hyb": HYB, "sec": SEC, "azl": AZL}
 
 # --------------------------------------------------------------------------
 # 1. Which source files become which pages
@@ -33,6 +75,9 @@ def add(repo, src, out):
     pages[(repo, src)] = out
 
 
+add("azl", "00-overview.md", "azure-local/index.html")
+for _f, _t in azl_files:
+    add("azl", _f, f"azure-local/{_f[:-3]}.html")
 add("hyb", "README.md", "hybrid/index.html")
 for f in sorted(os.listdir(os.path.join(HYB, "labs"))):
     if f.endswith(".md"):
@@ -75,6 +120,7 @@ for (repo, src), out in sorted(pages.items(), key=lambda kv: kv[1]):
     if repo == "hyb" and src.startswith("labs/") and "cleanup" not in src:
         hyb_nav.append((short(titles[(repo, src)]), out))
 hyb_nav.append(("Cleanup and reset", "hybrid/cleanup-and-reset.html"))
+azl_nav = [("Overview", "azure-local/index.html")] + [(t, f"azure-local/{f[:-3]}.html") for f, t in azl_files]
 
 sec_nav = [("Overview", "security/index.html"), ("Lab setup", "security/setup.html")]
 sec_groups = []
@@ -255,6 +301,7 @@ ICONS = {
     "hybrid": '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18a5 5 0 0 1-.6-9.96A6.5 6.5 0 0 1 18.8 9.1 4.5 4.5 0 0 1 18 18Z" fill="currentColor"/></svg>',
     "security": '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5Z" fill="currentColor"/></svg>',
     "ai": '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-8l-5 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm8 2.5c-.4 2.3-1.2 3.1-3.5 3.5 2.3.4 3.1 1.2 3.5 3.5.4-2.3 1.2-3.1 3.5-3.5-2.3-.4-3.1-1.2-3.5-3.5Z" fill="currentColor"/></svg>',
+    "azlocal": '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 3h16v6H4zm0 8h16v6H4zm3-6v2h2V5zm0 8v2h2v-2zM9 19h6v2H9z" fill="currentColor"/></svg>',
     "access": '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="12" rx="2" fill="currentColor"/><rect x="8" y="18" width="8" height="2" rx="1" fill="currentColor"/></svg>',
 }
 
@@ -267,6 +314,9 @@ def sidebar(track, out_rel):
     if track == "hybrid":
         name = "Hybrid management with Azure Arc"
         items = "".join(f"<li>{link(l, t)}</li>" for l, t in hyb_nav)
+    elif track == "azlocal":
+        name = "Azure Local in a nested lab"
+        items = "".join(f"<li>{link(l, t)}</li>" for l, t in azl_nav)
     else:
         name = "Securing Windows Server"
         parts = [f"<li>{link(l, t)}</li>" for l, t in sec_nav]
@@ -294,6 +344,8 @@ def crumbs(out_rel, title, track):
                 trail.append((re.sub(r"^Chapter (\d+):.*", r"Chapter \1", t), chap_out))
     elif track == "access":
         trail.append(("Lab access", "access/index.html"))
+    elif track == "azlocal":
+        trail.append(("Azure Local track", "azure-local/index.html"))
     trail = [(l, t) for l, t in trail if t != out_rel]
     items = "".join(f'<li><a href="{rel(out_rel, t)}">{html.escape(l)}</a></li>' for l, t in trail)
     return f'<nav class="crumbs" aria-label="Breadcrumb"><ol>{items}</ol></nav>'
@@ -329,19 +381,31 @@ def meta_line(body, kind):
     return f'<p class="meta"><span>{kind}</span><span>{mins} min read</span></p>'
 
 
+def azl_pager(out_rel):
+    seq = [t for _, t in azl_nav]
+    if out_rel not in seq:
+        return ""
+    i = seq.index(out_rel)
+    lab = dict((t, l) for l, t in azl_nav)
+    prev = f'<a href="{rel(out_rel, seq[i-1])}">‹ {html.escape(lab[seq[i-1]])}</a>' if i else ""
+    nxt = f'<a href="{rel(out_rel, seq[i+1])}">{html.escape(lab[seq[i+1]])} ›</a>' if i + 1 < len(seq) else ""
+    return f'<nav class="pager">{prev}{nxt}</nav>'
+
+
 def shell(out_rel, title, body, track=None, extra="", head="", kind="Article"):
     css = rel(out_rel, "assets/site.css")
     home = rel(out_rel, "index.html")
     nav = [("Hybrid", "hybrid/index.html", "hybrid"), ("Security", "security/index.html", "security"),
+           ("Azure Local", "azure-local/index.html", "azlocal"),
            ("Lab access", "https://access.ebigpictures.com/", "access"),
            ("AI Labs", "https://ai.ebigpictures.com/", "ai")]
     cur = ' aria-current="true"'
     nav_html = "".join(f'<a href="{t if t.startswith("http") else rel(out_rel, t)}"{cur if track == k else ""}>{l}</a>' for l, t, k in nav)
     full_title = f"{title} · Windows Server Labs" if title != "Windows Server Labs" else title
-    is_doc = track in ("hybrid", "security", "access")
+    is_doc = track in ("hybrid", "security", "access", "azlocal")
     if is_doc:
         body, aside = enhance(body)
-        side = sidebar(track, out_rel) if track in ("hybrid", "security") else ""
+        side = sidebar(track, out_rel) if track in ("hybrid", "security", "azlocal") else ""
         # metadata line right after the first h1
         dur = re.search(r"<h1[^>]*>.*?\s*\((\d+[^)]*min[^)]*)\)\s*</h1>", body)
         if dur:
@@ -350,7 +414,7 @@ def shell(out_rel, title, body, track=None, extra="", head="", kind="Article"):
         if dur:
             meta = meta.replace("</p>", f"<span>Lab time: {dur.group(1)}</span></p>")
         body = re.sub(r"(</h1>)", lambda m: m.group(1) + meta, body, count=1)
-        repo = REPO_URL["hyb" if track == "hybrid" else "sec"] if track in ("hybrid", "security") else None
+        repo = {"hybrid": REPO_URL["hyb"], "security": REPO_URL["sec"], "azlocal": REPO_URL["azl"]}.get(track)
         edit = f'<p class="source"><a href="{repo}" rel="noopener">View the source on GitHub</a></p>' if repo else ""
         layout = f"""<div class="doc {'has-toc' if side else 'no-toc'}">
 {side}
@@ -360,6 +424,7 @@ def shell(out_rel, title, body, track=None, extra="", head="", kind="Article"):
 {body}
 </article>
 {edit}
+{azl_pager(out_rel) if track == "azlocal" else ""}
 </main>
 {aside}
 </div>"""
@@ -393,11 +458,13 @@ def shell(out_rel, title, body, track=None, extra="", head="", kind="Article"):
     <ul>
       <li><a href="{rel(out_rel, 'hybrid/index.html')}">Hybrid track</a></li>
       <li><a href="{rel(out_rel, 'security/index.html')}">Security track</a></li>
+      <li><a href="{rel(out_rel, 'azure-local/index.html')}">Azure Local track</a></li>
       <li><a href="https://bookings.cloud.microsoft/book/WindowsServer2025Lab@ebigpictures.com/" rel="noopener">Book a lab slot</a></li>
       <li><a href="https://access.ebigpictures.com/">Lab access (team sign-in)</a></li>
       <li><a href="https://ai.ebigpictures.com/">AI Labs: Copilot Studio and Cowork</a></li>
       <li><a href="{REPO_URL['hyb']}" rel="noopener">Hybrid labs on GitHub</a></li>
       <li><a href="{REPO_URL['sec']}" rel="noopener">Security labs on GitHub</a></li>
+      <li><a href="{REPO_URL['azl']}" rel="noopener">Azure Local guide on GitHub</a></li>
     </ul>
   </div>
   <p class="fine">Lab environments only: several labs change security settings, lock accounts or force recovery. Never run them on production systems. An independent site, not affiliated with Microsoft. © 2026 Mohamed Dyabi</p>
@@ -424,9 +491,9 @@ def home_page():
     body = f"""
 <section class="hero">
   <div class="wrap">
-    <p class="kicker">Windows Server 2025 · Azure Arc · Security</p>
+    <p class="kicker">Windows Server 2025 · Azure Arc · Security · Azure Local</p>
     <h1>Learn Windows Server by doing it</h1>
-    <p class="lede">Two hands-on tracks. In the first, you take an on-premises server and manage it from Azure. In the second, you watch an attack, build the control that stops it, and prove that it works.</p>
+    <p class="lede">Three hands-on tracks. Take an on-premises server and manage it from Azure. Watch an attack, build the control that stops it, and prove that it works. And deploy Azure Local in a nested lab, with every real-world error and its fix.</p>
     <p class="cta"><a class="btn primary" href="hybrid/index.html">Start the hybrid track</a><a class="btn" href="security/setup.html">Build the security lab</a></p>
   </div>
 </section>
@@ -447,6 +514,13 @@ def home_page():
     <p>Four VMs, one domain, and an attacker. Each lab shows the attack first, then builds the control that stops it: passwords and lockout, Credential Guard, App Control, Protected Users, RODC, delegation, Sentinel, IPsec and BitLocker.</p>
     <ol class="mini">{sec_list}</ol>
     <p class="card-foot"><a href="security/setup.html">Build the lab and start ›</a></p>
+  </article>
+  <article class="card">
+    <div class="card-head"><span class="ico c-purple">{ICONS['azlocal']}</span><div><p class="card-kicker">Deployment guide · {len(azl_files)} steps · field-tested</p>
+    <h3><a href="azure-local/index.html">Azure Local in a nested lab</a></h3></div></div>
+    <p>Deploy a single-node Azure Local instance inside a Hyper-V VM, from an empty host to a running cluster in the Azure portal. Every step comes from a real deployment, with every error we hit and the fix that worked built in.</p>
+    <ol class="mini">{"".join(f'<li><a href="{t}">{html.escape(re.sub(r"^\d+\.\s*", "", l))}</a></li>' for l, t in azl_nav[1:])}</ol>
+    <p class="card-foot"><a href="azure-local/index.html">Start the Azure Local guide ›</a></p>
   </article>
 </div>
 
@@ -565,14 +639,14 @@ os.makedirs(OUT, exist_ok=True)
 
 for (repo, src), out in pages.items():
     body = render_md(repo, src, out)
-    track = "hybrid" if repo == "hyb" else "security"
+    track = {"hyb": "hybrid", "sec": "security", "azl": "azlocal"}[repo]
     extra = MERMAID if 'class="mermaid"' in body else ""
     if 'class="task"' in body:
         extra += CHECKLIST_JS
     dst = os.path.join(OUT, out)
     os.makedirs(os.path.dirname(dst), exist_ok=True)
     with open(dst, "w", encoding="utf-8") as fh:
-        kind = ("Lab" if ("/lab-" in src or (repo == "hyb" and src.startswith("labs/") and "cleanup" not in src))
+        kind = ("Guide" if repo == "azl" else "Lab" if ("/lab-" in src or (repo == "hyb" and src.startswith("labs/") and "cleanup" not in src))
                 else "Chapter" if src.endswith("README.md") and src.startswith("labs/") else "Article")
         fh.write(shell(out, titles[(repo, src)], body, track, extra, kind=kind))
 
