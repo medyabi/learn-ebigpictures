@@ -502,21 +502,21 @@ def home_page():
 <h2 class="section-title">Browse the tracks</h2>
 <div class="cards">
   <article class="card">
-    <div class="card-head"><span class="ico c-blue">{ICONS['hybrid']}</span><div><p class="card-kicker">Learning path · {n_hyb} labs · about 8 hours</p>
+    <div class="card-head"><span class="ico c-blue">{ICONS['hybrid']}</span><div><p class="card-kicker">Learning path · {n_hyb} labs</p>
     <h3><a href="hybrid/index.html">Hybrid management with Azure Arc</a></h3></div></div>
     <p>One Windows Server 2025 VM per person. Connect it to Azure Arc, unlock the Software Assurance benefits, and use Hotpatch, Azure Policy, Azure Monitor, Change Tracking, Defender for Cloud and Windows Admin Center in Azure. Every lab ends with customer talking points.</p>
     <ol class="mini">{hyb_list}</ol>
     <p class="card-foot"><a href="hybrid/index.html">Start the hybrid track ›</a></p>
   </article>
   <article class="card">
-    <div class="card-head"><span class="ico c-red">{ICONS['security']}</span><div><p class="card-kicker">Learning path · {n_sec} labs · attack, then defend</p>
+    <div class="card-head"><span class="ico c-red">{ICONS['security']}</span><div><p class="card-kicker">Learning path · {n_sec} labs</p>
     <h3><a href="security/index.html">Securing Windows Server</a></h3></div></div>
     <p>Four VMs, one domain, and an attacker. Each lab shows the attack first, then builds the control that stops it: passwords and lockout, Credential Guard, App Control, Protected Users, RODC, delegation, Sentinel, IPsec and BitLocker.</p>
     <ol class="mini">{sec_list}</ol>
     <p class="card-foot"><a href="security/setup.html">Build the lab and start ›</a></p>
   </article>
   <article class="card">
-    <div class="card-head"><span class="ico c-purple">{ICONS['azlocal']}</span><div><p class="card-kicker">Deployment guide · {len(azl_files)} steps · field-tested</p>
+    <div class="card-head"><span class="ico c-purple">{ICONS['azlocal']}</span><div><p class="card-kicker">Deployment guide · {len(azl_files)} steps</p>
     <h3><a href="azure-local/index.html">Azure Local in a nested lab</a></h3></div></div>
     <p>Deploy a single-node Azure Local instance inside a Hyper-V VM, from an empty host to a running cluster in the Azure portal. Every step comes from a real deployment, with every error we hit and the fix that worked built in.</p>
     <ol class="mini">{"".join(f'<li><a href="{t}">{html.escape(re.sub(r"^\d+\.\s*", "", l))}</a></li>' for l, t in azl_nav[1:])}</ol>
