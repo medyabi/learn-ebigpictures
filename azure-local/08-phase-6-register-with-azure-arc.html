@@ -15,7 +15,7 @@
 <header class="masthead">
   <a class="brand" href="../index.html"><img src="../assets/favicon.svg" alt="" width="24" height="24"><span>Windows Server Labs</span></a>
   <span class="divider" aria-hidden="true"></span>
-  <nav class="mainnav" aria-label="Main"><a href="../hybrid/index.html">Hybrid</a><a href="../security/index.html">Security</a><a href="index.html" aria-current="true">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
+  <nav class="mainnav" aria-label="Main"><a href="../foundations/index.html">Foundations</a><a href="../hybrid/index.html">Hybrid</a><a href="../security/index.html">Security</a><a href="index.html" aria-current="true">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
   <a class="gh" href="https://github.com/medyabi" rel="noopener">GitHub</a>
 </header>
 <div class="doc has-toc">
@@ -71,7 +71,7 @@ Enter-PSSession $s</code></pre></div>
 (Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion').UBR # 33296 = 2608
 &amp; "$env:ProgramFiles\AzureConnectedMachineAgent\azcmagent.exe" show | Select-String 'Agent Status|Resource Group|Location'
 Exit-PSSession</code></pre></div>
-<div class="alert note"><p class="alert-title">Note</p><p><strong>Important:</strong> Two traps from our lab: (1) Get-ArcZeroDaySolutionUpdateConfig asks for a ConfigFilePath and waits forever. Press Ctrl+C, you don’t need it. (2) While you’re inside [AZLNode1], Invoke-Command -VMName AZLNode1 fails with "does not resolve to a single virtual machine", because you’re already on the node. Run the commands directly, or Exit-PSSession first.</p></div>
+<div class="alert important"><p class="alert-title">Important</p><p><strong>Important:</strong> Two traps from our lab: (1) Get-ArcZeroDaySolutionUpdateConfig asks for a ConfigFilePath and waits forever. Press Ctrl+C, you don’t need it. (2) While you’re inside [AZLNode1], Invoke-Command -VMName AZLNode1 fails with "does not resolve to a single virtual machine", because you’re already on the node. Run the commands directly, or Exit-PSSession first.</p></div>
 </article>
 <p class="source"><a href="https://github.com/medyabi/Azure-Local-Lab-Deployment-Guide" rel="noopener">View the source on GitHub</a></p>
 <nav class="pager"><a href="07-phase-5-network-time-zone-name-from-the-host.html">‹ 7. Phase 5 — Network, time zone, name (from the host)</a><a href="09-phase-7-deploy-from-the-portal.html">9. Phase 7 — Deploy from the portal ›</a></nav>

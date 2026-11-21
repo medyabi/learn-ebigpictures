@@ -15,7 +15,7 @@
 <header class="masthead">
   <a class="brand" href="../index.html"><img src="../assets/favicon.svg" alt="" width="24" height="24"><span>Windows Server Labs</span></a>
   <span class="divider" aria-hidden="true"></span>
-  <nav class="mainnav" aria-label="Main"><a href="index.html" aria-current="true">Hybrid</a><a href="../security/index.html">Security</a><a href="../azure-local/index.html">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
+  <nav class="mainnav" aria-label="Main"><a href="../foundations/index.html">Foundations</a><a href="index.html" aria-current="true">Hybrid</a><a href="../security/index.html">Security</a><a href="../azure-local/index.html">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
   <a class="gh" href="https://github.com/medyabi" rel="noopener">GitHub</a>
 </header>
 <div class="doc has-toc">
@@ -23,7 +23,7 @@
 <main id="content" class="article">
 <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../index.html">Labs</a></li><li><a href="index.html">Hybrid track</a></li></ol></nav>
 <article class="prose">
-<h1 id="lab-5-azure-monitor-60-min">Lab 5: Azure Monitor</h1><p class="meta"><span>Lab</span><span>3 min read</span><span>Lab time: 60 min</span></p>
+<h1 id="lab-5-azure-monitor-60-min">Lab 5: Azure Monitor</h1><p class="meta"><span class="level l200">Level 200</span><span>Lab</span><span>3 min read</span><span>Lab time: 60 min</span></p>
 <nav class="pager"><a href="04-azure-policy-and-machine-configuration.html">← Lab 4</a> <a href="index.html">Overview</a> <a href="06-change-tracking-and-inventory.html">Lab 6 →</a></nav>
 <p>In this lab you see your server's performance and event logs in Azure, and you query them with KQL. That's the answer to "what replaces SCOM for our hybrid servers?"</p>
 <p><strong>How does it work?</strong> Three pieces work together:</p>
@@ -45,17 +45,19 @@
 </ol>
 <p><strong>Part B — Collect event logs and query them</strong></p>
 <ol start="6">
-<li>Search for <strong>Data collection rules</strong> &gt; <strong>Create</strong>:
-   - Name <code>dcr-events-&lt;yourname&gt;</code>, your resource group and region, platform <strong>Windows</strong>.
-   - <strong>Resources</strong>: add your Arc server.
-   - <strong>Collect and deliver</strong>: add a data source <strong>Windows Event Logs</strong>, select <strong>System</strong> and <strong>Application</strong> with levels <strong>Critical</strong>, <strong>Error</strong> and <strong>Warning</strong>. Destination: your workspace.</li>
-<li>On your VM, write a test error event:</li>
-</ol>
+<li>Search for <strong>Data collection rules</strong> &gt; <strong>Create</strong>:<ul>
+<li>Name <code>dcr-events-&lt;yourname&gt;</code>, your resource group and region, platform <strong>Windows</strong>.</li>
+<li><strong>Resources</strong>: add your Arc server.</li>
+<li><strong>Collect and deliver</strong>: add a data source <strong>Windows Event Logs</strong>, select <strong>System</strong> and <strong>Application</strong> with levels <strong>Critical</strong>, <strong>Error</strong> and <strong>Warning</strong>. Destination: your workspace.</li>
+</ul>
+</li>
+<li>
+<p>On your VM, write a test error event:</p>
 <div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>New-EventLog -LogName Application -Source PresalesLab -ErrorAction SilentlyContinue
 Write-EventLog -LogName Application -Source PresalesLab -EventId 999 -EntryType Error -Message "Presales lab test error"</code></pre></div>
-<ol start="8">
-<li>After about 10 minutes, open your workspace &gt; <strong>Logs</strong> and run:</li>
-</ol>
+</li>
+<li>
+<p>After about 10 minutes, open your workspace &gt; <strong>Logs</strong> and run:</p>
 <div class="codeblock"><div class="code-head"><span></span><button type="button" class="copy">Copy</button></div><pre><code>Heartbeat
 | where TimeGenerated &gt; ago(1h)
 | summarize LastSeen = max(TimeGenerated) by Computer
@@ -63,8 +65,10 @@ Write-EventLog -LogName Application -Source PresalesLab -EventId 999 -EntryType 
 Event
 | where Source == "PresalesLab"
 | project TimeGenerated, Computer, EventID, RenderedDescription</code></pre></div>
-<ol start="9">
-<li>From the second query, select <strong>New alert rule</strong>. Create an alert that fires when the count is greater than 0, with an action group that emails you. Write the test event again and wait for the mail.</li>
+</li>
+<li>
+<p>From the second query, select <strong>New alert rule</strong>. Create an alert that fires when the count is greater than 0, with an action group that emails you. Write the test event again and wait for the mail.</p>
+</li>
 </ol>
 <h3 id="check-yourself">Check yourself</h3>
 <ul>

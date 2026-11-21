@@ -15,7 +15,7 @@
 <header class="masthead">
   <a class="brand" href="../index.html"><img src="../assets/favicon.svg" alt="" width="24" height="24"><span>Windows Server Labs</span></a>
   <span class="divider" aria-hidden="true"></span>
-  <nav class="mainnav" aria-label="Main"><a href="../hybrid/index.html">Hybrid</a><a href="../security/index.html">Security</a><a href="index.html" aria-current="true">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
+  <nav class="mainnav" aria-label="Main"><a href="../foundations/index.html">Foundations</a><a href="../hybrid/index.html">Hybrid</a><a href="../security/index.html">Security</a><a href="index.html" aria-current="true">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
   <a class="gh" href="https://github.com/medyabi" rel="noopener">GitHub</a>
 </header>
 <div class="doc has-toc">
@@ -76,7 +76,7 @@ Set-ItemProperty 'HKLM:\System\CurrentControlSet\Control\Terminal Server' -Name 
 Enable-NetFirewallRule -DisplayGroup 'Remote Desktop'
 }
 Restart-VM -Name $NodeVM -Force</code></pre></div>
-<div class="alert note"><p class="alert-title">Note</p><p><strong>Important:</strong> Rename <strong>before</strong> Arc registration. The Arc resource takes the computer name, and the only clean way to change it afterwards is to reinstall.</p></div>
+<div class="alert important"><p class="alert-title">Important</p><p><strong>Important:</strong> Rename <strong>before</strong> Arc registration. The Arc resource takes the computer name, and the only clean way to change it afterwards is to reinstall.</p></div>
 </article>
 <p class="source"><a href="https://github.com/medyabi/Azure-Local-Lab-Deployment-Guide" rel="noopener">View the source on GitHub</a></p>
 <nav class="pager"><a href="06-phase-4-install-the-os.html">‹ 6. Phase 4 — Install the OS</a><a href="08-phase-6-register-with-azure-arc.html">8. Phase 6 — Register with Azure Arc ›</a></nav>

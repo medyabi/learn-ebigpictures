@@ -15,7 +15,7 @@
 <header class="masthead">
   <a class="brand" href="../../index.html"><img src="../../assets/favicon.svg" alt="" width="24" height="24"><span>Windows Server Labs</span></a>
   <span class="divider" aria-hidden="true"></span>
-  <nav class="mainnav" aria-label="Main"><a href="../../hybrid/index.html">Hybrid</a><a href="../index.html" aria-current="true">Security</a><a href="../../azure-local/index.html">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
+  <nav class="mainnav" aria-label="Main"><a href="../../foundations/index.html">Foundations</a><a href="../../hybrid/index.html">Hybrid</a><a href="../index.html" aria-current="true">Security</a><a href="../../azure-local/index.html">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
   <a class="gh" href="https://github.com/medyabi" rel="noopener">GitHub</a>
 </header>
 <div class="doc has-toc">
@@ -23,7 +23,7 @@
 <main id="content" class="article">
 <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../../index.html">Labs</a></li><li><a href="../index.html">Security track</a></li><li><a href="index.html">Chapter 2</a></li></ol></nav>
 <article class="prose">
-<h1 id="lab-23-the-protected-users-group">Lab 2.3: The Protected Users group</h1><p class="meta"><span>Lab</span><span>2 min read</span></p>
+<h1 id="lab-23-the-protected-users-group">Lab 2.3: The Protected Users group</h1><p class="meta"><span class="level l300">Level 300</span><span>Lab</span><span>2 min read</span></p>
 <nav class="pager"><a href="lab-2.2-entra-password-protection.html">← Lab 2.2</a> <a href="index.html">Chapter overview</a> <a href="lab-2.4-rodc.html">Lab 2.4 →</a></nav>
 <div class="table-wrap"><table>
 
@@ -70,11 +70,13 @@
 <p>There's no NTLM hash to use, and nothing is cached on SEA-SVR1. Even a stolen Kerberos ticket expires in 4 hours. The loot is worthless or short-lived.</p>
 <h2 id="step-by-step">🧪 Step by step</h2>
 <ol>
-<li>Add Adam and John to the group:</li>
-</ol>
+<li>
+<p>Add Adam and John to the group:</p>
 <div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>Add-ADGroupMember "Protected Users" -Members Adam, John</code></pre></div>
-<ol start="2">
-<li>Keep one <strong>break-glass</strong> admin account outside the group. If Kerberos ever has a problem, you still have a way in.</li>
+</li>
+<li>
+<p>Keep one <strong>break-glass</strong> admin account outside the group. If Kerberos ever has a problem, you still have a way in.</p>
+</li>
 <li>Have Adam sign out and sign back in. Group membership is only read at sign-in.</li>
 </ol>
 <p>Now sign in to SEA-SVR1 as Adam and look at the tickets:</p>

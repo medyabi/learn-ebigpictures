@@ -15,7 +15,7 @@
 <header class="masthead">
   <a class="brand" href="../index.html"><img src="../assets/favicon.svg" alt="" width="24" height="24"><span>Windows Server Labs</span></a>
   <span class="divider" aria-hidden="true"></span>
-  <nav class="mainnav" aria-label="Main"><a href="index.html" aria-current="true">Hybrid</a><a href="../security/index.html">Security</a><a href="../azure-local/index.html">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
+  <nav class="mainnav" aria-label="Main"><a href="../foundations/index.html">Foundations</a><a href="index.html" aria-current="true">Hybrid</a><a href="../security/index.html">Security</a><a href="../azure-local/index.html">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
   <a class="gh" href="https://github.com/medyabi" rel="noopener">GitHub</a>
 </header>
 <div class="doc has-toc">
@@ -23,7 +23,7 @@
 <main id="content" class="article">
 <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../index.html">Labs</a></li><li><a href="index.html">Hybrid track</a></li></ol></nav>
 <article class="prose">
-<h1 id="lab-6-change-tracking-and-inventory-45-min">Lab 6: Change Tracking and Inventory</h1><p class="meta"><span>Lab</span><span>2 min read</span><span>Lab time: 45 min</span></p>
+<h1 id="lab-6-change-tracking-and-inventory-45-min">Lab 6: Change Tracking and Inventory</h1><p class="meta"><span class="level l200">Level 200</span><span>Lab</span><span>2 min read</span><span>Lab time: 45 min</span></p>
 <nav class="pager"><a href="05-azure-monitor.html">← Lab 5</a> <a href="index.html">Overview</a> <a href="07-microsoft-defender-for-cloud.html">Lab 7 →</a></nav>
 <p>In this lab you get a live inventory of your server — software, services, files, registry — and you catch a change someone made. It answers the classic incident question: "what changed on this server last night?"</p>
 <p><strong>What is it?</strong> Change Tracking and Inventory keeps a record of what's installed and running on each server, and logs <strong>every change</strong> with a timestamp. Think of it as a CCTV camera on the server's configuration. It uses the Azure Monitor Agent from Lab 5 and sends data to a Log Analytics workspace.</p>
@@ -33,26 +33,32 @@
 <li>Open your machine in <strong>Azure Arc</strong> &gt; <strong>Operations</strong> &gt; <strong>Change tracking</strong>.</li>
 <li>Select <strong>Enable change tracking and inventory feature with AMA</strong> &gt; <strong>Enable</strong>. The portal installs the <strong>ChangeTracking-Windows</strong> extension and creates a DCR named <code>ct-dcr-…</code>. Wait a few minutes for the deployment notification.</li>
 <li>Open <strong>Operations</strong> &gt; <strong>Inventory</strong> &gt; <strong>Software</strong>. Find <strong>Windows Admin Center</strong> — you installed it in Lab 1. Look at <strong>Services</strong> too.</li>
-<li>Make some changes on your VM, as an admin "doing something at night":</li>
-</ol>
+<li>
+<p>Make some changes on your VM, as an admin "doing something at night":</p>
 <div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>Stop-Service -Name Spooler
 Set-Service  -Name Spooler -StartupType Disabled
 Install-WindowsFeature -Name Telnet-Client</code></pre></div>
-<ol start="5">
-<li>Wait. Changes can take <strong>up to 30 minutes</strong> to appear. Use the time to check Lab 4 compliance.</li>
+</li>
+<li>
+<p>Wait. Changes can take <strong>up to 30 minutes</strong> to appear. Use the time to check Lab 4 compliance.</p>
+</li>
 <li>Back in <strong>Change tracking</strong>, look at the <strong>Changes</strong> list. Filter on <strong>Services</strong>: you see the Print Spooler state and startup type change, with the time.</li>
-<li>Query the same data in your workspace &gt; <strong>Logs</strong>:</li>
-</ol>
+<li>
+<p>Query the same data in your workspace &gt; <strong>Logs</strong>:</p>
 <div class="codeblock"><div class="code-head"><span></span><button type="button" class="copy">Copy</button></div><pre><code>ConfigurationChange
 | where TimeGenerated &gt; ago(2h)
 | project TimeGenerated, Computer, ConfigChangeType, SvcName, SoftwareName, SvcState, SvcStartupType
 | order by TimeGenerated desc</code></pre></div>
-<ol start="8">
-<li>Optional: in <strong>Change tracking</strong> &gt; <strong>Settings</strong>, add a file path to watch, for example <code>C:\LabConfig\*.ini</code>, then create and edit a file there.</li>
-<li>Put things back:</li>
-</ol>
+</li>
+<li>
+<p>Optional: in <strong>Change tracking</strong> &gt; <strong>Settings</strong>, add a file path to watch, for example <code>C:\LabConfig\*.ini</code>, then create and edit a file there.</p>
+</li>
+<li>
+<p>Put things back:</p>
 <div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>Set-Service -Name Spooler -StartupType Automatic
 Start-Service -Name Spooler</code></pre></div>
+</li>
+</ol>
 <h3 id="check-yourself">Check yourself</h3>
 <ul>
 <li>Where does Change Tracking get its data path from? (The Azure Monitor Agent and a Change Tracking DCR.)</li>

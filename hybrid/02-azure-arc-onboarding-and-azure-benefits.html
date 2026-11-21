@@ -15,7 +15,7 @@
 <header class="masthead">
   <a class="brand" href="../index.html"><img src="../assets/favicon.svg" alt="" width="24" height="24"><span>Windows Server Labs</span></a>
   <span class="divider" aria-hidden="true"></span>
-  <nav class="mainnav" aria-label="Main"><a href="index.html" aria-current="true">Hybrid</a><a href="../security/index.html">Security</a><a href="../azure-local/index.html">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
+  <nav class="mainnav" aria-label="Main"><a href="../foundations/index.html">Foundations</a><a href="index.html" aria-current="true">Hybrid</a><a href="../security/index.html">Security</a><a href="../azure-local/index.html">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
   <a class="gh" href="https://github.com/medyabi" rel="noopener">GitHub</a>
 </header>
 <div class="doc has-toc">
@@ -23,7 +23,7 @@
 <main id="content" class="article">
 <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../index.html">Labs</a></li><li><a href="index.html">Hybrid track</a></li></ol></nav>
 <article class="prose">
-<h1 id="lab-2-azure-arc-onboarding-and-azure-benefits-75-min">Lab 2: Azure Arc onboarding and Azure benefits</h1><p class="meta"><span>Lab</span><span>4 min read</span><span>Lab time: 75 min</span></p>
+<h1 id="lab-2-azure-arc-onboarding-and-azure-benefits-75-min">Lab 2: Azure Arc onboarding and Azure benefits</h1><p class="meta"><span class="level l200">Level 200</span><span>Lab</span><span>4 min read</span><span>Lab time: 75 min</span></p>
 <nav class="pager"><a href="01-windows-admin-center.html">← Lab 1</a> <a href="index.html">Overview</a> <a href="03-hotpatching-with-azure-arc.html">Lab 3 →</a></nav>
 <p>In this lab your on-premises VM shows up in the Azure portal, next to cloud VMs, and you manage its updates from there. That's the core of every hybrid conversation.</p>
 <p><strong>What is Azure Arc?</strong> Azure Arc projects a server that runs <strong>outside Azure</strong> into Azure as a resource. A small agent, the <strong>Azure Connected Machine agent</strong>, runs on the server and talks to Azure over HTTPS (port 443). Think of it as giving your server an Azure passport: it stays at home, but Azure now knows it, can tag it, apply policy to it and update it.</p>
@@ -32,12 +32,14 @@
 <ol>
 <li>Sign in to the <a href="https://portal.azure.com" rel="noopener">Azure portal</a> and create a resource group named <code>rg-presales-&lt;yourname&gt;</code>.</li>
 <li>Search for <strong>Azure Arc</strong> &gt; <strong>Machines</strong> &gt; <strong>Onboard/Create</strong> &gt; <strong>Onboard existing machines</strong>.</li>
-<li>On <strong>Basics</strong>:
-   - Pick your subscription and <code>rg-presales-&lt;yourname&gt;</code>.
-   - <strong>Region</strong>: France Central. It supports Windows Admin Center in Azure (Lab 8).
-   - <strong>Operating system</strong>: Windows.
-   - <strong>Connectivity method</strong>: Public endpoint.
-   - <strong>Authentication method</strong>: Authenticate machines manually.</li>
+<li>On <strong>Basics</strong>:<ul>
+<li>Pick your subscription and <code>rg-presales-&lt;yourname&gt;</code>.</li>
+<li><strong>Region</strong>: France Central. It supports Windows Admin Center in Azure (Lab 8).</li>
+<li><strong>Operating system</strong>: Windows.</li>
+<li><strong>Connectivity method</strong>: Public endpoint.</li>
+<li><strong>Authentication method</strong>: Authenticate machines manually.</li>
+</ul>
+</li>
 <li>On <strong>Tags</strong>, add <code>Owner = &lt;yourname&gt;</code> and <code>Purpose = presales-lab</code>.</li>
 <li>On <strong>Download and run script</strong>, select <strong>Register</strong> if the resource providers aren't registered yet, then <strong>Download</strong> the script.</li>
 </ol>
@@ -45,10 +47,12 @@
 <ol start="6">
 <li>Copy the script to your VM (RDP clipboard works for text) and run it in <strong>PowerShell as administrator</strong>.</li>
 <li>When prompted, sign in with your Azure account. The script installs the agent and connects the server.</li>
-<li>Check the connection from the VM:</li>
-</ol>
+<li>
+<p>Check the connection from the VM:</p>
 <div class="codeblock"><div class="code-head"><span></span><button type="button" class="copy">Copy</button></div><pre><code>azcmagent show</code></pre></div>
 <p><strong>Agent Status</strong> should be <strong>Connected</strong>. You also see the resource name, resource group and region.</p>
+</li>
+</ol>
 <p><strong>Part C — Manage it from Azure</strong></p>
 <ol start="9">
 <li>In the portal, open <strong>Azure Arc &gt; Machines</strong> and select your server. Look at <strong>Overview</strong> and <strong>Properties</strong>: OS version, cores, memory, IP addresses — an inventory with no extra tool.</li>

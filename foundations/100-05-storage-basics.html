@@ -1,0 +1,176 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab 100-5: Storage basics (30 min) · Windows Server Labs</title>
+<meta name="description" content="Hands-on Windows Server 2025 labs: hybrid management with Azure Arc, and Windows Server security.">
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+</head>
+<body class="t-foundations">
+<a class="skip" href="#content">Skip to main content</a>
+<header class="masthead">
+  <a class="brand" href="../index.html"><img src="../assets/favicon.svg" alt="" width="24" height="24"><span>Windows Server Labs</span></a>
+  <span class="divider" aria-hidden="true"></span>
+  <nav class="mainnav" aria-label="Main"><a href="index.html" aria-current="true">Foundations</a><a href="../hybrid/index.html">Hybrid</a><a href="../security/index.html">Security</a><a href="../azure-local/index.html">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
+  <a class="gh" href="https://github.com/medyabi" rel="noopener">GitHub</a>
+</header>
+<div class="doc has-toc">
+<details class="toc"><summary>Table of contents</summary><nav aria-label="Level 100: Foundations"><p class="toc-title">Level 100: Foundations</p><input id="toc-filter" class="toc-filter" type="search" placeholder="Filter by title" aria-label="Filter by title"><ol class="toc-list"><li><a href="index.html">Overview</a></li><li><a href="100-01-meet-windows-server-2025.html">Lab 100-1: Meet Windows Server 2025</a></li><li><a href="100-02-editions-and-licensing.html">Lab 100-2: Editions and licensing</a></li><li><a href="100-03-roles-and-features.html">Lab 100-3: Roles and features</a></li><li><a href="100-04-manage-and-monitor.html">Lab 100-4: Manage and monitor your server</a></li><li><a href="100-05-storage-basics.html" aria-current="page">Lab 100-5: Storage basics</a></li></ol></nav></details>
+<main id="content" class="article">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../index.html">Labs</a></li><li><a href="index.html">Foundations</a></li></ol></nav>
+<article class="prose">
+<h1 id="lab-100-5-storage-basics-30-min">Lab 100-5: Storage basics</h1><p class="meta"><span class="level l100">Level 100</span><span>Lab</span><span>4 min read</span><span>Lab time: 30 min</span></p>
+<nav class="pager"><a href="100-04-manage-and-monitor.html">← Lab 100-4</a> <a href="index.html">Overview</a> <a href="../hybrid/index.html">Level 200: Hybrid labs →</a></nav>
+<p>In this lab you add disks to your server, format them with the two Windows file systems, and share data over the network. Storage is behind almost every customer project: file servers, VMs, backups, databases.</p>
+<p><strong>NTFS or ReFS?</strong> <strong>NTFS</strong> is the classic file system: it boots Windows and works everywhere. <strong>ReFS</strong> (Resilient File System) is built for large volumes and virtualization: it checks its own data for corruption and makes some operations, like copying big VM files, much faster. Think of NTFS as a reliable family car and ReFS as a truck built for heavy loads: you don't drive a truck to the shop, and you don't move a house with a family car.</p>
+<p>Your VM has only one disk, so you create <strong>virtual disks</strong> (VHDX files) inside it. They behave like real disks.</p>
+<h3 id="steps">Steps</h3>
+<ol>
+<li>
+<p>Open <strong>PowerShell as administrator</strong> and look at the disks and volumes you have now:</p>
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>Get-Disk | Select-Object Number, FriendlyName, BusType, PartitionStyle, @{ Name = "SizeGB"; Expression = { $_.Size / 1GB } }
+Get-Volume | Where-Object DriveLetter | Select-Object DriveLetter, FileSystem, FileSystemLabel, @{ Name = "SizeGB"; Expression = { [math]::Round($_.Size / 1GB, 1) } }</code></pre></div>
+</li>
+<li>
+<p>Create two 10 GB virtual disks and attach them. Windows uses <strong>diskpart</strong> for this:</p>
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>New-Item -Path C:\Lab -ItemType Directory -Force | Out-Null
+@"
+create vdisk file="C:\Lab\data1.vhdx" maximum=10240 type=expandable
+attach vdisk
+create vdisk file="C:\Lab\data2.vhdx" maximum=10240 type=expandable
+attach vdisk
+"@ | Set-Content C:\Lab\vdisks.txt
+diskpart /s C:\Lab\vdisks.txt</code></pre></div>
+<p><strong>Expandable</strong> means the file starts small and grows as you write data, like a dynamic disk in Hyper-V.</p>
+</li>
+<li>
+<p>The two new disks appear as <strong>RAW</strong> (empty). Initialize them, then format the first one <strong>NTFS</strong> and the second one <strong>ReFS</strong>:</p>
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>$new = Get-Disk | Where-Object PartitionStyle -eq 'RAW' | Sort-Object Number
+$new | Initialize-Disk -PartitionStyle GPT
+
+New-Partition -DiskNumber $new[0].Number -UseMaximumSize -DriveLetter N |
+  Format-Volume -FileSystem NTFS -NewFileSystemLabel "Data-NTFS" -Confirm:$false
+New-Partition -DiskNumber $new[1].Number -UseMaximumSize -DriveLetter R |
+  Format-Volume -FileSystem ReFS -NewFileSystemLabel "Data-ReFS" -Confirm:$false</code></pre></div>
+</li>
+<li>
+<p>Compare the two volumes:</p>
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>Get-Volume -DriveLetter N, R | Select-Object DriveLetter, FileSystem, FileSystemLabel, HealthStatus, SizeRemaining</code></pre></div>
+<p>Open <strong>File Explorer</strong> &gt; <strong>This PC</strong>: you now have <strong>N:</strong> and <strong>R:</strong>. Right-click each &gt; <strong>Properties</strong> and compare the file system.</p>
+</li>
+<li>
+<p>See ReFS speed for yourself. Create a 2 GB file on each volume, then copy it on the same volume and time the copy:</p>
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>fsutil file createnew N:\big.bin 2147483648
+fsutil file createnew R:\big.bin 2147483648
+Measure-Command { Copy-Item N:\big.bin N:\copy.bin } | Select-Object TotalSeconds
+Measure-Command { Copy-Item R:\big.bin R:\copy.bin } | Select-Object TotalSeconds</code></pre></div>
+<p>On ReFS, Windows Server 2025 uses <strong>block cloning</strong>: the copy only adds a pointer to the same data, so it's almost instant. This is why Hyper-V and backup products like ReFS.</p>
+</li>
+<li>
+<p>Share a folder on the ReFS volume, and look at the SMB security settings of your server:</p>
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>New-Item -Path R:\Projects -ItemType Directory | Out-Null
+New-SmbShare -Name Projects -Path R:\Projects -FullAccess Administrators -EncryptData $true
+Get-SmbShare -Name Projects | Select-Object Name, Path, EncryptData
+Get-SmbServerConfiguration | Select-Object EnableSMB1Protocol, RequireSecuritySignature, EncryptData</code></pre></div>
+<p><strong>EncryptData</strong> on the share encrypts the traffic for that share. SMB1, the old and insecure version, is <strong>off</strong>.</p>
+</li>
+<li>
+<p>Clean up (optional; your VM is reset after the slot anyway):</p>
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>Remove-SmbShare -Name Projects -Force
+@"
+select vdisk file="C:\Lab\data1.vhdx"
+detach vdisk
+select vdisk file="C:\Lab\data2.vhdx"
+detach vdisk
+"@ | Set-Content C:\Lab\detach.txt
+diskpart /s C:\Lab\detach.txt</code></pre></div>
+</li>
+</ol>
+<h3 id="check-yourself">Check yourself</h3>
+<ul>
+<li>Which file system boots Windows? (NTFS. ReFS is for data volumes.)</li>
+<li>Why is a copy on ReFS so fast? (Block cloning: the new file points to the same blocks until one of them changes.)</li>
+<li>What does <code>-EncryptData $true</code> on a share protect? (The data while it travels on the network.)</li>
+</ul>
+<h3 id="customer-talking-points">Customer talking points</h3>
+<ul>
+<li><strong>ReFS</strong> for VM storage, backup repositories and large data volumes: built-in integrity checks and very fast VM operations. <strong>NTFS</strong> for the system drive and general use.</li>
+<li><strong>SMB 3 encryption</strong> protects file traffic with one setting, and Windows Server 2025 keeps old, insecure SMB1 off.</li>
+<li>The next step up is <strong>Storage Spaces Direct</strong> on Datacenter: pool the disks of several servers into one resilient storage system. That's Level 400.</li>
+</ul>
+<hr />
+<nav class="pager"><a href="100-04-manage-and-monitor.html">← Lab 100-4</a> <a href="index.html">Overview</a> <a href="../hybrid/index.html">Level 200: Hybrid labs →</a></nav>
+<p>You've finished Level 100. Next, connect your server to Azure: <strong>Level 200, Lab 1: <a href="../hybrid/01-windows-admin-center.html">Windows Admin Center</a></strong>.</p>
+</article>
+<p class="source"><a href="https://github.com/medyabi/windows-server2025-Hybrid-lab" rel="noopener">View the source on GitHub</a></p>
+
+</main>
+<aside class="aside-toc" aria-label="In this article"><p>In this article</p><ol><li><a href="#steps">Steps</a></li><li><a href="#check-yourself">Check yourself</a></li><li><a href="#customer-talking-points">Customer talking points</a></li></ol></aside>
+</div>
+<footer class="sitefoot">
+  <div class="foot-in">
+    <div><strong>Windows Server Labs</strong><p>Hands-on labs by Mohamed Dyabi, Microsoft Certified Trainer.</p></div>
+    <ul>
+      <li><a href="../hybrid/index.html">Hybrid track</a></li>
+      <li><a href="../security/index.html">Security track</a></li>
+      <li><a href="../azure-local/index.html">Azure Local track</a></li>
+      <li><a href="https://bookings.cloud.microsoft/book/WindowsServer2025Lab@ebigpictures.com/" rel="noopener">Book a lab slot</a></li>
+      <li><a href="https://access.ebigpictures.com/">Lab access (team sign-in)</a></li>
+      <li><a href="https://ai.ebigpictures.com/">AI Labs: Copilot Studio and Cowork</a></li>
+      <li><a href="https://github.com/medyabi/windows-server2025-Hybrid-lab" rel="noopener">Hybrid labs on GitHub</a></li>
+      <li><a href="https://github.com/medyabi/windows-server-security-lab" rel="noopener">Security labs on GitHub</a></li>
+      <li><a href="https://github.com/medyabi/Azure-Local-Lab-Deployment-Guide" rel="noopener">Azure Local guide on GitHub</a></li>
+    </ul>
+  </div>
+  <p class="fine">Lab environments only: several labs change security settings, lock accounts or force recovery. Never run them on production systems. An independent site, not affiliated with Microsoft. © 2026 Mohamed Dyabi</p>
+</footer>
+<script>
+(function(){
+  // Table of contents: open on wide screens, collapsible on small ones
+  var toc = document.querySelector('details.toc');
+  if (toc) {
+    var mq = window.matchMedia('(min-width: 1024px)');
+    var sync = function(){ if (mq.matches) toc.open = true; };
+    sync(); if (mq.addEventListener) mq.addEventListener('change', sync);
+    var cur = toc.querySelector('[aria-current="page"]');
+    if (cur && cur.scrollIntoView && mq.matches) cur.scrollIntoView({block: 'center'});
+  }
+  // Filter by title
+  var f = document.getElementById('toc-filter');
+  if (f) f.addEventListener('input', function(){
+    var q = f.value.trim().toLowerCase();
+    document.querySelectorAll('.toc-list li').forEach(function(li){
+      var hit = !q || li.textContent.toLowerCase().indexOf(q) !== -1;
+      li.hidden = !hit;
+    });
+  });
+  // Copy buttons on code blocks
+  document.querySelectorAll('.codeblock').forEach(function(cb){
+    var btn = cb.querySelector('.copy'), code = cb.querySelector('code');
+    if (!btn || !code) return;
+    btn.addEventListener('click', function(){
+      navigator.clipboard.writeText(code.innerText).then(function(){
+        btn.textContent = 'Copied'; setTimeout(function(){ btn.textContent = 'Copy'; }, 1500);
+      }, function(){ btn.textContent = 'Select and copy'; });
+    });
+  });
+  // Highlight the current section in "In this article"
+  var links = document.querySelectorAll('.aside-toc a');
+  if (links.length && 'IntersectionObserver' in window) {
+    var map = {}; links.forEach(function(a){ map[a.getAttribute('href').slice(1)] = a; });
+    var obs = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if (e.isIntersecting) {
+        links.forEach(function(a){ a.classList.remove('on'); });
+        var a = map[e.target.id]; if (a) a.classList.add('on');
+      }});
+    }, {rootMargin: '0px 0px -75% 0px'});
+    Object.keys(map).forEach(function(id){ var h = document.getElementById(id); if (h) obs.observe(h); });
+  }
+})();
+</script>
+</body>
+</html>

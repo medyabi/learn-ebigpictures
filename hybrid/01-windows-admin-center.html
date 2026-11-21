@@ -15,7 +15,7 @@
 <header class="masthead">
   <a class="brand" href="../index.html"><img src="../assets/favicon.svg" alt="" width="24" height="24"><span>Windows Server Labs</span></a>
   <span class="divider" aria-hidden="true"></span>
-  <nav class="mainnav" aria-label="Main"><a href="index.html" aria-current="true">Hybrid</a><a href="../security/index.html">Security</a><a href="../azure-local/index.html">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
+  <nav class="mainnav" aria-label="Main"><a href="../foundations/index.html">Foundations</a><a href="index.html" aria-current="true">Hybrid</a><a href="../security/index.html">Security</a><a href="../azure-local/index.html">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
   <a class="gh" href="https://github.com/medyabi" rel="noopener">GitHub</a>
 </header>
 <div class="doc has-toc">
@@ -23,31 +23,39 @@
 <main id="content" class="article">
 <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../index.html">Labs</a></li><li><a href="index.html">Hybrid track</a></li></ol></nav>
 <article class="prose">
-<h1 id="lab-1-windows-admin-center-45-min">Lab 1: Windows Admin Center</h1><p class="meta"><span>Lab</span><span>2 min read</span><span>Lab time: 45 min</span></p>
+<h1 id="lab-1-windows-admin-center-45-min">Lab 1: Windows Admin Center</h1><p class="meta"><span class="level l200">Level 200</span><span>Lab</span><span>2 min read</span><span>Lab time: 45 min</span></p>
 <nav class="pager"><a href="index.html">← Overview</a> <a href="index.html">Overview</a> <a href="02-azure-arc-onboarding-and-azure-benefits.html">Lab 2 →</a></nav>
 <p>By the end of this lab you manage your server from a web browser, with no MMC consoles and no RDP. That's the demo customers remember.</p>
 <p><strong>What is Windows Admin Center (WAC)?</strong> It's a free, browser-based management tool for Windows Server. You install a small <strong>gateway</strong> on one machine, and from there you manage servers, clusters and PCs over the network. Think of it as Server Manager, Event Viewer, Device Manager and PowerShell, all in one browser tab. On Windows Server it listens on port <strong>443</strong>.</p>
 <h3 id="steps">Steps</h3>
 <ol>
 <li>RDP to your VM and open <strong>PowerShell as administrator</strong>.</li>
-<li>Download the installer:</li>
-</ol>
+<li>
+<p>Download the installer:</p>
 <div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>Start-BitsTransfer -Source "https://aka.ms/WACdownload" -Destination ".\WindowsAdminCenter.exe"</code></pre></div>
-<ol start="3">
-<li>Run <code>.\WindowsAdminCenter.exe</code> and follow the wizard:
-   - Accept the licence terms.
-   - Choose <strong>Express setup</strong>.
-   - On <strong>Select TLS certificate</strong>, choose <strong>Generate a self-signed certificate</strong>. It's fine for a lab and expires after 60 days. In production, the customer uses a certificate from their own CA.
-   - Keep <strong>automatic updates</strong> on, then <strong>Install</strong>.</li>
+</li>
+<li>
+<p>Run <code>.\WindowsAdminCenter.exe</code> and follow the wizard:</p>
+<ul>
+<li>Accept the licence terms.</li>
+<li>Choose <strong>Express setup</strong>.</li>
+<li>On <strong>Select TLS certificate</strong>, choose <strong>Generate a self-signed certificate</strong>. It's fine for a lab and expires after 60 days. In production, the customer uses a certificate from their own CA.</li>
+<li>Keep <strong>automatic updates</strong> on, then <strong>Install</strong>.</li>
+</ul>
+</li>
 <li>Tick <strong>Start Windows Admin Center</strong> and select <strong>Finish</strong>. Sign in with your local <strong>Administrator</strong> account.</li>
-<li>Your server appears under <strong>All connections</strong>. Click it and take the tour:
-   - <strong>Overview</strong>: CPU, memory, disk and network in real time.
-   - <strong>Events</strong>, <strong>Services</strong>, <strong>Processes</strong>: what you would normally do in three different consoles.
-   - <strong>PowerShell</strong>: a remote PowerShell session in the browser.</li>
-<li>Make a real change from WAC:
-   - <strong>Roles &amp; features</strong> &gt; install <strong>Windows Server Backup</strong>.
-   - <strong>Firewall</strong> &gt; create an inbound rule allowing <strong>TCP 8080</strong>.
-   - <strong>Updates</strong> &gt; check for updates. Don't install them yet — we need this VM for Lab 3.</li>
+<li>Your server appears under <strong>All connections</strong>. Click it and take the tour:<ul>
+<li><strong>Overview</strong>: CPU, memory, disk and network in real time.</li>
+<li><strong>Events</strong>, <strong>Services</strong>, <strong>Processes</strong>: what you would normally do in three different consoles.</li>
+<li><strong>PowerShell</strong>: a remote PowerShell session in the browser.</li>
+</ul>
+</li>
+<li>Make a real change from WAC:<ul>
+<li><strong>Roles &amp; features</strong> &gt; install <strong>Windows Server Backup</strong>.</li>
+<li><strong>Firewall</strong> &gt; create an inbound rule allowing <strong>TCP 8080</strong>.</li>
+<li><strong>Updates</strong> &gt; check for updates. Don't install them yet — we need this VM for Lab 3.</li>
+</ul>
+</li>
 <li>Open <strong>Azure hybrid center</strong> and look at the services offered. You'll use Azure Arc in Lab 2.</li>
 </ol>
 <h3 id="check-yourself">Check yourself</h3>

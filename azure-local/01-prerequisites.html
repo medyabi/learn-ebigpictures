@@ -15,7 +15,7 @@
 <header class="masthead">
   <a class="brand" href="../index.html"><img src="../assets/favicon.svg" alt="" width="24" height="24"><span>Windows Server Labs</span></a>
   <span class="divider" aria-hidden="true"></span>
-  <nav class="mainnav" aria-label="Main"><a href="../hybrid/index.html">Hybrid</a><a href="../security/index.html">Security</a><a href="index.html" aria-current="true">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
+  <nav class="mainnav" aria-label="Main"><a href="../foundations/index.html">Foundations</a><a href="../hybrid/index.html">Hybrid</a><a href="../security/index.html">Security</a><a href="index.html" aria-current="true">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
   <a class="gh" href="https://github.com/medyabi" rel="noopener">GitHub</a>
 </header>
 <div class="doc has-toc">
@@ -110,7 +110,7 @@
 </tr>
 </tbody>
 </table></div>
-<div class="alert note"><p class="alert-title">Note</p><p><strong>Important:</strong> Active Directory accepted R00t123456789 (13 characters, no special character), but Azure Local would have rejected it later in the deployment. The default domain policy is much weaker than the Azure Local rule, so always check your passwords with the script in section 4.1.</p></div>
+<div class="alert important"><p class="alert-title">Important</p><p><strong>Important:</strong> Active Directory accepted R00t123456789 (13 characters, no special character), but Azure Local would have rejected it later in the deployment. The default domain policy is much weaker than the Azure Local rule, so always check your passwords with the script in section 4.1.</p></div>
 <h2 id="15-your-lan-router-check-this-first">1.5 Your LAN router (check this first)</h2>
 <p>Why does the router matter? Because many home and office routers advertise <strong>themselves as an IPv6 DNS server</strong> (through router advertisements or DHCPv6). Windows then asks the router *and* your DC. The router answers "name does not exist" for MCT.LAB, Windows keeps that answer, and the node loses the domain.</p>
 <p>In our lab this broke <strong>"Create the cluster"</strong> with DNS name does not exist for AZLNode1.mct.lab. The router was 192.168.100.1, which also answered over IPv6 as fe80::1.</p>

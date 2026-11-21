@@ -79,6 +79,10 @@ add("azl", "00-overview.md", "azure-local/index.html")
 for _f, _t in azl_files:
     add("azl", _f, f"azure-local/{_f[:-3]}.html")
 add("hyb", "README.md", "hybrid/index.html")
+add("hyb", "foundations/README.md", "foundations/index.html")
+for f in sorted(os.listdir(os.path.join(HYB, "foundations"))):
+    if f.endswith(".md") and f != "README.md":
+        add("hyb", f"foundations/{f}", f"foundations/{f[:-3]}.html")
 for f in sorted(os.listdir(os.path.join(HYB, "labs"))):
     if f.endswith(".md"):
         add("hyb", f"labs/{f}", f"hybrid/{f[:-3]}.html")
@@ -114,6 +118,11 @@ titles = {k: first_h1(os.path.join(ROOTS[k[0]], k[1])) for k in pages}
 def short(t):
     return re.sub(r"\s*\((\d+ min[^)]*|[^)]*min[^)]*)\)$", "", t)
 
+
+fnd_nav = [("Overview", "foundations/index.html")]
+for (repo, src), out in sorted(pages.items(), key=lambda kv: kv[1]):
+    if repo == "hyb" and src.startswith("foundations/1"):
+        fnd_nav.append((short(titles[(repo, src)]), out))
 
 hyb_nav = [("Overview", "hybrid/index.html")]
 for (repo, src), out in sorted(pages.items(), key=lambda kv: kv[1]):
@@ -180,8 +189,26 @@ def render_md(repo, src_rel, out_rel):
     with open(os.path.join(ROOTS[repo], src_rel), encoding="utf-8") as fh:
         text = fh.read()
     # a closing code fence directly followed by text breaks lists: add a blank line
+    # list continuation written with 3 spaces: Python-Markdown needs 4
+    lines, fixed, in_fence, pad = text.split("\n"), [], False, ""
+    for line in lines:
+        if re.match(r"^\s*```", line):
+            if not in_fence:
+                pad = " " if re.match(r"^ {3}```", line) else ""
+            fixed.append(pad + line)
+            in_fence = not in_fence
+            continue
+        if in_fence:
+            fixed.append(pad + line if line.strip() else line)
+        elif re.match(r"^ {3}\S", line):
+            fixed.append(" " + line)
+        elif (re.match(r"^\d+\.\s", line) and fixed and fixed[-1].strip()
+              and not re.match(r"^\s*(\d+\.|[-*+])\s", fixed[-1])):
+            fixed += ["", line]  # a list item right after a paragraph
+        else:
+            fixed.append(line)
+    lines = fixed
     out_lines, in_fence = [], False
-    lines = text.split("\n")
     for i, line in enumerate(lines):
         out_lines.append(line)
         if re.match(r"^\s*```", line):
@@ -205,7 +232,7 @@ def render_md(repo, src_rel, out_rel):
         inner = m.group(1)
         lead = re.sub(r"<[^>]+>", "", inner[:200]).lower()
         kind = "note"
-        if re.search(r"legal|before you start|first|warning|never|do not", lead):
+        if re.search(r"important|legal|before you start|first|warning|never|do not", lead):
             kind = "important"
         if re.search(r"cost", lead):
             kind = "warning"
@@ -298,6 +325,7 @@ SITE_JS = """<script>
 LANG_LABEL = {"powershell": "PowerShell", "kusto": "Kusto", "bash": "Bash", "json": "JSON", "xml": "XML"}
 
 ICONS = {
+    "foundations": '<svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="5" rx="1.5" fill="currentColor"/><rect x="3" y="11" width="18" height="5" rx="1.5" fill="currentColor" opacity=".7"/><rect x="3" y="18" width="18" height="3" rx="1.5" fill="currentColor" opacity=".45"/></svg>',
     "hybrid": '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18a5 5 0 0 1-.6-9.96A6.5 6.5 0 0 1 18.8 9.1 4.5 4.5 0 0 1 18 18Z" fill="currentColor"/></svg>',
     "security": '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5Z" fill="currentColor"/></svg>',
     "ai": '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 4h16a2 2 0 0 1 2 2v9a2 2 0 0 1-2 2h-8l-5 4v-4H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2Zm8 2.5c-.4 2.3-1.2 3.1-3.5 3.5 2.3.4 3.1 1.2 3.5 3.5.4-2.3 1.2-3.1 3.5-3.5-2.3-.4-3.1-1.2-3.5-3.5Z" fill="currentColor"/></svg>',
@@ -311,7 +339,10 @@ def sidebar(track, out_rel):
         cur = ' aria-current="page"' if target == out_rel else ""
         return f'<a href="{rel(out_rel, target)}"{cur}>{html.escape(label)}</a>'
 
-    if track == "hybrid":
+    if track == "foundations":
+        name = "Level 100: Foundations"
+        items = "".join(f"<li>{link(l, t)}</li>" for l, t in fnd_nav)
+    elif track == "hybrid":
         name = "Hybrid management with Azure Arc"
         items = "".join(f"<li>{link(l, t)}</li>" for l, t in hyb_nav)
     elif track == "azlocal":
@@ -335,7 +366,9 @@ def sidebar(track, out_rel):
 
 def crumbs(out_rel, title, track):
     trail = [("Labs", "index.html")]
-    if track == "hybrid":
+    if track == "foundations":
+        trail.append(("Foundations", "foundations/index.html"))
+    elif track == "hybrid":
         trail.append(("Hybrid track", "hybrid/index.html"))
     elif track == "security":
         trail.append(("Security track", "security/index.html"))
@@ -392,29 +425,35 @@ def azl_pager(out_rel):
     return f'<nav class="pager">{prev}{nxt}</nav>'
 
 
+LEVEL = {"foundations": 100, "hybrid": 200, "security": 300}
+
+
 def shell(out_rel, title, body, track=None, extra="", head="", kind="Article"):
     css = rel(out_rel, "assets/site.css")
     home = rel(out_rel, "index.html")
-    nav = [("Hybrid", "hybrid/index.html", "hybrid"), ("Security", "security/index.html", "security"),
+    nav = [("Foundations", "foundations/index.html", "foundations"), ("Hybrid", "hybrid/index.html", "hybrid"),
+           ("Security", "security/index.html", "security"),
            ("Azure Local", "azure-local/index.html", "azlocal"),
            ("Lab access", "https://access.ebigpictures.com/", "access"),
            ("AI Labs", "https://ai.ebigpictures.com/", "ai")]
     cur = ' aria-current="true"'
     nav_html = "".join(f'<a href="{t if t.startswith("http") else rel(out_rel, t)}"{cur if track == k else ""}>{l}</a>' for l, t, k in nav)
     full_title = f"{title} · Windows Server Labs" if title != "Windows Server Labs" else title
-    is_doc = track in ("hybrid", "security", "access", "azlocal")
+    is_doc = track in ("foundations", "hybrid", "security", "access", "azlocal")
     if is_doc:
         body, aside = enhance(body)
-        side = sidebar(track, out_rel) if track in ("hybrid", "security", "azlocal") else ""
+        side = sidebar(track, out_rel) if track in ("foundations", "hybrid", "security", "azlocal") else ""
         # metadata line right after the first h1
         dur = re.search(r"<h1[^>]*>.*?\s*\((\d+[^)]*min[^)]*)\)\s*</h1>", body)
         if dur:
             body = body.replace(" (" + dur.group(1) + ")</h1>", "</h1>", 1)
         meta = meta_line(body, kind)
+        if track in LEVEL:
+            meta = meta.replace('<p class="meta">', f'<p class="meta"><span class="level l{LEVEL[track]}">Level {LEVEL[track]}</span>', 1)
         if dur:
             meta = meta.replace("</p>", f"<span>Lab time: {dur.group(1)}</span></p>")
         body = re.sub(r"(</h1>)", lambda m: m.group(1) + meta, body, count=1)
-        repo = {"hybrid": REPO_URL["hyb"], "security": REPO_URL["sec"], "azlocal": REPO_URL["azl"]}.get(track)
+        repo = {"foundations": REPO_URL["hyb"], "hybrid": REPO_URL["hyb"], "security": REPO_URL["sec"], "azlocal": REPO_URL["azl"]}.get(track)
         edit = f'<p class="source"><a href="{repo}" rel="noopener">View the source on GitHub</a></p>' if repo else ""
         layout = f"""<div class="doc {'has-toc' if side else 'no-toc'}">
 {side}
@@ -478,11 +517,13 @@ def shell(out_rel, title, body, track=None, extra="", head="", kind="Article"):
 # --------------------------------------------------------------------------
 # 5. Home page
 # --------------------------------------------------------------------------
+n_fnd = len(fnd_nav) - 1
 n_hyb = sum(1 for (r, s) in pages if r == "hyb" and s.startswith("labs/") and "cleanup" not in s)
 n_sec = sum(1 for (r, s) in pages if r == "sec" and "/lab-" in s)
 
 
 def home_page():
+    fnd_list = "".join(f'<li><a href="{t}">{html.escape(re.sub(r"^Lab 100-\\d+:\\s*", "", l))}</a></li>' for l, t in fnd_nav[1:])
     hyb_items = [(re.sub(r"^Lab \d+:\s*", "", l), t) for l, t in hyb_nav[1:-1]]
     hyb_list = "".join(f'<li><a href="{t}">{html.escape(l)}</a></li>' for l, t in hyb_items)
     sec_items = [(re.sub(r"^Chapter \d+:\s*", "", ti), c, len(it)) for ti, c, it in sec_groups]
@@ -493,23 +534,39 @@ def home_page():
   <div class="wrap">
     <p class="kicker">Windows Server 2025 · Azure Arc · Security · Azure Local</p>
     <h1>Learn hybrid cloud by doing it</h1>
-    <p class="lede">Three hands-on tracks. Take an on-premises server and manage it from Azure. Watch an attack, build the control that stops it, and prove that it works. And deploy Azure Local in a nested lab, with every real-world error and its fix.</p>
-    <p class="cta"><a class="btn primary" href="hybrid/index.html">Start the hybrid track</a><a class="btn" href="security/setup.html">Build the security lab</a></p>
+    <p class="lede">A Windows Server learning path from Level 100 to 500, plus Azure Local. Take an on-premises server and manage it from Azure. Watch an attack, build the control that stops it, and prove that it works. And deploy Azure Local in a nested lab, with every real-world error and its fix.</p>
+    <p class="cta"><a class="btn primary" href="foundations/index.html">Start at Level 100</a><a class="btn" href="hybrid/index.html">Jump to the hybrid labs</a></p>
   </div>
 </section>
 
 <div class="wrap">
+<h2 class="section-title">The learning path</h2>
+<ol class="levels">
+  <li class="l100"><a href="foundations/index.html"><span class="lv">Level 100</span><strong>Foundations</strong><span>Editions, licensing, roles, admin tools, storage</span></a></li>
+  <li class="l200"><a href="hybrid/index.html"><span class="lv">Level 200</span><strong>Hybrid with Azure Arc</strong><span>Arc, Hotpatch, Policy, Monitor, Defender</span></a></li>
+  <li class="l300"><a href="security/index.html"><span class="lv">Level 300</span><strong>Securing Windows Server</strong><span>Attack, then build the control that stops it</span></a></li>
+  <li class="l400 soon"><div><span class="lv">Level 400 · coming</span><strong>Windows Server HCI</strong><span>Failover clustering, Storage Spaces Direct, SDN</span></div></li>
+  <li class="l500 soon"><div><span class="lv">Level 500 · coming</span><strong>Architecture scenarios</strong><span>Design a customer solution, then check yourself</span></div></li>
+</ol>
+
 <h2 class="section-title">Browse the tracks</h2>
 <div class="cards">
   <article class="card">
-    <div class="card-head"><span class="ico c-blue">{ICONS['hybrid']}</span><div><p class="card-kicker">Learning path · {n_hyb} labs</p>
+    <div class="card-head"><span class="ico c-yellow">{ICONS['foundations']}</span><div><p class="card-kicker">Level 100 · {n_fnd} labs</p>
+    <h3><a href="foundations/index.html">Windows Server 2025 foundations</a></h3></div></div>
+    <p>For new presales engineers. Meet Windows Server 2025, pick the right edition and size a licence, add roles, manage the server with SConfig and PowerShell, and compare NTFS and ReFS. No Azure needed.</p>
+    <ol class="mini">{fnd_list}</ol>
+    <p class="card-foot"><a href="foundations/index.html">Start Level 100 ›</a></p>
+  </article>
+  <article class="card">
+    <div class="card-head"><span class="ico c-blue">{ICONS['hybrid']}</span><div><p class="card-kicker">Level 200 · {n_hyb} labs</p>
     <h3><a href="hybrid/index.html">Hybrid management with Azure Arc</a></h3></div></div>
     <p>One Windows Server 2025 VM per person. Connect it to Azure Arc, unlock the Software Assurance benefits, and use Hotpatch, Azure Policy, Azure Monitor, Change Tracking, Defender for Cloud and Windows Admin Center in Azure. Every lab ends with customer talking points.</p>
     <ol class="mini">{hyb_list}</ol>
     <p class="card-foot"><a href="hybrid/index.html">Start the hybrid track ›</a></p>
   </article>
   <article class="card">
-    <div class="card-head"><span class="ico c-red">{ICONS['security']}</span><div><p class="card-kicker">Learning path · {n_sec} labs</p>
+    <div class="card-head"><span class="ico c-red">{ICONS['security']}</span><div><p class="card-kicker">Level 300 · {n_sec} labs</p>
     <h3><a href="security/index.html">Securing Windows Server</a></h3></div></div>
     <p>Four VMs, one domain, and an attacker. Each lab shows the attack first, then builds the control that stops it: passwords and lockout, Credential Guard, App Control, Protected Users, RODC, delegation, Sentinel, IPsec and BitLocker.</p>
     <ol class="mini">{sec_list}</ol>
@@ -554,7 +611,8 @@ def home_page():
 </ol>
 
 <h2 class="section-title">What you need</h2>
-<div class="cards two">
+<div class="cards">
+  <div class="card plain"><h3>Level 100</h3><p>Only your lab VM and a Remote Desktop connection. Two 2-hour lab slots cover the whole level.</p></div>
   <div class="card plain"><h3>Hybrid track</h3><p>A Windows Server 2025 VM (your instructor provides one), an Azure subscription where you can create a resource group, and about two days.</p></div>
   <div class="card plain"><h3>Security track</h3><p>A Hyper-V host for four Generation 2 VMs with Secure Boot and a virtual TPM, plus Azure and Microsoft 365 trials for the cloud chapters.</p></div>
 </div>
@@ -639,14 +697,14 @@ os.makedirs(OUT, exist_ok=True)
 
 for (repo, src), out in pages.items():
     body = render_md(repo, src, out)
-    track = {"hyb": "hybrid", "sec": "security", "azl": "azlocal"}[repo]
+    track = {"sec": "security", "azl": "azlocal"}.get(repo) or ("foundations" if src.startswith("foundations/") else "hybrid")
     extra = MERMAID if 'class="mermaid"' in body else ""
     if 'class="task"' in body:
         extra += CHECKLIST_JS
     dst = os.path.join(OUT, out)
     os.makedirs(os.path.dirname(dst), exist_ok=True)
     with open(dst, "w", encoding="utf-8") as fh:
-        kind = ("Guide" if repo == "azl" else "Lab" if ("/lab-" in src or (repo == "hyb" and src.startswith("labs/") and "cleanup" not in src))
+        kind = ("Guide" if repo == "azl" else "Lab" if ("/lab-" in src or (repo == "hyb" and src.startswith(("labs/", "foundations/1")) and "cleanup" not in src))
                 else "Chapter" if src.endswith("README.md") and src.startswith("labs/") else "Article")
         fh.write(shell(out, titles[(repo, src)], body, track, extra, kind=kind))
 

@@ -15,7 +15,7 @@
 <header class="masthead">
   <a class="brand" href="../../index.html"><img src="../../assets/favicon.svg" alt="" width="24" height="24"><span>Windows Server Labs</span></a>
   <span class="divider" aria-hidden="true"></span>
-  <nav class="mainnav" aria-label="Main"><a href="../../hybrid/index.html">Hybrid</a><a href="../index.html" aria-current="true">Security</a><a href="../../azure-local/index.html">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
+  <nav class="mainnav" aria-label="Main"><a href="../../foundations/index.html">Foundations</a><a href="../../hybrid/index.html">Hybrid</a><a href="../index.html" aria-current="true">Security</a><a href="../../azure-local/index.html">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
   <a class="gh" href="https://github.com/medyabi" rel="noopener">GitHub</a>
 </header>
 <div class="doc has-toc">
@@ -23,7 +23,7 @@
 <main id="content" class="article">
 <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../../index.html">Labs</a></li><li><a href="../index.html">Security track</a></li><li><a href="index.html">Chapter 5</a></li></ol></nav>
 <article class="prose">
-<h1 id="lab-52-ipsec-connection-security-rules">Lab 5.2: IPsec connection security rules</h1><p class="meta"><span>Lab</span><span>3 min read</span></p>
+<h1 id="lab-52-ipsec-connection-security-rules">Lab 5.2: IPsec connection security rules</h1><p class="meta"><span class="level l300">Level 300</span><span>Lab</span><span>3 min read</span></p>
 <nav class="pager"><a href="lab-5.1-windows-firewall.html">← Lab 5.1</a> <a href="index.html">Chapter overview</a> <a href="lab-5.3-firewall-review-wac.html">Lab 5.3 →</a></nav>
 <div class="table-wrap"><table>
 
@@ -72,14 +72,18 @@
 <h2 id="step-by-step">🧪 Step by step</h2>
 <p>We'll do this with a GPO, so both servers get the same rules.</p>
 <ol>
-<li>On SEA-DC1, create a GPO called <strong>IPsec-DC1-SVR1</strong>. Link it to an OU that holds only the two test servers. Not the whole domain!</li>
+<li>
+<p>On SEA-DC1, create a GPO called <strong>IPsec-DC1-SVR1</strong>. Link it to an OU that holds only the two test servers. Not the whole domain!</p>
+<div class="alert note"><p class="alert-title">Note</p><p>⚠️ <strong>Added by this repository:</strong> a domain controller should stay in the <strong>Domain Controllers</strong> OU, so no single OU holds both machines. Link the GPO to <strong>both</strong> <code>Domain Controllers</code> and <code>Servers</code> (see <a href="../setup.html#extra-setup-the-labs-assume">lab setup</a>). Because the rule's endpoints are only <code>10.10.0.10</code> and <code>10.10.0.11</code>, it affects no other machine, but check <em>Group Policy Results</em> to be sure the GPO applies only to those two computers.</p></div>
+</li>
+<li>
+<p>Edit it: <em>Computer Configuration &gt; Policies &gt; Windows Settings &gt; Security Settings &gt; Windows Defender Firewall with Advanced Security &gt; Connection Security Rules &gt; New Rule</em>.</p>
+</li>
+<li>Rule type: <strong>Server-to-server</strong>. Endpoint 1: <strong>10.10.0.10</strong> (SEA-DC1). Endpoint 2: <strong>10.10.0.11</strong> (SEA-SVR1).</li>
+<li>Requirements: <strong>Require authentication for inbound and outbound connections</strong>.</li>
+<li>Authentication method: <strong>Advanced &gt; Customize</strong>. Under <strong>First authentication</strong>, add <strong>Computer (Kerberos V5)</strong>.</li>
+<li>Profile: <strong>Domain</strong>. Name: <strong>dc1-svr1-auth</strong>.</li>
 </ol>
-<div class="alert note"><p class="alert-title">Note</p><p>⚠️ <strong>Added by this repository:</strong> a domain controller should stay in the <strong>Domain Controllers</strong> OU, so no single OU holds both machines. Link the GPO to <strong>both</strong> <code>Domain Controllers</code> and <code>Servers</code> (see <a href="../setup.html#extra-setup-the-labs-assume">lab setup</a>). Because the rule's endpoints are only <code>10.10.0.10</code> and <code>10.10.0.11</code>, it affects no other machine, but check <em>Group Policy Results</em> to be sure the GPO applies only to those two computers.
-2. Edit it: <em>Computer Configuration &gt; Policies &gt; Windows Settings &gt; Security Settings &gt; Windows Defender Firewall with Advanced Security &gt; Connection Security Rules &gt; New Rule</em>.
-3. Rule type: <strong>Server-to-server</strong>. Endpoint 1: <strong>10.10.0.10</strong> (SEA-DC1). Endpoint 2: <strong>10.10.0.11</strong> (SEA-SVR1).
-4. Requirements: <strong>Require authentication for inbound and outbound connections</strong>.
-5. Authentication method: <strong>Advanced &gt; Customize</strong>. Under <strong>First authentication</strong>, add <strong>Computer (Kerberos V5)</strong>.
-6. Profile: <strong>Domain</strong>. Name: <strong>dc1-svr1-auth</strong>.</p></div>
 <p>That gives us authentication. Now let's require encryption:</p>
 <ol>
 <li>In the same GPO, go to <strong>Inbound Rules &gt; New Rule &gt; Custom</strong>. All programs.</li>

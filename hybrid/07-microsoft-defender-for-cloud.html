@@ -15,7 +15,7 @@
 <header class="masthead">
   <a class="brand" href="../index.html"><img src="../assets/favicon.svg" alt="" width="24" height="24"><span>Windows Server Labs</span></a>
   <span class="divider" aria-hidden="true"></span>
-  <nav class="mainnav" aria-label="Main"><a href="index.html" aria-current="true">Hybrid</a><a href="../security/index.html">Security</a><a href="../azure-local/index.html">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
+  <nav class="mainnav" aria-label="Main"><a href="../foundations/index.html">Foundations</a><a href="index.html" aria-current="true">Hybrid</a><a href="../security/index.html">Security</a><a href="../azure-local/index.html">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
   <a class="gh" href="https://github.com/medyabi" rel="noopener">GitHub</a>
 </header>
 <div class="doc has-toc">
@@ -23,7 +23,7 @@
 <main id="content" class="article">
 <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../index.html">Labs</a></li><li><a href="index.html">Hybrid track</a></li></ol></nav>
 <article class="prose">
-<h1 id="lab-7-microsoft-defender-for-cloud-60-min">Lab 7: Microsoft Defender for Cloud</h1><p class="meta"><span>Lab</span><span>3 min read</span><span>Lab time: 60 min</span></p>
+<h1 id="lab-7-microsoft-defender-for-cloud-60-min">Lab 7: Microsoft Defender for Cloud</h1><p class="meta"><span class="level l200">Level 200</span><span>Lab</span><span>3 min read</span><span>Lab time: 60 min</span></p>
 <nav class="pager"><a href="06-change-tracking-and-inventory.html">← Lab 6</a> <a href="index.html">Overview</a> <a href="08-windows-management-from-azure.html">Lab 8 →</a></nav>
 <p>In this lab your on-premises server gets the same protection as an Azure VM: security recommendations, a secure score, endpoint protection and alerts. And you trigger a safe test alert to see it end to end.</p>
 <p><strong>Two layers, two prices:</strong></p>
@@ -49,11 +49,15 @@
 <p>Microsoft documents two safe ways to check that detection works. Both create <strong>test</strong> alerts only.</p>
 <ol start="7">
 <li><strong>Sample alerts (fastest):</strong> in <strong>Defender for Cloud</strong> &gt; <strong>Security alerts</strong>, select <strong>Sample alerts</strong>, pick the subscription and the <strong>Defender for Servers</strong> plan, then <strong>Create sample alerts</strong>. They appear after a few minutes, for simulated resources.</li>
-<li><strong>A real test on your server:</strong> check that <strong>MDE.Windows</strong> is installed (step 3). Then, in <strong>Command Prompt as administrator</strong> on your VM, run the documented validation command:</li>
-</ol>
+<li>
+<p><strong>A real test on your server:</strong> check that <strong>MDE.Windows</strong> is installed (step 3). Then, in <strong>Command Prompt as administrator</strong> on your VM, run the documented validation command:</p>
 <div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>powershell.exe -NoExit -ExecutionPolicy Bypass -WindowStyle Hidden $ErrorActionPreference = 'silentlycontinue';(New-Object System.Net.WebClient).DownloadFile('http://127.0.0.1/1.exe', 'C:\test-MDATP-test\invoice.exe');Start-Process 'C:\test-MDATP-test\invoice.exe'</code></pre></div>
-<p>The window closes by itself. It downloads nothing real — the address is the server itself.
-9. Within about 10 minutes, open <strong>Security alerts</strong>. You see an alert for <strong>your</strong> server. Open it and look at the details: what, where, when, and the suggested response.</p>
+<p>The window closes by itself. It downloads nothing real — the address is the server itself.</p>
+</li>
+<li>
+<p>Within about 10 minutes, open <strong>Security alerts</strong>. You see an alert for <strong>your</strong> server. Open it and look at the details: what, where, when, and the suggested response.</p>
+</li>
+</ol>
 <h3 id="check-yourself">Check yourself</h3>
 <ul>
 <li>What's free and what's paid? (Recommendations and secure score: free. Threat protection with Defender for Servers: paid, per server.)</li>

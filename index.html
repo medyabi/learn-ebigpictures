@@ -15,7 +15,7 @@
 <header class="masthead">
   <a class="brand" href="index.html"><img src="assets/favicon.svg" alt="" width="24" height="24"><span>Windows Server Labs</span></a>
   <span class="divider" aria-hidden="true"></span>
-  <nav class="mainnav" aria-label="Main"><a href="hybrid/index.html">Hybrid</a><a href="security/index.html">Security</a><a href="azure-local/index.html">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
+  <nav class="mainnav" aria-label="Main"><a href="foundations/index.html">Foundations</a><a href="hybrid/index.html">Hybrid</a><a href="security/index.html">Security</a><a href="azure-local/index.html">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
   <a class="gh" href="https://github.com/medyabi" rel="noopener">GitHub</a>
 </header>
 <main id="content" class="home">
@@ -24,23 +24,39 @@
   <div class="wrap">
     <p class="kicker">Windows Server 2025 · Azure Arc · Security · Azure Local</p>
     <h1>Learn hybrid cloud by doing it</h1>
-    <p class="lede">Three hands-on tracks. Take an on-premises server and manage it from Azure. Watch an attack, build the control that stops it, and prove that it works. And deploy Azure Local in a nested lab, with every real-world error and its fix.</p>
-    <p class="cta"><a class="btn primary" href="hybrid/index.html">Start the hybrid track</a><a class="btn" href="security/setup.html">Build the security lab</a></p>
+    <p class="lede">A Windows Server learning path from Level 100 to 500, plus Azure Local. Take an on-premises server and manage it from Azure. Watch an attack, build the control that stops it, and prove that it works. And deploy Azure Local in a nested lab, with every real-world error and its fix.</p>
+    <p class="cta"><a class="btn primary" href="foundations/index.html">Start at Level 100</a><a class="btn" href="hybrid/index.html">Jump to the hybrid labs</a></p>
   </div>
 </section>
 
 <div class="wrap">
+<h2 class="section-title">The learning path</h2>
+<ol class="levels">
+  <li class="l100"><a href="foundations/index.html"><span class="lv">Level 100</span><strong>Foundations</strong><span>Editions, licensing, roles, admin tools, storage</span></a></li>
+  <li class="l200"><a href="hybrid/index.html"><span class="lv">Level 200</span><strong>Hybrid with Azure Arc</strong><span>Arc, Hotpatch, Policy, Monitor, Defender</span></a></li>
+  <li class="l300"><a href="security/index.html"><span class="lv">Level 300</span><strong>Securing Windows Server</strong><span>Attack, then build the control that stops it</span></a></li>
+  <li class="l400 soon"><div><span class="lv">Level 400 · coming</span><strong>Windows Server HCI</strong><span>Failover clustering, Storage Spaces Direct, SDN</span></div></li>
+  <li class="l500 soon"><div><span class="lv">Level 500 · coming</span><strong>Architecture scenarios</strong><span>Design a customer solution, then check yourself</span></div></li>
+</ol>
+
 <h2 class="section-title">Browse the tracks</h2>
 <div class="cards">
   <article class="card">
-    <div class="card-head"><span class="ico c-blue"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18a5 5 0 0 1-.6-9.96A6.5 6.5 0 0 1 18.8 9.1 4.5 4.5 0 0 1 18 18Z" fill="currentColor"/></svg></span><div><p class="card-kicker">Learning path · 9 labs</p>
+    <div class="card-head"><span class="ico c-yellow"><svg viewBox="0 0 24 24" aria-hidden="true"><rect x="3" y="4" width="18" height="5" rx="1.5" fill="currentColor"/><rect x="3" y="11" width="18" height="5" rx="1.5" fill="currentColor" opacity=".7"/><rect x="3" y="18" width="18" height="3" rx="1.5" fill="currentColor" opacity=".45"/></svg></span><div><p class="card-kicker">Level 100 · 5 labs</p>
+    <h3><a href="foundations/index.html">Windows Server 2025 foundations</a></h3></div></div>
+    <p>For new presales engineers. Meet Windows Server 2025, pick the right edition and size a licence, add roles, manage the server with SConfig and PowerShell, and compare NTFS and ReFS. No Azure needed.</p>
+    <ol class="mini"><li><a href="foundations/100-01-meet-windows-server-2025.html">Lab 100-1: Meet Windows Server 2025</a></li><li><a href="foundations/100-02-editions-and-licensing.html">Lab 100-2: Editions and licensing</a></li><li><a href="foundations/100-03-roles-and-features.html">Lab 100-3: Roles and features</a></li><li><a href="foundations/100-04-manage-and-monitor.html">Lab 100-4: Manage and monitor your server</a></li><li><a href="foundations/100-05-storage-basics.html">Lab 100-5: Storage basics</a></li></ol>
+    <p class="card-foot"><a href="foundations/index.html">Start Level 100 ›</a></p>
+  </article>
+  <article class="card">
+    <div class="card-head"><span class="ico c-blue"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M7 18a5 5 0 0 1-.6-9.96A6.5 6.5 0 0 1 18.8 9.1 4.5 4.5 0 0 1 18 18Z" fill="currentColor"/></svg></span><div><p class="card-kicker">Level 200 · 9 labs</p>
     <h3><a href="hybrid/index.html">Hybrid management with Azure Arc</a></h3></div></div>
     <p>One Windows Server 2025 VM per person. Connect it to Azure Arc, unlock the Software Assurance benefits, and use Hotpatch, Azure Policy, Azure Monitor, Change Tracking, Defender for Cloud and Windows Admin Center in Azure. Every lab ends with customer talking points.</p>
     <ol class="mini"><li><a href="hybrid/01-windows-admin-center.html">Windows Admin Center</a></li><li><a href="hybrid/02-azure-arc-onboarding-and-azure-benefits.html">Azure Arc onboarding and Azure benefits</a></li><li><a href="hybrid/03-hotpatching-with-azure-arc.html">Hotpatching with Azure Arc</a></li><li><a href="hybrid/04-azure-policy-and-machine-configuration.html">Azure Policy and Machine Configuration</a></li><li><a href="hybrid/05-azure-monitor.html">Azure Monitor</a></li><li><a href="hybrid/06-change-tracking-and-inventory.html">Change Tracking and Inventory</a></li><li><a href="hybrid/07-microsoft-defender-for-cloud.html">Microsoft Defender for Cloud</a></li><li><a href="hybrid/08-windows-management-from-azure.html">Windows management from Azure</a></li><li><a href="hybrid/09-security-baseline-with-osconfig.html">Security baseline with OSConfig</a></li></ol>
     <p class="card-foot"><a href="hybrid/index.html">Start the hybrid track ›</a></p>
   </article>
   <article class="card">
-    <div class="card-head"><span class="ico c-red"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5Z" fill="currentColor"/></svg></span><div><p class="card-kicker">Learning path · 25 labs</p>
+    <div class="card-head"><span class="ico c-red"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2 4 5v6c0 5 3.4 9.4 8 11 4.6-1.6 8-6 8-11V5Z" fill="currentColor"/></svg></span><div><p class="card-kicker">Level 300 · 25 labs</p>
     <h3><a href="security/index.html">Securing Windows Server</a></h3></div></div>
     <p>Four VMs, one domain, and an attacker. Each lab shows the attack first, then builds the control that stops it: passwords and lockout, Credential Guard, App Control, Protected Users, RODC, delegation, Sentinel, IPsec and BitLocker.</p>
     <ol class="mini"><li><a href="security/01-securing-the-os/index.html">Securing the Windows Server operating system</a> <span class="count">6 labs</span></li><li><a href="security/02-hybrid-ad-accounts/index.html">Securing hybrid Active Directory accounts</a> <span class="count">5 labs</span></li><li><a href="security/03-least-privilege-and-delegation/index.html">Least privilege and delegation</a> <span class="count">4 labs</span></li><li><a href="security/04-watching-from-azure/index.html">Watching your servers from Azure</a> <span class="count">4 labs</span></li><li><a href="security/05-networking/index.html">Securing Windows Server networking</a> <span class="count">3 labs</span></li><li><a href="security/06-storage-encryption/index.html">Securing Windows Server storage</a> <span class="count">3 labs</span></li></ol>
@@ -85,7 +101,8 @@
 </ol>
 
 <h2 class="section-title">What you need</h2>
-<div class="cards two">
+<div class="cards">
+  <div class="card plain"><h3>Level 100</h3><p>Only your lab VM and a Remote Desktop connection. Two 2-hour lab slots cover the whole level.</p></div>
   <div class="card plain"><h3>Hybrid track</h3><p>A Windows Server 2025 VM (your instructor provides one), an Azure subscription where you can create a resource group, and about two days.</p></div>
   <div class="card plain"><h3>Security track</h3><p>A Hyper-V host for four Generation 2 VMs with Secure Boot and a virtual TPM, plus Azure and Microsoft 365 trials for the cloud chapters.</p></div>
 </div>

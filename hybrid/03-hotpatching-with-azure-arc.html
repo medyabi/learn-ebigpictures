@@ -15,7 +15,7 @@
 <header class="masthead">
   <a class="brand" href="../index.html"><img src="../assets/favicon.svg" alt="" width="24" height="24"><span>Windows Server Labs</span></a>
   <span class="divider" aria-hidden="true"></span>
-  <nav class="mainnav" aria-label="Main"><a href="index.html" aria-current="true">Hybrid</a><a href="../security/index.html">Security</a><a href="../azure-local/index.html">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
+  <nav class="mainnav" aria-label="Main"><a href="../foundations/index.html">Foundations</a><a href="index.html" aria-current="true">Hybrid</a><a href="../security/index.html">Security</a><a href="../azure-local/index.html">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
   <a class="gh" href="https://github.com/medyabi" rel="noopener">GitHub</a>
 </header>
 <div class="doc has-toc">
@@ -23,7 +23,7 @@
 <main id="content" class="article">
 <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../index.html">Labs</a></li><li><a href="index.html">Hybrid track</a></li></ol></nav>
 <article class="prose">
-<h1 id="lab-3-hotpatching-with-azure-arc-45-min">Lab 3: Hotpatching with Azure Arc</h1><p class="meta"><span>Lab</span><span>3 min read</span><span>Lab time: 45 min</span></p>
+<h1 id="lab-3-hotpatching-with-azure-arc-45-min">Lab 3: Hotpatching with Azure Arc</h1><p class="meta"><span class="level l200">Level 200</span><span>Lab</span><span>3 min read</span><span>Lab time: 45 min</span></p>
 <nav class="pager"><a href="02-azure-arc-onboarding-and-azure-benefits.html">← Lab 2</a> <a href="index.html">Overview</a> <a href="04-azure-policy-and-machine-configuration.html">Lab 4 →</a></nav>
 <p>In this lab you turn on <strong>Hotpatch</strong> and install a security update with <strong>no reboot</strong>. For a customer running 24/7 workloads, this is the feature that gets attention.</p>
 <p><strong>What is Hotpatch?</strong> A normal security update replaces files on disk, so the server must restart to load them. A hotpatch changes the code <strong>in memory</strong>, while it runs. Think of changing a tyre while the car keeps driving.</p>
@@ -36,22 +36,26 @@
 <p><strong>Requirements:</strong> Windows Server 2025 Standard or Datacenter, connected to Azure Arc, with <strong>virtualization-based security (VBS)</strong> running. On Hyper-V that means a <strong>Generation 2</strong> VM with <strong>Secure Boot</strong> — your VM already has both.</p>
 <h3 id="steps">Steps</h3>
 <ol>
-<li>On your VM, check that VBS is running:</li>
-</ol>
+<li>
+<p>On your VM, check that VBS is running:</p>
 <div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>Get-CimInstance -Namespace root/Microsoft/Windows/DeviceGuard -ClassName Win32_DeviceGuard |
   Select-Object -ExpandProperty VirtualizationBasedSecurityStatus</code></pre></div>
 <p><strong>2</strong> means running. If you get anything else, enable it and restart:</p>
 <div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>New-ItemProperty -Path 'HKLM:\System\CurrentControlSet\Control\DeviceGuard' -Name 'EnableVirtualizationBasedSecurity' -PropertyType DWord -Value 1 -Force
 Restart-Computer</code></pre></div>
-<ol start="2">
-<li>Check the OS build with <code>winver</code>. Hotpatch needs build <strong>26100.1742 or later</strong> — our ISO is far newer.</li>
+</li>
+<li>
+<p>Check the OS build with <code>winver</code>. Hotpatch needs build <strong>26100.1742 or later</strong> — our ISO is far newer.</p>
+</li>
 <li>In the portal, go to <strong>Azure Arc &gt; Machines</strong> &gt; your server &gt; <strong>Hotpatch</strong> &gt; <strong>Confirm</strong>.</li>
 <li>Wait about <strong>10 minutes</strong>. The status moves from <strong>Pending</strong> to enabled. If it stays on Pending, ask your instructor to check the Arc agent.</li>
 <li>Open <strong>Updates</strong> (Azure Update Manager) &gt; <strong>Check for updates</strong>. Look at the update list: a hotpatch update is marked as not needing a reboot.</li>
 <li>Select <strong>One-time update</strong>, choose the available security update, and install it.</li>
-<li>When it finishes, open <strong>History</strong> in Update Manager. Look at the <strong>reboot status</strong> column. Then check uptime on the VM — it didn't restart:</li>
-</ol>
+<li>
+<p>When it finishes, open <strong>History</strong> in Update Manager. Look at the <strong>reboot status</strong> column. Then check uptime on the VM — it didn't restart:</p>
 <div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>(Get-Date) - (Get-CimInstance Win32_OperatingSystem).LastBootUpTime</code></pre></div>
+</li>
+</ol>
 <div class="alert note"><p class="alert-title">Note</p><p><strong>If the update still asks for a reboot:</strong> the VM may not be on the expected baseline. It then gets a normal update until the next baseline month (January), and hotpatches work from there. That's also a real-world lesson: hotpatch only works when servers stay on the baseline.</p></div>
 <h3 id="check-yourself">Check yourself</h3>
 <ul>

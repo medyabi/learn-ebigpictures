@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab 100-2: Editions and licensing (30 min) · Windows Server Labs</title>
+<meta name="description" content="Hands-on Windows Server 2025 labs: hybrid management with Azure Arc, and Windows Server security.">
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+</head>
+<body class="t-foundations">
+<a class="skip" href="#content">Skip to main content</a>
+<header class="masthead">
+  <a class="brand" href="../index.html"><img src="../assets/favicon.svg" alt="" width="24" height="24"><span>Windows Server Labs</span></a>
+  <span class="divider" aria-hidden="true"></span>
+  <nav class="mainnav" aria-label="Main"><a href="index.html" aria-current="true">Foundations</a><a href="../hybrid/index.html">Hybrid</a><a href="../security/index.html">Security</a><a href="../azure-local/index.html">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
+  <a class="gh" href="https://github.com/medyabi" rel="noopener">GitHub</a>
+</header>
+<div class="doc has-toc">
+<details class="toc"><summary>Table of contents</summary><nav aria-label="Level 100: Foundations"><p class="toc-title">Level 100: Foundations</p><input id="toc-filter" class="toc-filter" type="search" placeholder="Filter by title" aria-label="Filter by title"><ol class="toc-list"><li><a href="index.html">Overview</a></li><li><a href="100-01-meet-windows-server-2025.html">Lab 100-1: Meet Windows Server 2025</a></li><li><a href="100-02-editions-and-licensing.html" aria-current="page">Lab 100-2: Editions and licensing</a></li><li><a href="100-03-roles-and-features.html">Lab 100-3: Roles and features</a></li><li><a href="100-04-manage-and-monitor.html">Lab 100-4: Manage and monitor your server</a></li><li><a href="100-05-storage-basics.html">Lab 100-5: Storage basics</a></li></ol></nav></details>
+<main id="content" class="article">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../index.html">Labs</a></li><li><a href="index.html">Foundations</a></li></ol></nav>
+<article class="prose">
+<h1 id="lab-100-2-editions-and-licensing-30-min">Lab 100-2: Editions and licensing</h1><p class="meta"><span class="level l100">Level 100</span><span>Lab</span><span>4 min read</span><span>Lab time: 30 min</span></p>
+<nav class="pager"><a href="100-01-meet-windows-server-2025.html">← Lab 100-1</a> <a href="index.html">Overview</a> <a href="100-03-roles-and-features.html">Lab 100-3 →</a></nav>
+<p>In this lab you learn to answer the two questions every customer asks before buying: <strong>which edition</strong>, and <strong>how many licences</strong>. Then you size three real-looking customers.</p>
+<div class="alert important"><p class="alert-title">Important</p><p><strong>Important:</strong> licensing rules come from the Microsoft Product Terms and change over time. Use this lab to understand the model and to ask the right questions. For a quote, always check the current terms with your licensing team or distributor.</p></div>
+<h3 id="three-editions">Three editions</h3>
+<p>Think of the editions like car models built on the same engine. The engine (Windows Server) is the same; what changes is how many passengers you're allowed to carry and a few premium options.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th></th>
+<th><strong>Standard</strong></th>
+<th><strong>Datacenter</strong></th>
+<th><strong>Datacenter: Azure Edition</strong></th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td>Best for</td>
+<td>Physical servers, or hosts with few VMs</td>
+<td>Virtualization hosts, hyperconverged clusters</td>
+<td>VMs running in Azure or on Azure Local</td>
+</tr>
+<tr>
+<td>Windows Server VMs covered when all cores are licensed</td>
+<td>2</td>
+<td>Unlimited</td>
+<td>Not applicable (runs in Azure or Azure Local)</td>
+</tr>
+<tr>
+<td>Storage Spaces Direct (hyperconverged storage)</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>SDN Network Controller</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Host Guardian Hyper-V support (shielded VMs)</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Can activate guest VMs with AVMA</td>
+<td>No</td>
+<td>Yes</td>
+<td>Yes</td>
+</tr>
+<tr>
+<td>Hotpatching</td>
+<td>Through Azure Arc</td>
+<td>Through Azure Arc</td>
+<td>Built in</td>
+</tr>
+</tbody>
+</table></div>
+<p>Almost everything else is the same in all editions: Hyper-V, Failover Clustering, Storage Replica, SMB over QUIC, Network ATC, Active Directory, Windows Admin Center support.</p>
+<h3 id="how-windows-server-is-licensed">How Windows Server is licensed</h3>
+<p>There are two ways to pay.</p>
+<p><strong>1. Per core, the classic way (perpetual licences, often with Software Assurance):</strong></p>
+<ul>
+<li>License <strong>every physical core</strong> of the server.</li>
+<li>Minimum <strong>8 cores per processor</strong> and <strong>16 cores per server</strong>, even if the server has fewer.</li>
+<li><strong>Standard</strong>: licensing all cores covers <strong>2</strong> Windows Server VMs. For 4 VMs, license all the cores twice, and so on.</li>
+<li><strong>Datacenter</strong>: licensing all cores covers <strong>unlimited</strong> Windows Server VMs on that host.</li>
+<li>Users and devices also need <strong>CALs</strong> (client access licences), and <strong>RDS CALs</strong> for Remote Desktop Services.</li>
+</ul>
+<p><strong>2. Pay-as-you-go through Azure Arc (Windows Server 2025 only):</strong></p>
+<ul>
+<li>Connect the server to Azure Arc, turn on pay-as-you-go, and pay <strong>per physical core, per hour</strong>, on your Azure bill.</li>
+<li><strong>Same price for Standard and Datacenter.</strong></li>
+<li><strong>No CALs</strong> for standard use (RDS CALs are still needed).</li>
+<li>It covers only the machine where it's enabled: <strong>no rights for VMs on that host</strong>, so no AVMA.</li>
+<li>7-day free trial. Billing continues while it's on, even if the server is off, so disable it when you stop using it.</li>
+</ul>
+<p><strong>And Software Assurance?</strong> Customers with active SA (or subscription licences) unlock <strong>Windows Server Management enabled by Azure Arc</strong>: Update Manager, Change Tracking, Machine Configuration, Windows Admin Center in Azure, Best Practices Assessment and more. That's the whole Level 200 track.</p>
+<h3 id="steps">Steps</h3>
+<ol>
+<li>
+<p>On your VM, in <strong>PowerShell as administrator</strong>, see which editions this installation can be upgraded to:</p>
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>DISM /Online /Get-CurrentEdition
+DISM /Online /Get-TargetEditions</code></pre></div>
+<p>You're already on Datacenter, the top on-premises edition, so there's nothing above it. On a Standard server, Datacenter would appear: upgrading in place is possible.</p>
+</li>
+<li>
+<p>Look at how your VM is activated again:</p>
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>cscript //nologo $env:windir\system32\slmgr.vbs /dli</code></pre></div>
+<p>AVMA works only because the <strong>host</strong> runs Datacenter. On a Standard host, each guest would need its own key.</p>
+</li>
+<li>
+<p>Now size these three customers. Write your answer, then open the solution.</p>
+<p><strong>Customer A.</strong> One physical server, 1 processor with 12 cores, running Windows Server directly (no VMs): a file server.</p>
+<p><details><summary>Solution</summary></p>
+<p>Standard edition, <strong>16 cores</strong> (the server minimum, even with only 12 physical cores). Plus CALs for the users.</p>
+</details>
+<p><strong>Customer B.</strong> One Hyper-V host, 2 processors with 16 cores each, running 6 Windows Server VMs today and growing.</p>
+<p><details><summary>Solution</summary></p>
+<p>32 physical cores. Standard would need the 32 cores licensed <strong>3 times</strong> (2 VMs each), so 96 core licences, and more as they grow. <strong>Datacenter</strong> licenses the 32 cores once and covers unlimited VMs: simpler and usually cheaper above roughly 10 to 12 VMs. Compare current prices to find the exact break-even point.</p>
+</details>
+<p><strong>Customer C.</strong> A branch office with a small server they'll replace within the year, and no Software Assurance.</p>
+<p><details><summary>Solution</summary></p>
+<p>A good case for <strong>pay-as-you-go with Azure Arc</strong>: no upfront purchase, no CALs for standard use, and they stop paying when they stop using it. Arc also gives them Azure management for that server.</p>
+</details>
+</li>
+</ol>
+<h3 id="check-yourself">Check yourself</h3>
+<ul>
+<li>What's the minimum number of core licences for a server with one 6-core processor? (16.)</li>
+<li>When does Datacenter beat Standard? (When a host runs many Windows Server VMs, or needs Storage Spaces Direct or SDN.)</li>
+<li>Does pay-as-you-go cover the VMs on a host? (No. Each machine needs its own licence.)</li>
+</ul>
+<h3 id="customer-talking-points">Customer talking points</h3>
+<ul>
+<li><strong>Few VMs per host: Standard. Many VMs, or hyperconverged: Datacenter.</strong></li>
+<li>Pay-as-you-go turns Windows Server into an <strong>operating expense</strong>, billed through Azure, with no CALs for standard use.</li>
+<li>Software Assurance isn't just upgrade rights anymore: on Windows Server 2025 it unlocks <strong>Azure management benefits at no extra licence cost</strong>.</li>
+</ul>
+<hr />
+<nav class="pager"><a href="100-01-meet-windows-server-2025.html">← Lab 100-1</a> <a href="index.html">Overview</a> <a href="100-03-roles-and-features.html">Lab 100-3 →</a></nav>
+</article>
+<p class="source"><a href="https://github.com/medyabi/windows-server2025-Hybrid-lab" rel="noopener">View the source on GitHub</a></p>
+
+</main>
+<aside class="aside-toc" aria-label="In this article"><p>In this article</p><ol><li><a href="#three-editions">Three editions</a></li><li><a href="#how-windows-server-is-licensed">How Windows Server is licensed</a></li><li><a href="#steps">Steps</a></li><li><a href="#check-yourself">Check yourself</a></li><li><a href="#customer-talking-points">Customer talking points</a></li></ol></aside>
+</div>
+<footer class="sitefoot">
+  <div class="foot-in">
+    <div><strong>Windows Server Labs</strong><p>Hands-on labs by Mohamed Dyabi, Microsoft Certified Trainer.</p></div>
+    <ul>
+      <li><a href="../hybrid/index.html">Hybrid track</a></li>
+      <li><a href="../security/index.html">Security track</a></li>
+      <li><a href="../azure-local/index.html">Azure Local track</a></li>
+      <li><a href="https://bookings.cloud.microsoft/book/WindowsServer2025Lab@ebigpictures.com/" rel="noopener">Book a lab slot</a></li>
+      <li><a href="https://access.ebigpictures.com/">Lab access (team sign-in)</a></li>
+      <li><a href="https://ai.ebigpictures.com/">AI Labs: Copilot Studio and Cowork</a></li>
+      <li><a href="https://github.com/medyabi/windows-server2025-Hybrid-lab" rel="noopener">Hybrid labs on GitHub</a></li>
+      <li><a href="https://github.com/medyabi/windows-server-security-lab" rel="noopener">Security labs on GitHub</a></li>
+      <li><a href="https://github.com/medyabi/Azure-Local-Lab-Deployment-Guide" rel="noopener">Azure Local guide on GitHub</a></li>
+    </ul>
+  </div>
+  <p class="fine">Lab environments only: several labs change security settings, lock accounts or force recovery. Never run them on production systems. An independent site, not affiliated with Microsoft. © 2026 Mohamed Dyabi</p>
+</footer>
+<script>
+(function(){
+  // Table of contents: open on wide screens, collapsible on small ones
+  var toc = document.querySelector('details.toc');
+  if (toc) {
+    var mq = window.matchMedia('(min-width: 1024px)');
+    var sync = function(){ if (mq.matches) toc.open = true; };
+    sync(); if (mq.addEventListener) mq.addEventListener('change', sync);
+    var cur = toc.querySelector('[aria-current="page"]');
+    if (cur && cur.scrollIntoView && mq.matches) cur.scrollIntoView({block: 'center'});
+  }
+  // Filter by title
+  var f = document.getElementById('toc-filter');
+  if (f) f.addEventListener('input', function(){
+    var q = f.value.trim().toLowerCase();
+    document.querySelectorAll('.toc-list li').forEach(function(li){
+      var hit = !q || li.textContent.toLowerCase().indexOf(q) !== -1;
+      li.hidden = !hit;
+    });
+  });
+  // Copy buttons on code blocks
+  document.querySelectorAll('.codeblock').forEach(function(cb){
+    var btn = cb.querySelector('.copy'), code = cb.querySelector('code');
+    if (!btn || !code) return;
+    btn.addEventListener('click', function(){
+      navigator.clipboard.writeText(code.innerText).then(function(){
+        btn.textContent = 'Copied'; setTimeout(function(){ btn.textContent = 'Copy'; }, 1500);
+      }, function(){ btn.textContent = 'Select and copy'; });
+    });
+  });
+  // Highlight the current section in "In this article"
+  var links = document.querySelectorAll('.aside-toc a');
+  if (links.length && 'IntersectionObserver' in window) {
+    var map = {}; links.forEach(function(a){ map[a.getAttribute('href').slice(1)] = a; });
+    var obs = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if (e.isIntersecting) {
+        links.forEach(function(a){ a.classList.remove('on'); });
+        var a = map[e.target.id]; if (a) a.classList.add('on');
+      }});
+    }, {rootMargin: '0px 0px -75% 0px'});
+    Object.keys(map).forEach(function(id){ var h = document.getElementById(id); if (h) obs.observe(h); });
+  }
+})();
+</script>
+</body>
+</html>

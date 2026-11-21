@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab 100-4: Manage and monitor your server (30 min) · Windows Server Labs</title>
+<meta name="description" content="Hands-on Windows Server 2025 labs: hybrid management with Azure Arc, and Windows Server security.">
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+</head>
+<body class="t-foundations">
+<a class="skip" href="#content">Skip to main content</a>
+<header class="masthead">
+  <a class="brand" href="../index.html"><img src="../assets/favicon.svg" alt="" width="24" height="24"><span>Windows Server Labs</span></a>
+  <span class="divider" aria-hidden="true"></span>
+  <nav class="mainnav" aria-label="Main"><a href="index.html" aria-current="true">Foundations</a><a href="../hybrid/index.html">Hybrid</a><a href="../security/index.html">Security</a><a href="../azure-local/index.html">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
+  <a class="gh" href="https://github.com/medyabi" rel="noopener">GitHub</a>
+</header>
+<div class="doc has-toc">
+<details class="toc"><summary>Table of contents</summary><nav aria-label="Level 100: Foundations"><p class="toc-title">Level 100: Foundations</p><input id="toc-filter" class="toc-filter" type="search" placeholder="Filter by title" aria-label="Filter by title"><ol class="toc-list"><li><a href="index.html">Overview</a></li><li><a href="100-01-meet-windows-server-2025.html">Lab 100-1: Meet Windows Server 2025</a></li><li><a href="100-02-editions-and-licensing.html">Lab 100-2: Editions and licensing</a></li><li><a href="100-03-roles-and-features.html">Lab 100-3: Roles and features</a></li><li><a href="100-04-manage-and-monitor.html" aria-current="page">Lab 100-4: Manage and monitor your server</a></li><li><a href="100-05-storage-basics.html">Lab 100-5: Storage basics</a></li></ol></nav></details>
+<main id="content" class="article">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../index.html">Labs</a></li><li><a href="index.html">Foundations</a></li></ol></nav>
+<article class="prose">
+<h1 id="lab-100-4-manage-and-monitor-your-server-30-min">Lab 100-4: Manage and monitor your server</h1><p class="meta"><span class="level l100">Level 100</span><span>Lab</span><span>3 min read</span><span>Lab time: 30 min</span></p>
+<nav class="pager"><a href="100-03-roles-and-features.html">← Lab 100-3</a> <a href="index.html">Overview</a> <a href="100-05-storage-basics.html">Lab 100-5 →</a></nav>
+<p>In this lab you look after your server like an admin does every day: change basic settings without the GUI, run commands remotely, read the event logs and check performance. These are the skills that keep a server healthy, and the ones customers expect their partner to have.</p>
+<p><strong>Why learn this without the GUI?</strong> Because the best servers have no GUI. <strong>Server Core</strong> is smaller, safer and needs fewer updates, and many customers run it for infrastructure roles. Think of it like a car with no dashboard screen: it drives the same, you just use the keys and the pedals.</p>
+<h3 id="steps">Steps</h3>
+<p><strong>Part A: SConfig, the text menu</strong></p>
+<ol>
+<li>
+<p>Open <strong>PowerShell as administrator</strong> and type:</p>
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>sconfig</code></pre></div>
+<p>This is the menu you get on Server Core. Look at what it covers: computer name, domain, Windows Update, Remote Desktop, network settings, date and time.</p>
+</li>
+<li>
+<p>Type <strong>6</strong> (or the number shown for <strong>Install updates</strong>) to see the update options, then go back. Don't change the computer name or the network: you'd lose your connection.</p>
+</li>
+<li>Type <strong>15</strong> (or the number shown for <strong>Exit to command line (PowerShell)</strong>) to leave.</li>
+</ol>
+<p><strong>Part B: PowerShell remoting</strong></p>
+<ol start="4">
+<li>
+<p>Remoting lets you run commands on many servers at once. It's on by default on Windows Server. Check it:</p>
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>Get-Service WinRM
+Test-WSMan -ComputerName localhost</code></pre></div>
+</li>
+<li>
+<p>Run a command "remotely" on your own server (with a domain, you'd put 10 server names here):</p>
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>Invoke-Command -ComputerName localhost -ScriptBlock { Get-Service | Where-Object Status -eq Running | Measure-Object }</code></pre></div>
+</li>
+</ol>
+<p><strong>Part C: event logs</strong></p>
+<ol start="6">
+<li>
+<p>The <strong>System</strong> log is the first place to look when something goes wrong. Show the last 10 events, then only the errors:</p>
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>Get-WinEvent -LogName System -MaxEvents 10 | Select-Object TimeCreated, Id, LevelDisplayName, ProviderName
+Get-WinEvent -FilterHashtable @{ LogName = 'System'; Level = 2 } -MaxEvents 5 | Select-Object TimeCreated, Id, Message</code></pre></div>
+</li>
+<li>
+<p>Find when the server last started (event 6005, "The Event log service was started"):</p>
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>Get-WinEvent -FilterHashtable @{ LogName = 'System'; Id = 6005 } -MaxEvents 1 | Select-Object TimeCreated</code></pre></div>
+</li>
+<li>
+<p>Open <strong>Event Viewer</strong> (<code>eventvwr.msc</code>) and find the same events in <strong>Windows Logs</strong> &gt; <strong>System</strong>. Use <strong>Filter Current Log</strong> to show only <strong>Error</strong>.</p>
+</li>
+</ol>
+<p><strong>Part D: performance</strong></p>
+<ol start="9">
+<li>
+<p>Measure the CPU and free memory for 5 seconds:</p>
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>Get-Counter -Counter '\Processor(_Total)\% Processor Time', '\Memory\Available MBytes' -SampleInterval 1 -MaxSamples 5</code></pre></div>
+</li>
+<li>
+<p>Open <strong>Task Manager</strong> (Ctrl + Shift + Esc) &gt; <strong>Performance</strong>, then <strong>Open Resource Monitor</strong> at the bottom. Find which process uses the most CPU and memory.</p>
+</li>
+<li>
+<p>Check which updates are installed:</p>
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>Get-HotFix | Sort-Object InstalledOn -Descending | Select-Object -First 5</code></pre></div>
+</li>
+</ol>
+<h3 id="check-yourself">Check yourself</h3>
+<ul>
+<li>Which tool configures Server Core without a GUI? (SConfig, or PowerShell.)</li>
+<li>Where do you look first when a server misbehaves? (The <strong>System</strong> event log, filtered on errors.)</li>
+<li>Why does remoting matter? (One command runs on many servers, which is how admins manage at scale.)</li>
+</ul>
+<h3 id="customer-talking-points">Customer talking points</h3>
+<ul>
+<li><strong>Server Core</strong> is the recommended install for infrastructure roles: smaller, safer, fewer reboots. SConfig and PowerShell make it easy to manage.</li>
+<li><strong>PowerShell remoting</strong> is on by default: the base for automation, and for tools like Windows Admin Center.</li>
+<li>For many servers at once, the next step is <strong>Azure Monitor and Azure Arc</strong> (Level 200): the same logs and counters, in one place, with alerts.</li>
+</ul>
+<hr />
+<nav class="pager"><a href="100-03-roles-and-features.html">← Lab 100-3</a> <a href="index.html">Overview</a> <a href="100-05-storage-basics.html">Lab 100-5 →</a></nav>
+</article>
+<p class="source"><a href="https://github.com/medyabi/windows-server2025-Hybrid-lab" rel="noopener">View the source on GitHub</a></p>
+
+</main>
+<aside class="aside-toc" aria-label="In this article"><p>In this article</p><ol><li><a href="#steps">Steps</a></li><li><a href="#check-yourself">Check yourself</a></li><li><a href="#customer-talking-points">Customer talking points</a></li></ol></aside>
+</div>
+<footer class="sitefoot">
+  <div class="foot-in">
+    <div><strong>Windows Server Labs</strong><p>Hands-on labs by Mohamed Dyabi, Microsoft Certified Trainer.</p></div>
+    <ul>
+      <li><a href="../hybrid/index.html">Hybrid track</a></li>
+      <li><a href="../security/index.html">Security track</a></li>
+      <li><a href="../azure-local/index.html">Azure Local track</a></li>
+      <li><a href="https://bookings.cloud.microsoft/book/WindowsServer2025Lab@ebigpictures.com/" rel="noopener">Book a lab slot</a></li>
+      <li><a href="https://access.ebigpictures.com/">Lab access (team sign-in)</a></li>
+      <li><a href="https://ai.ebigpictures.com/">AI Labs: Copilot Studio and Cowork</a></li>
+      <li><a href="https://github.com/medyabi/windows-server2025-Hybrid-lab" rel="noopener">Hybrid labs on GitHub</a></li>
+      <li><a href="https://github.com/medyabi/windows-server-security-lab" rel="noopener">Security labs on GitHub</a></li>
+      <li><a href="https://github.com/medyabi/Azure-Local-Lab-Deployment-Guide" rel="noopener">Azure Local guide on GitHub</a></li>
+    </ul>
+  </div>
+  <p class="fine">Lab environments only: several labs change security settings, lock accounts or force recovery. Never run them on production systems. An independent site, not affiliated with Microsoft. © 2026 Mohamed Dyabi</p>
+</footer>
+<script>
+(function(){
+  // Table of contents: open on wide screens, collapsible on small ones
+  var toc = document.querySelector('details.toc');
+  if (toc) {
+    var mq = window.matchMedia('(min-width: 1024px)');
+    var sync = function(){ if (mq.matches) toc.open = true; };
+    sync(); if (mq.addEventListener) mq.addEventListener('change', sync);
+    var cur = toc.querySelector('[aria-current="page"]');
+    if (cur && cur.scrollIntoView && mq.matches) cur.scrollIntoView({block: 'center'});
+  }
+  // Filter by title
+  var f = document.getElementById('toc-filter');
+  if (f) f.addEventListener('input', function(){
+    var q = f.value.trim().toLowerCase();
+    document.querySelectorAll('.toc-list li').forEach(function(li){
+      var hit = !q || li.textContent.toLowerCase().indexOf(q) !== -1;
+      li.hidden = !hit;
+    });
+  });
+  // Copy buttons on code blocks
+  document.querySelectorAll('.codeblock').forEach(function(cb){
+    var btn = cb.querySelector('.copy'), code = cb.querySelector('code');
+    if (!btn || !code) return;
+    btn.addEventListener('click', function(){
+      navigator.clipboard.writeText(code.innerText).then(function(){
+        btn.textContent = 'Copied'; setTimeout(function(){ btn.textContent = 'Copy'; }, 1500);
+      }, function(){ btn.textContent = 'Select and copy'; });
+    });
+  });
+  // Highlight the current section in "In this article"
+  var links = document.querySelectorAll('.aside-toc a');
+  if (links.length && 'IntersectionObserver' in window) {
+    var map = {}; links.forEach(function(a){ map[a.getAttribute('href').slice(1)] = a; });
+    var obs = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if (e.isIntersecting) {
+        links.forEach(function(a){ a.classList.remove('on'); });
+        var a = map[e.target.id]; if (a) a.classList.add('on');
+      }});
+    }, {rootMargin: '0px 0px -75% 0px'});
+    Object.keys(map).forEach(function(id){ var h = document.getElementById(id); if (h) obs.observe(h); });
+  }
+})();
+</script>
+</body>
+</html>

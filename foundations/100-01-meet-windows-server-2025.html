@@ -1,0 +1,146 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab 100-1: Meet Windows Server 2025 (30 min) · Windows Server Labs</title>
+<meta name="description" content="Hands-on Windows Server 2025 labs: hybrid management with Azure Arc, and Windows Server security.">
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+</head>
+<body class="t-foundations">
+<a class="skip" href="#content">Skip to main content</a>
+<header class="masthead">
+  <a class="brand" href="../index.html"><img src="../assets/favicon.svg" alt="" width="24" height="24"><span>Windows Server Labs</span></a>
+  <span class="divider" aria-hidden="true"></span>
+  <nav class="mainnav" aria-label="Main"><a href="index.html" aria-current="true">Foundations</a><a href="../hybrid/index.html">Hybrid</a><a href="../security/index.html">Security</a><a href="../azure-local/index.html">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
+  <a class="gh" href="https://github.com/medyabi" rel="noopener">GitHub</a>
+</header>
+<div class="doc has-toc">
+<details class="toc"><summary>Table of contents</summary><nav aria-label="Level 100: Foundations"><p class="toc-title">Level 100: Foundations</p><input id="toc-filter" class="toc-filter" type="search" placeholder="Filter by title" aria-label="Filter by title"><ol class="toc-list"><li><a href="index.html">Overview</a></li><li><a href="100-01-meet-windows-server-2025.html" aria-current="page">Lab 100-1: Meet Windows Server 2025</a></li><li><a href="100-02-editions-and-licensing.html">Lab 100-2: Editions and licensing</a></li><li><a href="100-03-roles-and-features.html">Lab 100-3: Roles and features</a></li><li><a href="100-04-manage-and-monitor.html">Lab 100-4: Manage and monitor your server</a></li><li><a href="100-05-storage-basics.html">Lab 100-5: Storage basics</a></li></ol></nav></details>
+<main id="content" class="article">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../index.html">Labs</a></li><li><a href="index.html">Foundations</a></li></ol></nav>
+<article class="prose">
+<h1 id="lab-100-1-meet-windows-server-2025-30-min">Lab 100-1: Meet Windows Server 2025</h1><p class="meta"><span class="level l100">Level 100</span><span>Lab</span><span>3 min read</span><span>Lab time: 30 min</span></p>
+<nav class="pager"><a href="index.html">Overview</a> <a href="100-02-editions-and-licensing.html">Lab 100-2 →</a></nav>
+<p>In this lab you get to know your server. What version is it? Which edition? Is it activated? Is it the full desktop or Server Core? These are the first four questions any admin asks, and the first four a customer will ask you.</p>
+<p><strong>What is Windows Server 2025?</strong> It's the current Long-Term Servicing Channel release of Windows Server, built on the same code base as Windows 11 24H2 (build 26100). Think of it as the engine room of a company: it runs the file shares, the identities, the virtual machines and the business apps that people never see but always use.</p>
+<h3 id="steps">Steps</h3>
+<ol>
+<li>Connect to your VM with Remote Desktop and sign in.</li>
+<li>Press <strong>Win + R</strong>, type <code>winver</code>, and press <strong>Enter</strong>. Note the version and the <strong>OS build</strong> (26100.x).</li>
+<li>
+<p>Open <strong>PowerShell as administrator</strong> and get the same facts in one line:</p>
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>Get-ComputerInfo | Select-Object WindowsProductName, OsVersion, OsBuildNumber, CsNumberOfLogicalProcessors,
+  @{ Name = "MemoryGB"; Expression = { [math]::Round($_.CsTotalPhysicalMemory / 1GB, 1) } }</code></pre></div>
+</li>
+<li>
+<p>Check the <strong>edition</strong> and the <strong>install type</strong>:</p>
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>Get-WindowsEdition -Online
+(Get-ItemProperty 'HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion').InstallationType</code></pre></div>
+<p><code>ServerDatacenter</code> is the edition. <code>Server</code> means <strong>Desktop Experience</strong> (the full GUI). On <strong>Server Core</strong>, the same command returns <code>Server Core</code>.</p>
+</li>
+<li>
+<p>Check the <strong>activation</strong>:</p>
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>cscript //nologo $env:windir\system32\slmgr.vbs /dli</code></pre></div>
+<p>Look at <strong>License Status</strong> (Licensed) and the <strong>channel</strong>. Your VM is activated by its Hyper-V host, without a product key: that's <strong>Automatic Virtual Machine Activation (AVMA)</strong>. It works because the host runs Datacenter edition. You'll see why in Lab 100-2.</p>
+</li>
+<li>
+<p>Look at the taskbar, near the clock: there's an <strong>Azure Arc</strong> icon. In Windows Server 2025, the Arc setup wizard is installed by default. Don't run it now: connecting to Azure is Level 200.</p>
+</li>
+<li>Open <strong>Server Manager</strong> (it starts by itself at sign-in). Click <strong>Local Server</strong> and find the same information: computer name, workgroup, Windows Defender status, Remote Desktop <strong>Enabled</strong>, and the time zone.</li>
+</ol>
+<h3 id="whats-new-in-windows-server-2025-in-five-lines">What's new in Windows Server 2025, in five lines</h3>
+<p>You don't need every feature. You need five you can explain in one sentence each:</p>
+<ul>
+<li><strong>Hotpatching</strong>: security updates without a reboot, through Azure Arc (Level 200, Lab 3).</li>
+<li><strong>Azure Arc setup built in</strong>, and <strong>pay-as-you-go licensing</strong> billed per core through Azure.</li>
+<li><strong>Secure by default</strong>: SMB signing required by default, and Microsoft's security baseline applied in one command with OSConfig (Level 200, Lab 9).</li>
+<li><strong>Bigger Hyper-V</strong>: up to 4 PB of memory and 2,048 logical processors per host, and GPU partitioning with live migration.</li>
+<li><strong>Hyperconverged improvements</strong> in Datacenter: Network ATC, thin-provisioned Storage Spaces Direct volumes, workgroup clusters (Level 400).</li>
+</ul>
+<h3 id="check-yourself">Check yourself</h3>
+<ul>
+<li>How do you tell Desktop Experience from Server Core in PowerShell? (The <code>InstallationType</code> value: <code>Server</code> or <code>Server Core</code>.)</li>
+<li>Why is your VM activated with no product key? (AVMA: the Datacenter host activates its Windows Server guests.)</li>
+<li>What's the build number of Windows Server 2025? (26100.)</li>
+</ul>
+<h3 id="customer-talking-points">Customer talking points</h3>
+<ul>
+<li>Windows Server 2025 is the <strong>current long-term release</strong>: 5 years of mainstream support plus 5 years of extended support.</li>
+<li>Choose <strong>Server Core</strong> for infrastructure roles: smaller attack surface and fewer updates. Choose <strong>Desktop Experience</strong> when an app or a team needs the GUI.</li>
+<li>The headline for most customers is <strong>hotpatching</strong>: from 12 reboots a year to about 4.</li>
+</ul>
+<hr />
+<nav class="pager"><a href="index.html">Overview</a> <a href="100-02-editions-and-licensing.html">Lab 100-2 →</a></nav>
+</article>
+<p class="source"><a href="https://github.com/medyabi/windows-server2025-Hybrid-lab" rel="noopener">View the source on GitHub</a></p>
+
+</main>
+<aside class="aside-toc" aria-label="In this article"><p>In this article</p><ol><li><a href="#steps">Steps</a></li><li><a href="#whats-new-in-windows-server-2025-in-five-lines">What's new in Windows Server 2025, in five lines</a></li><li><a href="#check-yourself">Check yourself</a></li><li><a href="#customer-talking-points">Customer talking points</a></li></ol></aside>
+</div>
+<footer class="sitefoot">
+  <div class="foot-in">
+    <div><strong>Windows Server Labs</strong><p>Hands-on labs by Mohamed Dyabi, Microsoft Certified Trainer.</p></div>
+    <ul>
+      <li><a href="../hybrid/index.html">Hybrid track</a></li>
+      <li><a href="../security/index.html">Security track</a></li>
+      <li><a href="../azure-local/index.html">Azure Local track</a></li>
+      <li><a href="https://bookings.cloud.microsoft/book/WindowsServer2025Lab@ebigpictures.com/" rel="noopener">Book a lab slot</a></li>
+      <li><a href="https://access.ebigpictures.com/">Lab access (team sign-in)</a></li>
+      <li><a href="https://ai.ebigpictures.com/">AI Labs: Copilot Studio and Cowork</a></li>
+      <li><a href="https://github.com/medyabi/windows-server2025-Hybrid-lab" rel="noopener">Hybrid labs on GitHub</a></li>
+      <li><a href="https://github.com/medyabi/windows-server-security-lab" rel="noopener">Security labs on GitHub</a></li>
+      <li><a href="https://github.com/medyabi/Azure-Local-Lab-Deployment-Guide" rel="noopener">Azure Local guide on GitHub</a></li>
+    </ul>
+  </div>
+  <p class="fine">Lab environments only: several labs change security settings, lock accounts or force recovery. Never run them on production systems. An independent site, not affiliated with Microsoft. © 2026 Mohamed Dyabi</p>
+</footer>
+<script>
+(function(){
+  // Table of contents: open on wide screens, collapsible on small ones
+  var toc = document.querySelector('details.toc');
+  if (toc) {
+    var mq = window.matchMedia('(min-width: 1024px)');
+    var sync = function(){ if (mq.matches) toc.open = true; };
+    sync(); if (mq.addEventListener) mq.addEventListener('change', sync);
+    var cur = toc.querySelector('[aria-current="page"]');
+    if (cur && cur.scrollIntoView && mq.matches) cur.scrollIntoView({block: 'center'});
+  }
+  // Filter by title
+  var f = document.getElementById('toc-filter');
+  if (f) f.addEventListener('input', function(){
+    var q = f.value.trim().toLowerCase();
+    document.querySelectorAll('.toc-list li').forEach(function(li){
+      var hit = !q || li.textContent.toLowerCase().indexOf(q) !== -1;
+      li.hidden = !hit;
+    });
+  });
+  // Copy buttons on code blocks
+  document.querySelectorAll('.codeblock').forEach(function(cb){
+    var btn = cb.querySelector('.copy'), code = cb.querySelector('code');
+    if (!btn || !code) return;
+    btn.addEventListener('click', function(){
+      navigator.clipboard.writeText(code.innerText).then(function(){
+        btn.textContent = 'Copied'; setTimeout(function(){ btn.textContent = 'Copy'; }, 1500);
+      }, function(){ btn.textContent = 'Select and copy'; });
+    });
+  });
+  // Highlight the current section in "In this article"
+  var links = document.querySelectorAll('.aside-toc a');
+  if (links.length && 'IntersectionObserver' in window) {
+    var map = {}; links.forEach(function(a){ map[a.getAttribute('href').slice(1)] = a; });
+    var obs = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if (e.isIntersecting) {
+        links.forEach(function(a){ a.classList.remove('on'); });
+        var a = map[e.target.id]; if (a) a.classList.add('on');
+      }});
+    }, {rootMargin: '0px 0px -75% 0px'});
+    Object.keys(map).forEach(function(id){ var h = document.getElementById(id); if (h) obs.observe(h); });
+  }
+})();
+</script>
+</body>
+</html>

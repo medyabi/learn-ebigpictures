@@ -1,0 +1,157 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Lab 100-3: Roles and features (30 min) · Windows Server Labs</title>
+<meta name="description" content="Hands-on Windows Server 2025 labs: hybrid management with Azure Arc, and Windows Server security.">
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+</head>
+<body class="t-foundations">
+<a class="skip" href="#content">Skip to main content</a>
+<header class="masthead">
+  <a class="brand" href="../index.html"><img src="../assets/favicon.svg" alt="" width="24" height="24"><span>Windows Server Labs</span></a>
+  <span class="divider" aria-hidden="true"></span>
+  <nav class="mainnav" aria-label="Main"><a href="index.html" aria-current="true">Foundations</a><a href="../hybrid/index.html">Hybrid</a><a href="../security/index.html">Security</a><a href="../azure-local/index.html">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
+  <a class="gh" href="https://github.com/medyabi" rel="noopener">GitHub</a>
+</header>
+<div class="doc has-toc">
+<details class="toc"><summary>Table of contents</summary><nav aria-label="Level 100: Foundations"><p class="toc-title">Level 100: Foundations</p><input id="toc-filter" class="toc-filter" type="search" placeholder="Filter by title" aria-label="Filter by title"><ol class="toc-list"><li><a href="index.html">Overview</a></li><li><a href="100-01-meet-windows-server-2025.html">Lab 100-1: Meet Windows Server 2025</a></li><li><a href="100-02-editions-and-licensing.html">Lab 100-2: Editions and licensing</a></li><li><a href="100-03-roles-and-features.html" aria-current="page">Lab 100-3: Roles and features</a></li><li><a href="100-04-manage-and-monitor.html">Lab 100-4: Manage and monitor your server</a></li><li><a href="100-05-storage-basics.html">Lab 100-5: Storage basics</a></li></ol></nav></details>
+<main id="content" class="article">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../index.html">Labs</a></li><li><a href="index.html">Foundations</a></li></ol></nav>
+<article class="prose">
+<h1 id="lab-100-3-roles-and-features-30-min">Lab 100-3: Roles and features</h1><p class="meta"><span class="level l100">Level 100</span><span>Lab</span><span>3 min read</span><span>Lab time: 30 min</span></p>
+<nav class="pager"><a href="100-02-editions-and-licensing.html">← Lab 100-2</a> <a href="index.html">Overview</a> <a href="100-04-manage-and-monitor.html">Lab 100-4 →</a></nav>
+<p>In this lab you give your server a job. A fresh Windows Server does almost nothing: you choose what it becomes by adding <strong>roles</strong> and <strong>features</strong>. You make it a file server and a web server, once with the mouse and once with PowerShell.</p>
+<p><strong>Role or feature?</strong> A <strong>role</strong> is the server's job for other machines: file server, web server, DNS, Hyper-V, Active Directory. A <strong>feature</strong> is a tool that helps the server itself: BitLocker, Failover Clustering, Windows Server Backup. Think of a restaurant: the roles are what you serve customers (a kitchen, a bar), the features are the equipment behind the scenes (the dishwasher, the fridge).</p>
+<h3 id="steps">Steps</h3>
+<p><strong>Part A: in Server Manager</strong></p>
+<ol>
+<li>Open <strong>Server Manager</strong> &gt; <strong>Manage</strong> &gt; <strong>Add Roles and Features</strong>.</li>
+<li>Click <strong>Next</strong> until <strong>Server Roles</strong>. Expand <strong>File and Storage Services</strong> &gt; <strong>File and iSCSI Services</strong> and tick <strong>File Server</strong>. Click <strong>Next</strong>.</li>
+<li>On <strong>Features</strong>, don't add anything. Click <strong>Next</strong>, then <strong>Install</strong>. When it's done, click <strong>Close</strong>.</li>
+<li>Back in Server Manager, a new <strong>File and Storage Services</strong> entry appears on the left. That's the role's management page.</li>
+</ol>
+<p><strong>Part B: in PowerShell</strong></p>
+<ol start="5">
+<li>
+<p>Open <strong>PowerShell as administrator</strong>. List what's installed:</p>
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>Get-WindowsFeature | Where-Object Installed | Select-Object Name, DisplayName</code></pre></div>
+<p>You see <code>FS-FileServer</code>, the File Server role you just added.</p>
+</li>
+<li>
+<p>Install the <strong>web server (IIS)</strong> with its management tools, in one line:</p>
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>Install-WindowsFeature -Name Web-Server -IncludeManagementTools</code></pre></div>
+<p>Check the <strong>Restart Needed</strong> column: here it says <strong>No</strong>. Some roles do need a restart.</p>
+</li>
+<li>
+<p>Test the web server:</p>
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>(Invoke-WebRequest -Uri http://localhost -UseBasicParsing).StatusCode</code></pre></div>
+<p><code>200</code> means the default IIS page answers. You can also open <strong>http://localhost</strong> in Edge.</p>
+</li>
+<li>
+<p>Use the file server role: create a folder and share it.</p>
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>New-Item -Path C:\Shares\Sales -ItemType Directory -Force
+New-SmbShare -Name Sales -Path C:\Shares\Sales -FullAccess Administrators -ReadAccess Users
+Get-SmbShare
+Test-Path \\localhost\Sales</code></pre></div>
+</li>
+<li>
+<p>See what a role brings with it. Find the IIS service and the firewall rules it added:</p>
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>Get-Service W3SVC
+Get-NetFirewallRule | Where-Object DisplayName -like 'World Wide Web*' | Select-Object DisplayName, Enabled</code></pre></div>
+</li>
+<li>
+<p>Now add a <strong>feature</strong>, a tool for the server itself: Windows Server Backup.</p>
+<div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>Install-WindowsFeature -Name Windows-Server-Backup
+wbadmin get versions</code></pre></div>
+<p>No backup exists yet, so <code>wbadmin</code> says so. The tool is ready; a real backup also needs a separate target disk or a network share.</p>
+</li>
+</ol>
+<div class="alert note"><p class="alert-title">Note</p><p><strong>Note:</strong> keep a server to the roles it needs. Every extra role is more updates, more open ports and more attack surface.</p></div>
+<h3 id="check-yourself">Check yourself</h3>
+<ul>
+<li>Is Hyper-V a role or a feature? (A role: it serves virtual machines.)</li>
+<li>Which PowerShell command lists what's installed? (<code>Get-WindowsFeature</code>, filtered on <code>Installed</code>.)</li>
+<li>Why script the install instead of clicking? (It's repeatable: the same command builds 1 or 100 identical servers.)</li>
+</ul>
+<h3 id="customer-talking-points">Customer talking points</h3>
+<ul>
+<li>One operating system, many jobs: Windows Server becomes a file server, web server, domain controller or virtualization host <strong>by adding roles</strong>, with no extra product to buy.</li>
+<li>Everything in Server Manager can be done in <strong>PowerShell</strong>, which means automation and consistency at scale.</li>
+<li>Install only what you need: <strong>less attack surface, fewer updates</strong>.</li>
+</ul>
+<hr />
+<nav class="pager"><a href="100-02-editions-and-licensing.html">← Lab 100-2</a> <a href="index.html">Overview</a> <a href="100-04-manage-and-monitor.html">Lab 100-4 →</a></nav>
+</article>
+<p class="source"><a href="https://github.com/medyabi/windows-server2025-Hybrid-lab" rel="noopener">View the source on GitHub</a></p>
+
+</main>
+<aside class="aside-toc" aria-label="In this article"><p>In this article</p><ol><li><a href="#steps">Steps</a></li><li><a href="#check-yourself">Check yourself</a></li><li><a href="#customer-talking-points">Customer talking points</a></li></ol></aside>
+</div>
+<footer class="sitefoot">
+  <div class="foot-in">
+    <div><strong>Windows Server Labs</strong><p>Hands-on labs by Mohamed Dyabi, Microsoft Certified Trainer.</p></div>
+    <ul>
+      <li><a href="../hybrid/index.html">Hybrid track</a></li>
+      <li><a href="../security/index.html">Security track</a></li>
+      <li><a href="../azure-local/index.html">Azure Local track</a></li>
+      <li><a href="https://bookings.cloud.microsoft/book/WindowsServer2025Lab@ebigpictures.com/" rel="noopener">Book a lab slot</a></li>
+      <li><a href="https://access.ebigpictures.com/">Lab access (team sign-in)</a></li>
+      <li><a href="https://ai.ebigpictures.com/">AI Labs: Copilot Studio and Cowork</a></li>
+      <li><a href="https://github.com/medyabi/windows-server2025-Hybrid-lab" rel="noopener">Hybrid labs on GitHub</a></li>
+      <li><a href="https://github.com/medyabi/windows-server-security-lab" rel="noopener">Security labs on GitHub</a></li>
+      <li><a href="https://github.com/medyabi/Azure-Local-Lab-Deployment-Guide" rel="noopener">Azure Local guide on GitHub</a></li>
+    </ul>
+  </div>
+  <p class="fine">Lab environments only: several labs change security settings, lock accounts or force recovery. Never run them on production systems. An independent site, not affiliated with Microsoft. © 2026 Mohamed Dyabi</p>
+</footer>
+<script>
+(function(){
+  // Table of contents: open on wide screens, collapsible on small ones
+  var toc = document.querySelector('details.toc');
+  if (toc) {
+    var mq = window.matchMedia('(min-width: 1024px)');
+    var sync = function(){ if (mq.matches) toc.open = true; };
+    sync(); if (mq.addEventListener) mq.addEventListener('change', sync);
+    var cur = toc.querySelector('[aria-current="page"]');
+    if (cur && cur.scrollIntoView && mq.matches) cur.scrollIntoView({block: 'center'});
+  }
+  // Filter by title
+  var f = document.getElementById('toc-filter');
+  if (f) f.addEventListener('input', function(){
+    var q = f.value.trim().toLowerCase();
+    document.querySelectorAll('.toc-list li').forEach(function(li){
+      var hit = !q || li.textContent.toLowerCase().indexOf(q) !== -1;
+      li.hidden = !hit;
+    });
+  });
+  // Copy buttons on code blocks
+  document.querySelectorAll('.codeblock').forEach(function(cb){
+    var btn = cb.querySelector('.copy'), code = cb.querySelector('code');
+    if (!btn || !code) return;
+    btn.addEventListener('click', function(){
+      navigator.clipboard.writeText(code.innerText).then(function(){
+        btn.textContent = 'Copied'; setTimeout(function(){ btn.textContent = 'Copy'; }, 1500);
+      }, function(){ btn.textContent = 'Select and copy'; });
+    });
+  });
+  // Highlight the current section in "In this article"
+  var links = document.querySelectorAll('.aside-toc a');
+  if (links.length && 'IntersectionObserver' in window) {
+    var map = {}; links.forEach(function(a){ map[a.getAttribute('href').slice(1)] = a; });
+    var obs = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if (e.isIntersecting) {
+        links.forEach(function(a){ a.classList.remove('on'); });
+        var a = map[e.target.id]; if (a) a.classList.add('on');
+      }});
+    }, {rootMargin: '0px 0px -75% 0px'});
+    Object.keys(map).forEach(function(id){ var h = document.getElementById(id); if (h) obs.observe(h); });
+  }
+})();
+</script>
+</body>
+</html>

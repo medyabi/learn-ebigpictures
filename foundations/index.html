@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Level 100: Windows Server 2025 foundations · Windows Server Labs</title>
+<meta name="description" content="Hands-on Windows Server 2025 labs: hybrid management with Azure Arc, and Windows Server security.">
+<link rel="stylesheet" href="../assets/site.css">
+<link rel="icon" href="../assets/favicon.svg" type="image/svg+xml">
+<link rel="icon" href="../assets/favicon-32.png" sizes="32x32" type="image/png">
+<link rel="apple-touch-icon" href="../assets/apple-touch-icon.png">
+</head>
+<body class="t-foundations">
+<a class="skip" href="#content">Skip to main content</a>
+<header class="masthead">
+  <a class="brand" href="../index.html"><img src="../assets/favicon.svg" alt="" width="24" height="24"><span>Windows Server Labs</span></a>
+  <span class="divider" aria-hidden="true"></span>
+  <nav class="mainnav" aria-label="Main"><a href="index.html" aria-current="true">Foundations</a><a href="../hybrid/index.html">Hybrid</a><a href="../security/index.html">Security</a><a href="../azure-local/index.html">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
+  <a class="gh" href="https://github.com/medyabi" rel="noopener">GitHub</a>
+</header>
+<div class="doc has-toc">
+<details class="toc"><summary>Table of contents</summary><nav aria-label="Level 100: Foundations"><p class="toc-title">Level 100: Foundations</p><input id="toc-filter" class="toc-filter" type="search" placeholder="Filter by title" aria-label="Filter by title"><ol class="toc-list"><li><a href="index.html" aria-current="page">Overview</a></li><li><a href="100-01-meet-windows-server-2025.html">Lab 100-1: Meet Windows Server 2025</a></li><li><a href="100-02-editions-and-licensing.html">Lab 100-2: Editions and licensing</a></li><li><a href="100-03-roles-and-features.html">Lab 100-3: Roles and features</a></li><li><a href="100-04-manage-and-monitor.html">Lab 100-4: Manage and monitor your server</a></li><li><a href="100-05-storage-basics.html">Lab 100-5: Storage basics</a></li></ol></nav></details>
+<main id="content" class="article">
+<nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../index.html">Labs</a></li></ol></nav>
+<article class="prose">
+<h1 id="level-100-windows-server-2025-foundations">Level 100: Windows Server 2025 foundations</h1><p class="meta"><span class="level l100">Level 100</span><span>Article</span><span>2 min read</span></p>
+<p>Five short labs for new presales engineers. You meet Windows Server 2025, learn how it's sold, and do the everyday admin tasks a customer expects you to know. No Azure, no domain: just your own server.</p>
+<p>Why start here? Because every customer conversation starts with the basics. "Which edition do I need?", "How many licences for my three hosts?", "Can I manage it without a GUI?" If you can answer those calmly, the rest of the meeting goes well.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Lab</th>
+<th>What you'll be able to do</th>
+<th>Time</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><a href="100-01-meet-windows-server-2025.html">1. Meet Windows Server 2025</a></td>
+<td>Find the version, edition, activation and install type, and name the 2025 highlights</td>
+<td>30 min</td>
+</tr>
+<tr>
+<td><a href="100-02-editions-and-licensing.html">2. Editions and licensing</a></td>
+<td>Pick the right edition and size a licence for a customer</td>
+<td>30 min</td>
+</tr>
+<tr>
+<td><a href="100-03-roles-and-features.html">3. Roles and features</a></td>
+<td>Turn a server into a file server and a web server, in the GUI and in PowerShell</td>
+<td>30 min</td>
+</tr>
+<tr>
+<td><a href="100-04-manage-and-monitor.html">4. Manage and monitor your server</a></td>
+<td>Use SConfig, PowerShell remoting, event logs and performance counters</td>
+<td>30 min</td>
+</tr>
+<tr>
+<td><a href="100-05-storage-basics.html">5. Storage basics</a></td>
+<td>Add disks, compare NTFS and ReFS, and share a folder over SMB</td>
+<td>30 min</td>
+</tr>
+</tbody>
+</table></div>
+<p>About 2.5 hours in total: two lab slots.</p>
+<p><strong>What you need:</strong></p>
+<ul>
+<li>Your lab VM: Windows Server 2025 Datacenter (Desktop Experience), with a user name and password from your lab admin.</li>
+<li>Remote Desktop. The connection steps are on the lab access page.</li>
+<li>Nothing else. No Azure subscription for this level.</li>
+</ul>
+<div class="alert note"><p class="alert-title">Note</p><p><strong>Note:</strong> your VM is reset to a clean state at the end of each slot, so you can't break anything for good. Experiment.</p></div>
+<h2 id="the-learning-path">The learning path</h2>
+<p>The Windows Server labs follow five levels. Each level answers a harder customer conversation.</p>
+<div class="table-wrap"><table>
+<thead>
+<tr>
+<th>Level</th>
+<th>Theme</th>
+<th>After this level you can…</th>
+</tr>
+</thead>
+<tbody>
+<tr>
+<td><strong>100</strong></td>
+<td>Foundations (this track)</td>
+<td>Explain Windows Server 2025, its editions and licensing, and do a 10-minute demo</td>
+</tr>
+<tr>
+<td><strong>200</strong></td>
+<td><a href="../hybrid/index.html">Hybrid management with Azure Arc</a></td>
+<td>Run the Azure Arc and Software Assurance benefits demo end to end</td>
+</tr>
+<tr>
+<td><strong>300</strong></td>
+<td>Securing Windows Server</td>
+<td>Answer "how do we secure our servers?" with proof</td>
+</tr>
+<tr>
+<td><strong>400</strong></td>
+<td>Windows Server HCI (coming)</td>
+<td>Build a 2-node hyperconverged cluster and show it survive a failure</td>
+</tr>
+<tr>
+<td><strong>500</strong></td>
+<td>Architecture scenarios (coming)</td>
+<td>Design a customer solution and check it against a self-assessment</td>
+</tr>
+</tbody>
+</table></div>
+<p>Start with <a href="100-01-meet-windows-server-2025.html">Lab 1: Meet Windows Server 2025</a>.</p>
+</article>
+<p class="source"><a href="https://github.com/medyabi/windows-server2025-Hybrid-lab" rel="noopener">View the source on GitHub</a></p>
+
+</main>
+
+</div>
+<footer class="sitefoot">
+  <div class="foot-in">
+    <div><strong>Windows Server Labs</strong><p>Hands-on labs by Mohamed Dyabi, Microsoft Certified Trainer.</p></div>
+    <ul>
+      <li><a href="../hybrid/index.html">Hybrid track</a></li>
+      <li><a href="../security/index.html">Security track</a></li>
+      <li><a href="../azure-local/index.html">Azure Local track</a></li>
+      <li><a href="https://bookings.cloud.microsoft/book/WindowsServer2025Lab@ebigpictures.com/" rel="noopener">Book a lab slot</a></li>
+      <li><a href="https://access.ebigpictures.com/">Lab access (team sign-in)</a></li>
+      <li><a href="https://ai.ebigpictures.com/">AI Labs: Copilot Studio and Cowork</a></li>
+      <li><a href="https://github.com/medyabi/windows-server2025-Hybrid-lab" rel="noopener">Hybrid labs on GitHub</a></li>
+      <li><a href="https://github.com/medyabi/windows-server-security-lab" rel="noopener">Security labs on GitHub</a></li>
+      <li><a href="https://github.com/medyabi/Azure-Local-Lab-Deployment-Guide" rel="noopener">Azure Local guide on GitHub</a></li>
+    </ul>
+  </div>
+  <p class="fine">Lab environments only: several labs change security settings, lock accounts or force recovery. Never run them on production systems. An independent site, not affiliated with Microsoft. © 2026 Mohamed Dyabi</p>
+</footer>
+<script>
+(function(){
+  // Table of contents: open on wide screens, collapsible on small ones
+  var toc = document.querySelector('details.toc');
+  if (toc) {
+    var mq = window.matchMedia('(min-width: 1024px)');
+    var sync = function(){ if (mq.matches) toc.open = true; };
+    sync(); if (mq.addEventListener) mq.addEventListener('change', sync);
+    var cur = toc.querySelector('[aria-current="page"]');
+    if (cur && cur.scrollIntoView && mq.matches) cur.scrollIntoView({block: 'center'});
+  }
+  // Filter by title
+  var f = document.getElementById('toc-filter');
+  if (f) f.addEventListener('input', function(){
+    var q = f.value.trim().toLowerCase();
+    document.querySelectorAll('.toc-list li').forEach(function(li){
+      var hit = !q || li.textContent.toLowerCase().indexOf(q) !== -1;
+      li.hidden = !hit;
+    });
+  });
+  // Copy buttons on code blocks
+  document.querySelectorAll('.codeblock').forEach(function(cb){
+    var btn = cb.querySelector('.copy'), code = cb.querySelector('code');
+    if (!btn || !code) return;
+    btn.addEventListener('click', function(){
+      navigator.clipboard.writeText(code.innerText).then(function(){
+        btn.textContent = 'Copied'; setTimeout(function(){ btn.textContent = 'Copy'; }, 1500);
+      }, function(){ btn.textContent = 'Select and copy'; });
+    });
+  });
+  // Highlight the current section in "In this article"
+  var links = document.querySelectorAll('.aside-toc a');
+  if (links.length && 'IntersectionObserver' in window) {
+    var map = {}; links.forEach(function(a){ map[a.getAttribute('href').slice(1)] = a; });
+    var obs = new IntersectionObserver(function(es){
+      es.forEach(function(e){ if (e.isIntersecting) {
+        links.forEach(function(a){ a.classList.remove('on'); });
+        var a = map[e.target.id]; if (a) a.classList.add('on');
+      }});
+    }, {rootMargin: '0px 0px -75% 0px'});
+    Object.keys(map).forEach(function(id){ var h = document.getElementById(id); if (h) obs.observe(h); });
+  }
+})();
+</script>
+</body>
+</html>

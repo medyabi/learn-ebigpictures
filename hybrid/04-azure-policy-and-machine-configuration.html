@@ -15,7 +15,7 @@
 <header class="masthead">
   <a class="brand" href="../index.html"><img src="../assets/favicon.svg" alt="" width="24" height="24"><span>Windows Server Labs</span></a>
   <span class="divider" aria-hidden="true"></span>
-  <nav class="mainnav" aria-label="Main"><a href="index.html" aria-current="true">Hybrid</a><a href="../security/index.html">Security</a><a href="../azure-local/index.html">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
+  <nav class="mainnav" aria-label="Main"><a href="../foundations/index.html">Foundations</a><a href="index.html" aria-current="true">Hybrid</a><a href="../security/index.html">Security</a><a href="../azure-local/index.html">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
   <a class="gh" href="https://github.com/medyabi" rel="noopener">GitHub</a>
 </header>
 <div class="doc has-toc">
@@ -23,7 +23,7 @@
 <main id="content" class="article">
 <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../index.html">Labs</a></li><li><a href="index.html">Hybrid track</a></li></ol></nav>
 <article class="prose">
-<h1 id="lab-4-azure-policy-and-machine-configuration-45-min-30-min-wait">Lab 4: Azure Policy and Machine Configuration</h1><p class="meta"><span>Lab</span><span>2 min read</span><span>Lab time: 45 min + 30 min wait</span></p>
+<h1 id="lab-4-azure-policy-and-machine-configuration-45-min-30-min-wait">Lab 4: Azure Policy and Machine Configuration</h1><p class="meta"><span class="level l200">Level 200</span><span>Lab</span><span>2 min read</span><span>Lab time: 45 min + 30 min wait</span></p>
 <nav class="pager"><a href="03-hotpatching-with-azure-arc.html">← Lab 3</a> <a href="index.html">Overview</a> <a href="05-azure-monitor.html">Lab 5 →</a></nav>
 <p>In this lab you audit <strong>every</strong> server in a scope from Azure, with one assignment. That's how the customer proves compliance across hundreds of servers. Your server isn't hardened yet — you'll do that in Lab 9 and watch this compliance go up.</p>
 <p><strong>What's the difference?</strong> <strong>Azure Policy</strong> sets rules on Azure resources. <strong>Machine Configuration</strong> (formerly Guest Configuration) carries those rules <strong>inside the operating system</strong>, through the Arc agent. Think of it as Group Policy that works for any server — domain-joined or not, on-premises or in another cloud — with one compliance dashboard.</p>
@@ -31,11 +31,13 @@
 <ol>
 <li>In the portal, search for <strong>Policy</strong> &gt; <strong>Definitions</strong>.</li>
 <li>Search for <strong>Windows machines should meet requirements of the Azure compute security baseline</strong> and open it. For Windows Server 2025, this baseline is powered by the same <strong>OSConfig</strong> engine you'll use in Lab 9.</li>
-<li>Select <strong>Assign policy</strong>:
-   - <strong>Scope</strong>: your resource group <code>rg-presales-&lt;yourname&gt;</code>.
-   - If the portal offers to deploy the <strong>Machine Configuration prerequisites</strong>, accept.
-   - <strong>Parameters</strong>: set <strong>Include Arc connected servers</strong> to <strong>true</strong>.
-   - <strong>Review + create</strong> &gt; <strong>Create</strong>.</li>
+<li>Select <strong>Assign policy</strong>:<ul>
+<li><strong>Scope</strong>: your resource group <code>rg-presales-&lt;yourname&gt;</code>.</li>
+<li>If the portal offers to deploy the <strong>Machine Configuration prerequisites</strong>, accept.</li>
+<li><strong>Parameters</strong>: set <strong>Include Arc connected servers</strong> to <strong>true</strong>.</li>
+<li><strong>Review + create</strong> &gt; <strong>Create</strong>.</li>
+</ul>
+</li>
 <li>The first evaluation takes about <strong>30 minutes</strong>. Start Lab 5 and come back.</li>
 <li>Open <strong>Policy</strong> &gt; <strong>Compliance</strong> and select your assignment. Your server shows <strong>Compliant</strong> or <strong>Non-compliant</strong>.</li>
 <li>Select your server to see <strong>each rule</strong>, its expected value and its current value. Many will fail — the server still has default settings. Note the failing rules: Lab 9 fixes most of them.</li>

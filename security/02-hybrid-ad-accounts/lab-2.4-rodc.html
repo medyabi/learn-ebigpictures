@@ -15,7 +15,7 @@
 <header class="masthead">
   <a class="brand" href="../../index.html"><img src="../../assets/favicon.svg" alt="" width="24" height="24"><span>Windows Server Labs</span></a>
   <span class="divider" aria-hidden="true"></span>
-  <nav class="mainnav" aria-label="Main"><a href="../../hybrid/index.html">Hybrid</a><a href="../index.html" aria-current="true">Security</a><a href="../../azure-local/index.html">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
+  <nav class="mainnav" aria-label="Main"><a href="../../foundations/index.html">Foundations</a><a href="../../hybrid/index.html">Hybrid</a><a href="../index.html" aria-current="true">Security</a><a href="../../azure-local/index.html">Azure Local</a><a href="https://access.ebigpictures.com/">Lab access</a><a href="https://ai.ebigpictures.com/">AI Labs</a></nav>
   <a class="gh" href="https://github.com/medyabi" rel="noopener">GitHub</a>
 </header>
 <div class="doc has-toc">
@@ -23,7 +23,7 @@
 <main id="content" class="article">
 <nav class="crumbs" aria-label="Breadcrumb"><ol><li><a href="../../index.html">Labs</a></li><li><a href="../index.html">Security track</a></li><li><a href="index.html">Chapter 2</a></li></ol></nav>
 <article class="prose">
-<h1 id="lab-24-read-only-domain-controller-rodc">Lab 2.4: Read-only domain controller (RODC)</h1><p class="meta"><span>Lab</span><span>2 min read</span></p>
+<h1 id="lab-24-read-only-domain-controller-rodc">Lab 2.4: Read-only domain controller (RODC)</h1><p class="meta"><span class="level l300">Level 300</span><span>Lab</span><span>2 min read</span></p>
 <nav class="pager"><a href="lab-2.3-protected-users.html">← Lab 2.3</a> <a href="index.html">Chapter overview</a> <a href="lab-2.5-authentication-policy-silos.html">Lab 2.5 →</a></nav>
 <div class="table-wrap"><table>
 
@@ -68,11 +68,13 @@
 <p>The stolen RODC only holds hashes of branch users. The admin hashes were never there. You reset the cached passwords, delete the RODC computer object, and the damage stays small.</p>
 <h2 id="step-by-step">🧪 Step by step</h2>
 <ol>
-<li>On SEA-SVR2, install the role:</li>
-</ol>
+<li>
+<p>On SEA-SVR2, install the role:</p>
 <div class="codeblock"><div class="code-head"><span>PowerShell</span><button type="button" class="copy">Copy</button></div><pre><code>Install-WindowsFeature AD-Domain-Services -IncludeManagementTools</code></pre></div>
-<ol start="2">
-<li>In <strong>Server Manager</strong>, click the flag and choose <strong>Promote this server to a domain controller</strong>. Pick <strong>Add a domain controller to an existing domain</strong>.</li>
+</li>
+<li>
+<p>In <strong>Server Manager</strong>, click the flag and choose <strong>Promote this server to a domain controller</strong>. Pick <strong>Add a domain controller to an existing domain</strong>.</p>
+</li>
 <li>On <strong>Domain Controller Options</strong>, tick <strong>Read only domain controller (RODC)</strong> and set a DSRM password.</li>
 <li>On <strong>RODC Options</strong>, set <strong>Delegated administrator account</strong> to <strong>Adam</strong>. Adam becomes local admin of this RODC only.</li>
 <li>Under <strong>Accounts that are allowed to replicate passwords</strong>, add <strong>Accounting</strong>. Leave Administrators, Server Operators and the other admin groups in the <strong>denied</strong> list.</li>
